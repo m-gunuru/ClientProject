@@ -1,5 +1,51 @@
 public class LevelOutput{
-  
+  private String[][] dialogues;
+  private int currentLevel;
+  private int currentDialogueIndex;
+
+public void setLevel(int level) {
+        if (level >= 0 && level < dialogues.length) {
+            currentLevel = level;
+            currentDialogueIndex = 0;
+        } else {
+            throw new IllegalArgumentException("Invalid level: " + level);
+        }
+    }
+      
+
+  public String getCurrentDialogue(){
+    return dialogues[currentLevel][currentDialogueIndex];
+  }
+  public String nextDialogue(){
+    currentDialogueIndex++;
+    if(currentDialogueIndex>=dialogues[currentLevel).length){
+      return getCurrentDialogue();
+    } else {
+      return null; // Indicates end of dialogue
+    }
+  }
+  public boolean isDialogueFinished(){
+    return currentDialogueIndex == dialogues[currentLevel].length-1;
+  }
+  public void resetDialogue() {
+        currentDialogueIndex = 0;
+  }
+
+  public void addLevelDialogue(String[] newDialogue) {
+        String[][] newDialogues = new String[dialogues.length + 1][];
+        for (int i = 0; i < dialogues.length; i++) {
+            newDialogues[i] = dialogues[i];
+        }
+        newDialogues[newDialogues.length - 1] = newDialogue;
+        dialogues = newDialogues;
+ }
+  public int getCurrentLevel() {
+        return currentLevel;
+    }
+
+    public int getCurrentDialogueIndex() {
+        return currentDialogueIndex;
+    }
 
 
 
