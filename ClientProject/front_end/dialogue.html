@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #203162;
+      font-family: 'Press Start 2P';
+      color: white;
+    }
+
+   .dialogue-box {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 50px;
+  background-image: url('dialogue-box.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  text-align: center;
+  color: white;
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+
+    .dialogue-text {
+  margin-bottom: 20px;
+  font-size: 14px;
+  line-height: 1.75;
+  padding: 10px 20px;
+  background-color: transparent;
+}
+
+    .nextButton {
+      width: 41ch; 
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: .15em solid white;
+      animation: typing 4.5s steps(45) forwards, blink 1.25s infinite;
+      margin: 0 auto;
+      margin-top: -300px;
+      text-shadow: 3px 5px 1px #00000094;
+    }
+    .intro h2 {
+        text-align: center;
+        font-size: 25px;
+        
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 75%; }
+    }
+
+    @keyframes blink {
+      from { border-color: transparent; }
+      to { border-color: white; }
+    }
+
+
+  </style>
+</head>
+<body>
+  <div class="dialogue-box">
+    <div class="dialogue-text" id="dialogueText">Click below to begin the story...</div>
+    <button class="next-btn" onclick="nextDialogue()">Next</button>
+  </div>
+
+  <script>
+    const dialogues = [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ];
+
+    let currentIndex = 0;
+
+    function nextDialogue() {
+      const text = document.getElementById("dialogueText");
+
+      if (currentIndex < dialogues.length) {
+        text.textContent = dialogues[currentIndex];
+        currentIndex++;
+      } else {
+        text.textContent = "Scene complete ✨ Get ready for what’s next!";
+        document.querySelector(".next-btn").disabled = true;
+        document.querySelector(".next-btn").textContent = "Done";
+      }
+    }
+  </script>
+</body>
+</html>
