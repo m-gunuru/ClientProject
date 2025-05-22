@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #203162;
+      font-family: 'Press Start 2P';
+      color: white;
+    }
+
+    /* hero desgins the bg and title */
+    .hero {
+      background-image: url("bg1.png");
+      background-attachment: fixed;
+      background-size: cover;
+      background-position: top;
+      height: 1000px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: -250px;
+      font-size: 25px;
+      text-shadow: 3px 5px 2px #000000d7;
+    }
+
+    .hero h1 {
+      position: absolute;
+      top: 50px;
+      text-align: center;
+    }
+
+    /* intro desgins the text with the "typing effect" */
+    .intro {
+      width: 41ch; 
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: .15em solid white;
+      animation: typing 4.5s steps(45) forwards, blink 1.25s infinite;
+      margin: 0 auto;
+      margin-top: -550px;
+      text-shadow: 3px 5px 1px #00000094;
+    }
+    .intro h2 {
+      text-align: center;
+      font-size: 30px;
+        
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 90%; }
+    }
+
+    @keyframes blink {
+      from { border-color: transparent; }
+      to { border-color: white; }
+    }
+
+    /* designs the sign-up button */
+    .signUpB {
+      background-color: #1e518c;
+      color: #ffffff;
+      font-family: 'Press Start 2P';
+      font-size: 20px;
+      width: 175px;
+      height: 65px;
+      position: absolute;
+      text-align: center;
+      top: 40px;
+      left: 1250px;
+      border: 2px solid rgba(255, 255, 255, 0.778);
+      border-radius: 0; 
+      box-shadow: 4px 4px 0 #00000094; 
+      text-shadow: 2px 3px 2px #00000094;
+
+    }
+
+    /* log-in text boxes */
+    .log {
+      background-color: #1e518c;
+      color: white;
+      font-family: 'Press Start 2P';
+      font-size: 20px;
+      width: 350px;
+      height: 50px;
+      position: absolute;
+      border: 2px solid rgba(255, 255, 255, 0.778);
+      box-shadow: 4px 4px 0 #00000094; 
+      text-shadow: 2px 3px 2px #00000094;
+      text-align: center;
+      left: 550px;
+    }
+
+    .log::placeholder {
+      color: rgba(255, 255, 255, 0.68);
+    }
+    .logUser {
+      top: 300px;
+    }
+
+    .logPass{
+      top: 400px;
+    }
+
+
+
+  </style>
+</head>
+<body>
+  <div id="button-container"></div> 
+  <div id="user-container"></div> 
+  <div id="password-container"></div> 
+
+  <script src="FrontPage.js"></script> 
+
+
+  <div class="hero">
+    <h1>Rootbound</h1>
+  </div>
+  <div class="intro">
+    <h2>Welcome to the Latin and Greek Roots Game!</h2>
+  </div>
+</body>
+</html>
