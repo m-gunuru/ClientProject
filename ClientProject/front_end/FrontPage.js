@@ -9,7 +9,6 @@ signB.addEventListener('click', function () {
   window.location.href = 'SignInPage.html';
 });
 
-// append to container
 document.getElementById('button-container').appendChild(signB);
 
 
@@ -17,9 +16,6 @@ document.getElementById('button-container').appendChild(signB);
 const logUser = document.createElement('input');
 logUser.placeholder = 'Username';
 logUser.classList.add('log', 'logUser');
-
-
-// append to container
 document.getElementById('user-container').appendChild(logUser);
 
 
@@ -27,3 +23,15 @@ const logPass = document.createElement('input');
 logPass.placeholder = 'Password';
 logPass.classList.add('log', 'logPass');
 document.getElementById('password-container').appendChild(logPass);
+
+
+const logB = document.createElement('button');
+logB.textContent = 'Submit';
+logB.className = 'logB';
+
+
+document.getElementById('login-container').appendChild(logB);
+
+
+
+

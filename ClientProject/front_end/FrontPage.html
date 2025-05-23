@@ -18,7 +18,7 @@
 
     /* hero desgins the bg and title */
     .hero {
-      background-image: url("bg1.png");
+      background-image: url("image.png");
       background-attachment: fixed;
       background-size: cover;
       background-position: top;
@@ -33,8 +33,10 @@
     }
 
     .hero h1 {
+      width: 0;
       position: absolute;
       top: 50px;
+      left: 500px;
       text-align: center;
     }
 
@@ -111,14 +113,32 @@
       top: 400px;
     }
 
+    .logB {
+       background-color: #1e518c;
+      color: #ffffff;
+      font-family: 'Press Start 2P';
+      font-size: 20px;
+      width: 175px;
+      height: 65px;
+      position: absolute;
+      text-align: center;
+      top: 500px;
+      left: 640px;
+      border: 2px solid rgba(255, 255, 255, 0.778);
+      border-radius: 0; 
+      box-shadow: 4px 4px 0 #00000094; 
+      text-shadow: 2px 3px 2px #00000094;
+    }
 
 
+    
   </style>
 </head>
 <body>
   <div id="button-container"></div> 
   <div id="user-container"></div> 
   <div id="password-container"></div> 
+  <div id="login-container"></div>
 
   <script src="FrontPage.js"></script> 
 

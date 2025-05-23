@@ -16,7 +16,7 @@
     }
 
     .hero {
-      background-image: url("bg1.png");
+      background-image: url("image.png");
       background-attachment: fixed;
       background-size: cover;
       background-position: top;
@@ -30,18 +30,93 @@
       text-shadow: 3px 5px 2px #000000d7;
     }
 
+    .hero h6 {
+      color: rgb(255, 255, 255);
+      position: absolute;
+      top: 500px;
+      text-align: center;
+    }
+
     .hero h1 {
-      color: white;
+      color: rgb(255, 255, 255);
       position: absolute;
       top: 50px;
       text-align: center;
     }
 
+    /* email and code */
+    .createAcc {
+        background-color: #1e518c;
+        color: white;
+        font-family: 'Press Start 2P';
+        font-size: 20px;
+        width: 350px;
+        height: 50px;
+        position: absolute; /* Changed from relative */
+        border: 2px solid rgba(255, 255, 255, 0.778);
+        box-shadow: 4px 4px 0 #00000094; 
+        text-shadow: 2px 3px 2px #00000094;
+        text-align: center;
+        left: 550px;
+    }
+
+    .email {
+        top: 300px;
+    }
+
+    .emailCode {
+        top: 400px;
+    }
+
+    .submit {
+      background-color: #1e518c;
+      color: #ffffff;
+      font-family: 'Press Start 2P';
+      font-size: 20px;
+      width: 175px;
+      height: 65px;
+      position: absolute;
+      text-align: center;
+      top: 40px;
+      left: 1250px;
+      border: 2px solid rgba(255, 255, 255, 0.778);
+      border-radius: 0; 
+      box-shadow: 4px 4px 0 #00000094; 
+      text-shadow: 2px 3px 2px #00000094;
+    }
+
+    
+
   </style>
+
+  <!-- Firebase core library -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <!-- Firebase Auth (handles sign in, sign up, etc.) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
+  <script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCD_MdnDepCDnRYQqxf2hUehpxBhR5_aBo",
+    authDomain: "clientproject-eacce.firebaseapp.com",
+    projectId: "clientproject-eacce",
+    storageBucket: "clientproject-eacce.firebasestorage.app",
+    messagingSenderId: "460906541362",
+    appId: "1:460906541362:web:b095c8fd7ae35486cea72b",
+    measurementId: "G-JPGW0P68M7"
+  };
+  firebase.initializeApp(firebaseConfig);
+  </script>   
+
 </head>
 <body>
 <div class = "hero">
     <h1>Sign-Up</h1>
 </div>
+<div class="hero">
+    <h6>Please enter the code sent to your email</h6>
+</div>
+<div id ="userSign-container"> </div>
+<div id ="codeSign-container"> </div>
+<div id ="submit-container"> </div>
+<script src="SignUpPage.js"></script> 
 </body>
 </html>
