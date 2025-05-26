@@ -8,8 +8,9 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-let codeStore = {}; // Simple in-memory storage
+let codeStore = {}; 
 
+// generate n send code
 app.post('/send-code', (req, res) => {
   const { email } = req.body;
   const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -23,6 +24,7 @@ app.post('/send-code', (req, res) => {
     },
   });
 
+  // email note
   const mailOptions = {
     from: 'mohana.gunuru@gmail.com',
     to: email,
@@ -38,12 +40,15 @@ app.post('/send-code', (req, res) => {
 
 app.post('/verify-code', (req, res) => {
   const { email, code } = req.body;
+  const encodedEmail = encodeURIComponent(email);
   if (codeStore[email] === code) {
-    delete codeStore[email]; // One-time use
-    res.send({ verified: true });
+    delete codeStore[email]; 
+    res.send({ redirect: `http://localhost:5500/ClientProject/front_end/CreatePassword.html?email=${encodedEmail}` });
+
+
   } else {
-    res.send({ verified: false });
+    res.send({error: 'Code entered is incorrect. Please try again.' });
   }
 });
 
-app.listen(5500, () => console.log('Server running on port 5500'));
+app.listen(3000, () => console.log('Server running on port 3000'));

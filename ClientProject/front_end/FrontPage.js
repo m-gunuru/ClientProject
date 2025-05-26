@@ -28,10 +28,11 @@ document.getElementById('password-container').appendChild(logPass);
 const logB = document.createElement('button');
 logB.textContent = 'Submit';
 logB.className = 'logB';
-
-
 document.getElementById('login-container').appendChild(logB);
 
+logB.addEventListener('click', function() {
+  window.location.href = 'Dialogue.html';
+});
 
 
 
