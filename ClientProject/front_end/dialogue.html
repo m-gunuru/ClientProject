@@ -4,57 +4,59 @@
   <meta charset="UTF-8" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    html, body {
+      height: 100%;
     }
-
     body {
+      min-height: 100vh;
       background: #203162;
-      font-family: 'Press Start 2P';
+      font-family: 'Press Start 2P', monospace;
       color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
     }
-
     .dialogue-box {
-      max-width: 700px;
-      padding: 50px;
+      width: 90vw;
+      max-width: 950px;
+      min-height: 350px;
       background-image: url('Small%20Dialogue%20Box.png');
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
       text-align: center;
       color: white;
-      min-height: 250px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      margin: 0 auto;
+      align-items: center;
+      padding: 60px 40px 60px 40px;
+      box-shadow: 0 8px 40px 0 #0008;
     }
-
     .dialogue-text {
-      margin-bottom: 20px;
-      font-size: 14px;
-      line-height: 1.75;
-      padding: 10px 20px;
+      margin-bottom: 32px;
+      font-size: 1.2rem;
+      line-height: 2;
+      padding: 20px 24px;
       background-color: transparent;
+      word-break: break-word;
+      width: 100%;
     }
-
     .next-btn {
-      /* Remove previous centering/margin styles for button */
       width: auto;
       margin: 0;
       animation: none;
       border-right: none;
       text-shadow: 3px 5px 1px #00000094;
-      font-family: 'Press Start 2P';
+      font-family: 'Press Start 2P', monospace;
       background: #3a4fa0;
       color: white;
       border: 2px solid #fff;
-      padding: 16px 32px;
+      padding: 18px 44px;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 1rem;
       transition: background 0.2s;
     }
     .next-btn:disabled {
@@ -64,7 +66,6 @@
     .next-btn:hover:not(:disabled) {
       background: #1d2558;
     }
-
     @media (min-width: 768px) {
       .next-btn {
         position: fixed;
@@ -73,23 +74,14 @@
         z-index: 100;
       }
       .dialogue-box {
-        margin: 60px auto 0 auto;
+        width: 75vw;
+        min-height: 420px;
+        max-width: 1100px;
+        padding: 80px 60px 80px 60px;
       }
-    }
-
-    .intro h2 {
-      text-align: center;
-      font-size: 25px;
-    }
-
-    @keyframes typing {
-      from { width: 0; }
-      to { width: 75%; }
-    }
-
-    @keyframes blink {
-      from { border-color: transparent; }
-      to { border-color: white; }
+      .dialogue-text {
+        font-size: 1.4rem;
+      }
     }
   </style>
 </head>
@@ -98,21 +90,17 @@
     <div class="dialogue-text" id="dialogueText">Click below to begin the story...</div>
     <button class="next-btn" onclick="nextDialogue()">Next</button>
   </div>
-
   <script>
     const dialogues = [
-      "1",
-      "2",
-      "3",
-      "4",
-      "5"
+      "Welcome to the Latin and Greek roots adventure!",
+      "You'll learn etymology through interactive stories.",
+      "Each question helps unlock a new part of the tale.",
+      "Pay attention to the word roots you encounter.",
+      "Ready to begin your journey? Let's go!"
     ];
-
     let currentIndex = 0;
-
     function nextDialogue() {
       const text = document.getElementById("dialogueText");
-
       if (currentIndex < dialogues.length) {
         text.textContent = dialogues[currentIndex];
         currentIndex++;
