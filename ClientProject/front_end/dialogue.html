@@ -16,44 +16,70 @@
       color: white;
     }
 
-   .dialogue-box {
-  max-width: 700px;
-  padding: 50px;
-  background-image: url('Small%20Dialogue%20Box.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  text-align: center;
-  color: white;
-  min-height: 250px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
+    .dialogue-box {
+      max-width: 700px;
+      padding: 50px;
+      background-image: url('Small%20Dialogue%20Box.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      text-align: center;
+      color: white;
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin: 0 auto;
+    }
 
     .dialogue-text {
-  margin-bottom: 20px;
-  font-size: 14px;
-  line-height: 1.75;
-  padding: 10px 20px;
-  background-color: transparent;
-}
-
-    .nextButton {
-      width: 41ch; 
-      white-space: nowrap;
-      overflow: hidden;
-      border-right: .15em solid white;
-      animation: typing 4.5s steps(45) forwards, blink 1.25s infinite;
-      margin: 0 auto;
-      margin-top: -300px;
-      text-shadow: 3px 5px 1px #00000094;
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.75;
+      padding: 10px 20px;
+      background-color: transparent;
     }
+
+    .next-btn {
+      /* Remove previous centering/margin styles for button */
+      width: auto;
+      margin: 0;
+      animation: none;
+      border-right: none;
+      text-shadow: 3px 5px 1px #00000094;
+      font-family: 'Press Start 2P';
+      background: #3a4fa0;
+      color: white;
+      border: 2px solid #fff;
+      padding: 16px 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+    .next-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .next-btn:hover:not(:disabled) {
+      background: #1d2558;
+    }
+
+    @media (min-width: 768px) {
+      .next-btn {
+        position: fixed;
+        bottom: 40px;
+        right: 40px;
+        z-index: 100;
+      }
+      .dialogue-box {
+        margin: 60px auto 0 auto;
+      }
+    }
+
     .intro h2 {
-        text-align: center;
-        font-size: 25px;
-        
+      text-align: center;
+      font-size: 25px;
     }
 
     @keyframes typing {
@@ -65,8 +91,6 @@
       from { border-color: transparent; }
       to { border-color: white; }
     }
-
-
   </style>
 </head>
 <body>
