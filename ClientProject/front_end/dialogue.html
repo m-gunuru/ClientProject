@@ -158,23 +158,18 @@
   </style>
 </head>
 <body>
-<!-- Popup box (initially hidden) -->
-<div class="popup-box" id="popupBox">
-  <div class="popup-content">
-    <label style="display: flex; align-items: center; font-size: 1rem;">
-      <input type="checkbox" id="cb1" style="margin-right: 12px;">
-      Molly wants to <b>construct</b> a barn.
-    </label>
-    <label style="display: flex; align-items: center; font-size: 1rem; margin-top:8px;">
-      <input type="checkbox" id="cb2" style="margin-right: 12px;">
-      Jane wants the town to <b>construct</b> a community center.
-    </label>
-    <label style="display: flex; align-items: center; font-size: 1rem; margin-top:8px;">
-      <input type="checkbox" id="cb3" style="margin-right: 12px;">
-      Paul used an organizer to <b>construct</b> his essay.
-    </label>
-  </div>
-</div>
+  <div class="dialogue-container">
+    <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/PebbleMouthClosed.png" class="character left-character" id="pebble" />
+    <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/HamMouthClosed.png" class="character right-character" id="ham" />
+
+    <!-- Popup box (initially hidden) -->
+    <div class="popup-box" id="popupBox">
+      <div class="popup-content">
+        <label style="display: flex; align-items: center; font-size: 1rem;">
+          <input type="checkbox" id="popupCheckbox" style="margin-right: 12px;"> Check me!
+        </label>
+      </div>
+    </div>
 
     <div class="dialogue-box">
       <div class="speaker-name" id="speakerName">Click to Start</div>
@@ -196,60 +191,45 @@
     let currentIndex = 0;
 
     function nextDialogue() {
-  const text = document.getElementById("dialogueText");
-  const speaker = document.getElementById("speakerName");
-  const pebbleImg = document.getElementById("pebble");
-  const hamImg = document.getElementById("ham");
-  const btn = document.getElementById("nextBtn");
-  const popupBox = document.getElementById("popupBox");
+      const text = document.getElementById("dialogueText");
+      const speaker = document.getElementById("speakerName");
+      const pebbleImg = document.getElementById("pebble");
+      const hamImg = document.getElementById("ham");
+      const btn = document.getElementById("nextBtn");
+      const popupBox = document.getElementById("popupBox");
 
-  // If the popup is visible, check checkboxes before proceeding
-  if (popupBox.style.display === "block") {
-    const allChecked = document.getElementById('cb1').checked &&
-                      document.getElementById('cb2').checked &&
-                      document.getElementById('cb3').checked;
-    speaker.textContent = "Ham";
-    text.textContent = allChecked ? "yes" : "no";
-    popupBox.style.display = "none";
-    // Do not increment currentIndex, so user can try again if they want
-    return;
-  }
+      if (currentIndex < dialogues.length) {
+        const current = dialogues[currentIndex];
+        text.textContent = current.text;
+        speaker.textContent = current.speaker;
 
-  if (currentIndex < dialogues.length) {
-    const current = dialogues[currentIndex];
-    text.textContent = current.text;
-    speaker.textContent = current.speaker;
+        if (current.speaker === "Pebble") {
+          pebbleImg.classList.add("active");
+          hamImg.classList.remove("active");
+        } else {
+          pebbleImg.classList.remove("active");
+          hamImg.classList.add("active");
+        }
 
-    if (current.speaker === "Pebble") {
-      pebbleImg.classList.add("active");
-      hamImg.classList.remove("active");
-    } else {
-      pebbleImg.classList.remove("active");
-      hamImg.classList.add("active");
+        // Show/hide popup depending on dialogue trait
+        if (current.popup) {
+          popupBox.style.display = "block";
+        } else {
+          popupBox.style.display = "none";
+          document.getElementById("popupCheckbox").checked = false;
+        }
+
+        currentIndex++;
+      } else {
+        text.textContent = "End of the convo! 💬✨";
+        speaker.textContent = "";
+        btn.disabled = true;
+        btn.textContent = "Done";
+        pebbleImg.classList.add("active");
+        hamImg.classList.add("active");
+        popupBox.style.display = "none";
+      }
     }
-
-    // Show/hide popup depending on dialogue trait
-    if (current.popup) {
-      popupBox.style.display = "block";
-      // Uncheck all on show
-      document.getElementById('cb1').checked = false;
-      document.getElementById('cb2').checked = false;
-      document.getElementById('cb3').checked = false;
-    } else {
-      popupBox.style.display = "none";
-    }
-
-    currentIndex++;
-  } else {
-    text.textContent = "End of the convo! 💬✨";
-    speaker.textContent = "";
-    btn.disabled = true;
-    btn.textContent = "Done";
-    pebbleImg.classList.add("active");
-    hamImg.classList.add("active");
-    popupBox.style.display = "none";
-  }
-}
   </script>
 </body>
 </html>
