@@ -29,6 +29,7 @@
       user-select: none;
       pointer-events: none;
       z-index: 1;
+      opacity: 0.3; /* default faded */
     }
 
     .left-character {
@@ -42,7 +43,7 @@
 
     .dialogue-box {
       position: absolute;
-      bottom: 100px; /* lifted a bit higher */
+      bottom: 110px; /* lifted a bit */
       left: 50%;
       transform: translateX(-50%);
       width: 85vw;
@@ -123,7 +124,7 @@
   <div class="dialogue-container">
     <img 
       src="https://raw.githubusercontent.com/m-gunuru/ClientProject/test/ClientProject/front_end/PebbleMouthClosed.png"
-      class="character left-character" id="pebble" alt="Pebble" />
+      class="character left-character" id="pebble" alt="Pebble" style="opacity: 1;" />
     
     <img 
       src="https://raw.githubusercontent.com/m-gunuru/ClientProject/test/ClientProject/front_end/HamMouthClosed.png"
