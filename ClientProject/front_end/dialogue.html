@@ -18,14 +18,11 @@
       width: 100vw;
       height: 100vh;
       position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
     }
 
     .character {
       position: absolute;
-      bottom: 90px;
+      bottom: 80px;
       height: 580px;
       object-fit: contain;
       transition: opacity 0.2s;
@@ -45,7 +42,9 @@
 
     .dialogue-box {
       position: absolute;
-      bottom: 48px; /* LIFTED UP slightly */
+      bottom: 100px; /* lifted a bit higher */
+      left: 50%;
+      transform: translateX(-50%);
       width: 85vw;
       max-width: 1000px;
       background: rgba(0, 0, 0, 0.7);
@@ -74,7 +73,7 @@
 
     .next-btn {
       position: absolute;
-      bottom: 16px; /* Back to corner */
+      bottom: 20px;
       right: 32px;
       background: #3a4fa0;
       color: white;
@@ -98,4 +97,87 @@
       background: #1d2558;
     }
 
-    @media (max-width:
+    @media (max-width: 900px) {
+      .character {
+        height: 300px;
+        bottom: 70px;
+      }
+
+      .next-btn {
+        font-size: 0.75rem;
+        padding: 10px 20px;
+        right: 20px;
+        bottom: 16px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .character {
+        height: 200px;
+        bottom: 50px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dialogue-container">
+    <img 
+      src="https://raw.githubusercontent.com/m-gunuru/ClientProject/test/ClientProject/front_end/PebbleMouthClosed.png"
+      class="character left-character" id="pebble" alt="Pebble" />
+    
+    <img 
+      src="https://raw.githubusercontent.com/m-gunuru/ClientProject/test/ClientProject/front_end/HamMouthClosed.png"
+      class="character right-character" id="ham" alt="Ham" />
+
+    <div class="dialogue-box">
+      <div class="speaker-name" id="speakerName">Click to Start</div>
+      <div class="dialogue-text" id="dialogueText">Click below to begin the story...</div>
+    </div>
+
+    <button class="next-btn" onclick="nextDialogue()" id="nextBtn">Next</button>
+  </div>
+
+  <script>
+    const dialogues = [
+      { speaker: "Pebble", text: "P1" },
+      { speaker: "Pebble", text: "P2" },
+      { speaker: "Ham", text: "H3" },
+      { speaker: "Pebble", text: "P4" },
+      { speaker: "Ham", text: "H5" },
+    ];
+
+    let currentIndex = 0;
+
+    function nextDialogue() {
+      const text = document.getElementById("dialogueText");
+      const speaker = document.getElementById("speakerName");
+      const pebbleImg = document.getElementById("pebble");
+      const hamImg = document.getElementById("ham");
+      const btn = document.getElementById("nextBtn");
+
+      if (currentIndex < dialogues.length) {
+        const current = dialogues[currentIndex];
+        text.textContent = current.text;
+        speaker.textContent = current.speaker;
+
+        if (current.speaker === "Pebble") {
+          pebbleImg.style.opacity = 1;
+          hamImg.style.opacity = 0.3;
+        } else {
+          pebbleImg.style.opacity = 0.3;
+          hamImg.style.opacity = 1;
+        }
+
+        currentIndex++;
+      } else {
+        text.textContent = "End of the convo! 💬✨";
+        speaker.textContent = "";
+        btn.disabled = true;
+        btn.textContent = "Done";
+        pebbleImg.style.opacity = 1;
+        hamImg.style.opacity = 1;
+      }
+    }
+  </script>
+</body>
+</html>
