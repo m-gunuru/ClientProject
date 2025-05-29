@@ -6,22 +6,21 @@
   <style>
     html, body {
       height: 100%;
+      margin: 0;
     }
     body {
-      min-height: 100vh;
       background: #203162;
       font-family: 'Press Start 2P', monospace;
       color: white;
       display: flex;
       justify-content: center;
       align-items: center;
-      margin: 0;
     }
     .dialogue-container {
       position: relative;
       width: 90vw;
-      max-width: 950px;
-      min-height: 350px;
+      max-width: 1100px;
+      min-height: 420px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -30,34 +29,48 @@
       width: 100%;
       height: auto;
       display: block;
-      max-width: 950px;
-      min-height: 350px;
-      object-fit: contain;
     }
-  .dialogue-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #fff;
-    font-size: 1.2rem;
-    line-height: 2;
-    text-align: center;
-    pointer-events: none;
-    background: none;         /* No background */
-    border: none;             /* No border */
-    width: auto;              /* Shrink to fit */
-    min-width: 0;             /* Allow shrinking */
-    padding: 0 8px;           /* Minimal padding for readability */
-    word-break: break-word;
-    text-shadow: 1px 1px 3px #000, 0px 0px 2px #000; /* Keep text visible */
-}
+    .character {
+      position: absolute;
+      bottom: 20px;
+      width: 200px;
+      height: auto;
+    }
+    .left-character {
+      left: 20px;
+    }
+    .right-character {
+      right: 20px;
+    }
+    .dialogue-text {
+      position: absolute;
+      bottom: 140px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #fff;
+      font-size: 1.2rem;
+      line-height: 2;
+      text-align: center;
+      pointer-events: none;
+      background: none;
+      border: none;
+      width: 80%;
+      text-shadow: 1px 1px 3px #000, 0px 0px 2px #000;
+    }
+    .speaker-name {
+      position: absolute;
+      bottom: 220px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1rem;
+      color: #ffeb3b;
+      text-shadow: 2px 2px #000;
+    }
     .next-btn {
       position: absolute;
       bottom: 40px;
       right: 40px;
       z-index: 2;
-      width: auto;
       background: #3a4fa0;
       color: white;
       border: 2px solid #fff;
@@ -76,47 +89,57 @@
     .next-btn:hover:not(:disabled) {
       background: #1d2558;
     }
-    @media (min-width: 768px) {
-      .dialogue-container {
-        width: 75vw;
-        min-height: 420px;
-        max-width: 1100px;
-      }
-      .dialogue-image {
-        max-width: 1100px;
-        min-height: 420px;
-      }
-      .dialogue-text {
-        font-size: 1.4rem;
-      }
-    }
   </style>
 </head>
 <body>
   <div class="dialogue-container">
     <img src="Small Dialogue Box.png" alt="Small Dialogue Box" class="dialogue-image" />
+    <img src="PebbleMouthClosed.png" class="character left-character" id="pebble" />
+    <img src="HamMouthClosed.png" class="character right-character" id="ham" />
+    <div class="speaker-name" id="speakerName">Click to Start</div>
     <div class="dialogue-text" id="dialogueText">Click below to begin the story...</div>
     <button class="next-btn" onclick="nextDialogue()" id="nextBtn">Next</button>
   </div>
   <script>
     const dialogues = [
-      "Welcome to the Latin and Greek roots adventure!",
-      "You'll learn etymology through interactive stories.",
-      "Each question helps unlock a new part of the tale.",
-      "Pay attention to the word roots you encounter.",
-      "Ready to begin your journey? Let's go!"
+      { speaker: "Pebble", text: "P1" },
+      { speaker: "Pebble", text: "P2" },
+      { speaker: "Ham", text: "H3" },
+      { speaker: "Pebble", text: "P4" },
+      { speaker: "Ham", text: "H5" },
     ];
+
     let currentIndex = 0;
+
     function nextDialogue() {
       const text = document.getElementById("dialogueText");
+      const speaker = document.getElementById("speakerName");
+      const pebbleImg = document.getElementById("pebble");
+      const hamImg = document.getElementById("ham");
       const btn = document.getElementById("nextBtn");
+
       if (currentIndex < dialogues.length) {
-        text.textContent = dialogues[currentIndex];
+        const current = dialogues[currentIndex];
+        text.textContent = current.text;
+        speaker.textContent = current.speaker;
+
+        // Show who is talking by adjusting opacity
+        if (current.speaker === "Pebble") {
+          pebbleImg.style.opacity = 1;
+          hamImg.style.opacity = 0.4;
+        } else {
+          pebbleImg.style.opacity = 0.4;
+          hamImg.style.opacity = 1;
+        }
+
         currentIndex++;
       } else {
-        text.textContent = "Finished";
+        text.textContent = "The end of their convo! 💬✨";
+        speaker.textContent = "";
         btn.disabled = true;
         btn.textContent = "Done";
+        pebbleImg.style.opacity = 1;
+        hamImg.style.opacity = 1;
       }
     }
   </script>
