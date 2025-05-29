@@ -22,23 +22,25 @@
 
     .character {
       position: absolute;
-      bottom: 80px;
-      height: 580px;
+      bottom: 0;            /* changed from 80px to 0 */
+      height: 320px;        /* smaller height like Code 2 */
       object-fit: contain;
       transition: opacity 0.2s;
       user-select: none;
       pointer-events: none;
       z-index: 1;
       opacity: 0.3; /* default faded */
+      transform: none;      /* remove flipping */
     }
 
     .left-character {
-      left: 30px;
-      transform: scaleX(-1);
+      left: 0;              /* moved closer to edge */
     }
 
     .right-character {
       right: 30px;
+      bottom: 0;
+      height: 320px;
     }
 
     .dialogue-box {
@@ -122,12 +124,11 @@
 </head>
 <body>
   <div class="dialogue-container">
-   -- Pebble on the left -->
+    <!-- Pebble on the left -->
     <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/PebbleMouthClosed.png" class="character left-character" id="pebble" />
 
     <!-- Ham on the right -->
     <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/HamMouthClosed.png" class="character right-character" id="ham" />
-
 
     <div class="dialogue-box">
       <div class="speaker-name" id="speakerName">Click to Start</div>
