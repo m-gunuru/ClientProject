@@ -20,35 +20,39 @@
       position: relative;
     }
 
-    @keyframes talk-bounce {
-      0%, 100% {
-        transform: scale(1.05);
-      }
-      50% {
-        transform: scale(1.1);
-      }
-    }
-
     .character {
       position: absolute;
-      bottom: 0;
+      bottom: 0;           
       object-fit: contain;
-      transition: opacity 0.2s, height 0.2s;
+      transition: opacity 0.2s, height 0.2s, transform 0.3s ease;
       user-select: none;
       pointer-events: none;
       z-index: 1;
       opacity: 0.3;
-      transform: none;
+      transform: none; 
     }
 
     .character.active {
       opacity: 1;
       z-index: 2;
-      animation: talk-bounce 0.5s infinite ease-in-out;
+    }
+
+    /* Bounce animation for talking */
+    @keyframes bounce-talk {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.15) translateY(-15px); }
+      50% { transform: scale(1.1) translateY(0); }
+      70% { transform: scale(1.15) translateY(-8px); }
+      100% { transform: scale(1) translateY(0); }
+    }
+
+    .character.active.talking {
+      animation: bounce-talk 0.6s ease forwards;
+      opacity: 1 !important;
     }
 
     .left-character {
-      left: 0;
+      left: 0;        
       height: 520px; /* Pebble slightly bigger */
     }
 
@@ -64,7 +68,7 @@
 
     .dialogue-box {
       position: absolute;
-      bottom: 20px;
+      bottom: 20px; 
       left: 50%;
       transform: translateX(-50%);
       width: 85vw;
@@ -214,32 +218,55 @@
   let currentIndex = 0;
   let popupSubmitted = false;
 
+  const textElem = document.getElementById("dialogueText");
+  const speakerElem = document.getElementById("speakerName");
+  const pebbleImg = document.getElementById("pebble");
+  const hamImg = document.getElementById("ham");
+  const popupBox = document.getElementById("popupBox");
+  const backBtn = document.getElementById("backBtn");
+  const nextBtn = document.getElementById("nextBtn");
+
+  let typingTimeout;
+
+  function typeText(text, i = 0) {
+    if (i < text.length) {
+      textElem.textContent += text.charAt(i);
+      typingTimeout = setTimeout(() => typeText(text, i + 1), 120);
+    } else {
+      nextBtn.disabled = currentIndex >= dialogues.length - 1;
+    }
+  }
+
   function updateDialogue(index) {
-    const text = document.getElementById("dialogueText");
-    const speaker = document.getElementById("speakerName");
-    const pebbleImg = document.getElementById("pebble");
-    const hamImg = document.getElementById("ham");
-    const popupBox = document.getElementById("popupBox");
-    const backBtn = document.getElementById("backBtn");
-    const nextBtn = document.getElementById("nextBtn");
+    clearTimeout(typingTimeout);
 
     const current = dialogues[index];
-    text.textContent = current.text;
-    speaker.textContent = current.speaker;
+    speakerElem.textContent = current.speaker;
 
-    pebbleImg.classList.toggle("active", current.speaker === "Pebble");
-    hamImg.classList.toggle("active", current.speaker === "Ham");
+    backBtn.disabled = index === 0;
 
     if (current.popup && !popupSubmitted) {
       popupBox.style.display = "block";
       nextBtn.disabled = true;
+      textElem.textContent = ""; // Clear text waiting for popup
+      document.querySelectorAll(".popupCheckbox").forEach(cb => cb.checked = false);
     } else {
       popupBox.style.display = "none";
-      document.querySelectorAll(".popupCheckbox").forEach(cb => cb.checked = false);
-      nextBtn.disabled = index >= dialogues.length - 1;
+      nextBtn.disabled = true; // Disable while typing
+      textElem.textContent = "";
+      typeText(current.text);
     }
 
-    backBtn.disabled = index === 0;
+    // Remove all active and talking classes first
+    pebbleImg.classList.remove("active", "talking");
+    hamImg.classList.remove("active", "talking");
+
+    // Add active and talking to current speaker to trigger bounce + scale
+    if (current.speaker === "Pebble") {
+      pebbleImg.classList.add("active", "talking");
+    } else if (current.speaker === "Ham") {
+      hamImg.classList.add("active", "talking");
+    }
   }
 
   function nextDialogue() {
@@ -268,19 +295,16 @@
       }
     });
 
-    const text = document.getElementById("dialogueText");
-    const speaker = document.getElementById("speakerName");
-
     if (allCorrect) {
-      speaker.textContent = "Ham";
-      text.textContent = "Correct ✅";
+      speakerElem.textContent = "Ham";
+      textElem.textContent = "Correct ✅";
       popupSubmitted = true;
       setTimeout(() => {
         nextDialogue();
       }, 1000);
     } else {
-      speaker.textContent = "Ham";
-      text.textContent = "Wrong ❌ Try again!";
+      speakerElem.textContent = "Ham";
+      textElem.textContent = "Wrong ❌ Try again!";
     }
   }
 
