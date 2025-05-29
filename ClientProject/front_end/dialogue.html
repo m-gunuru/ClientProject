@@ -166,8 +166,7 @@
       }
     }
   </style>
-</head>
-<body>
+</head><body>
   <div class="dialogue-container">
     <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/PebbleMouthClosed.png" class="character left-character" id="pebble" />
     <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/HamMouthClosed.png" class="character right-character" id="ham" />
@@ -202,6 +201,7 @@
     ];
 
     let currentIndex = 0;
+    let allowNext = true;
 
     function updateDialogue(index) {
       const text = document.getElementById("dialogueText");
@@ -221,17 +221,20 @@
 
       if (current.popup) {
         popupBox.style.display = "block";
+        nextBtn.disabled = true;
+        allowNext = false;
       } else {
         popupBox.style.display = "none";
         document.querySelectorAll(".popupCheckbox").forEach(cb => cb.checked = false);
+        allowNext = true;
+        nextBtn.disabled = currentIndex >= dialogues.length - 1;
       }
 
       backBtn.disabled = index === 0;
-      nextBtn.disabled = index >= dialogues.length - 1;
     }
 
     function nextDialogue() {
-      if (currentIndex < dialogues.length - 1) {
+      if (allowNext && currentIndex < dialogues.length - 1) {
         currentIndex++;
         updateDialogue(currentIndex);
       }
@@ -257,9 +260,16 @@
       const speaker = document.getElementById("speakerName");
       speaker.textContent = "Ham";
       text.textContent = allCorrect ? "Correct ✅" : "Wrong ❌ Try again!";
+
+      if (allCorrect) {
+        allowNext = true;
+        document.getElementById("nextBtn").disabled = false;
+        document.getElementById("popupBox").style.display = "none";
+      }
     }
 
     window.onload = () => updateDialogue(currentIndex);
   </script>
 </body>
 </html>
+
