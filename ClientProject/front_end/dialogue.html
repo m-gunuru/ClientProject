@@ -1,95 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dialogue - Construct Usage</title>
+  <meta charset="UTF-8" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: url('image0.png') center center / cover no-repeat;
+      font-family: 'Press Start 2P', monospace;
+      color: white;
+      overflow: hidden;
     }
+
     .dialogue-container {
-      max-width: 600px;
-      margin: 40px auto;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-      padding: 32px 32px 24px 32px;
+      width: 100vw;
+      height: 100vh;
+      position: relative;
     }
-    .checkbox-list {
-      margin-bottom: 32px;
+
+    .character {
+      position: absolute;
+      bottom: 0;           
+      height: 320px;        
+      object-fit: contain;
+      transition: opacity 0.2s, height 0.2s;
+      user-select: none;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.3;
+      transform: none; 
     }
-    .checkbox-item {
-      display: flex;
-      align-items: flex-start;
-      margin-bottom: 20px;
-      font-size: 1.15em;
+
+    .character.active {
+      height: 500px;
+      opacity: 1;
+      z-index: 2;
     }
-    .checkbox-item input[type="checkbox"] {
-      width: 26px;
-      height: 26px;
-      margin-right: 18px;
-      accent-color: #5a8dee;
+
+    .left-character {
+      left: 0;        
     }
-    .character-box {
-      margin-top: 26px;
-      background: #e6f2ff;
+
+    .right-character {
+      right: 30px;
+      bottom: 0;
+      height: 320px;
+    }
+
+    .dialogue-box {
+      position: absolute;
+      bottom: 50px; 
+      left: 50%;
+      transform: translateX(-50%);
+      width: 85vw;
+      max-width: 1000px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 24px 32px 60px;
+      border: 2.5px solid #fff;
+      border-radius: 18px;
+      box-shadow: 0 -4px 16px #000a;
+      z-index: 2;
+    }
+    /* Popup box styling */
+    .popup-box {
+      position: absolute;
+      left: 50%;
+      bottom: 180px; /* Above the dialogue box */
+      transform: translateX(-50%);
+      width: 85vw;
+      max-width: 1000px;
+      background: rgba(0, 0, 0, 0.85);
+      padding: 32px 32px 32px;
+      border: 2.5px solid #fff;
+      border-radius: 18px;
+      box-shadow: 0 -4px 24px #000a;
+      z-index: 3;
+      display: none;
+    }
+
+    .speaker-name {
+      font-size: 1rem;
+      color: #ffeb3b;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px #000;
+      letter-spacing: 2px;
+    }
+
+    .dialogue-text {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #fff;
+      text-shadow: 1px 1px 3px #000;
+      min-height: 2em;
+    }
+
+    .next-btn {
+      position: absolute;
+      bottom: 20px;
+      right: 32px;
+      background: #3a4fa0;
+      color: white;
+      border: 2px solid #fff;
+      padding: 12px 34px;
       border-radius: 8px;
-      padding: 20px;
-      font-size: 1.13em;
-      min-height: 52px;
-      border: 2px solid #5a8dee;
-      display: flex;
-      align-items: center;
+      cursor: pointer;
+      font-size: 1rem;
+      font-family: 'Press Start 2P', monospace;
+      text-shadow: 3px 5px 1px #00000094;
+      transition: background 0.2s;
+      z-index: 3;
     }
-    .character-name {
-      font-weight: bold;
-      margin-right: 10px;
-      color: #2d5586;
+
+    .next-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .next-btn:hover:not(:disabled) {
+      background: #1d2558;
+    }
+
+    @media (max-width: 900px) {
+      .character {
+        height: 300px;
+        bottom: 70px;
+      }
+      .character.active {
+        height: 400px;
+      }
+      .next-btn {
+        font-size: 0.75rem;
+        padding: 10px 20px;
+        right: 20px;
+        bottom: 16px;
+      }
+      .popup-box {
+        bottom: 150px;
+        padding: 18px 10px 18px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .character {
+        height: 200px;
+        bottom: 50px;
+      }
+      .character.active {
+        height: 300px;
+      }
+      .popup-box {
+        bottom: 110px;
+        padding: 10px 3vw 10px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="dialogue-container">
-    <div class="checkbox-list">
-      <div class="checkbox-item">
-        <input type="checkbox" id="cb1">
-        <label for="cb1">Molly wants to ____ a barn.</label>
-      </div>
-      <div class="checkbox-item">
-        <input type="checkbox" id="cb2">
-        <label for="cb2">Jane wants the town to ____ a community center.</label>
-      </div>
-      <div class="checkbox-item">
-        <input type="checkbox" id="cb3">
-        <label for="cb3">Paul used an organizer to ____ his essay.</label>
-      </div>
-    </div>
-    <div class="character-box" id="charBox">
-      <span class="character-name">Ham:</span>
-      <span id="charText">Let's try the following</span>
-    </div>
-  </div>
-  <script>
-    const checkboxes = [
-      document.getElementById('cb1'),
-      document.getElementById('cb2'),
-      document.getElementById('cb3')
-    ];
-    const charBox = document.getElementById('charBox');
-    const charText = document.getElementById('charText');
+    <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/PebbleMouthClosed.png" class="character left-character" id="pebble" />
+    <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/HamMouthClosed.png" class="character right-character" id="ham" />
 
-    function updateCharBox() {
-      if (checkboxes.every(cb => cb.checked)) {
-        charText.textContent = 'Correct';
+    <!-- Popup box (initially hidden) -->
+    <div class="popup-box" id="popupBox">
+      <div class="popup-content">
+        <label style="display: flex; align-items: center; font-size: 1rem;">
+          <input type="checkbox" id="popupCheckbox" style="margin-right: 12px;"> Check me!
+        </label>
+      </div>
+    </div>
+
+    <div class="dialogue-box">
+      <div class="speaker-name" id="speakerName">Click to Start</div>
+      <div class="dialogue-text" id="dialogueText">Click below to begin the story...</div>
+    </div>
+
+    <button class="next-btn" onclick="nextDialogue()" id="nextBtn">Next</button>
+  </div>
+
+  <script>
+    const dialogues = [
+      { speaker: "Pebble", text: "P1" },
+      { speaker: "Pebble", text: "P2", popup: true }, // Example with popup
+      { speaker: "Ham", text: "H3" },
+      { speaker: "Pebble", text: "P4" },
+      { speaker: "Ham", text: "H5", popup: true } // Another popup example
+    ];
+
+    let currentIndex = 0;
+
+    function nextDialogue() {
+      const text = document.getElementById("dialogueText");
+      const speaker = document.getElementById("speakerName");
+      const pebbleImg = document.getElementById("pebble");
+      const hamImg = document.getElementById("ham");
+      const btn = document.getElementById("nextBtn");
+      const popupBox = document.getElementById("popupBox");
+
+      if (currentIndex < dialogues.length) {
+        const current = dialogues[currentIndex];
+        text.textContent = current.text;
+        speaker.textContent = current.speaker;
+
+        if (current.speaker === "Pebble") {
+          pebbleImg.classList.add("active");
+          hamImg.classList.remove("active");
+        } else {
+          pebbleImg.classList.remove("active");
+          hamImg.classList.add("active");
+        }
+
+        // Show/hide popup depending on dialogue trait
+        if (current.popup) {
+          popupBox.style.display = "block";
+        } else {
+          popupBox.style.display = "none";
+          document.getElementById("popupCheckbox").checked = false;
+        }
+
+        currentIndex++;
       } else {
-        charText.textContent = 'Incorrect';
+        text.textContent = "End of the convo! 💬✨";
+        speaker.textContent = "";
+        btn.disabled = true;
+        btn.textContent = "Done";
+        pebbleImg.classList.add("active");
+        hamImg.classList.add("active");
+        popupBox.style.display = "none";
       }
     }
-
-    checkboxes.forEach(cb => {
-      cb.addEventListener('change', updateCharBox);
-    });
   </script>
 </body>
 </html>
