@@ -25,59 +25,49 @@
       justify-content: center;
       align-items: center;
     }
-    .dialogue-image {
-      width: 100%;
-      height: auto;
-      display: block;
+    .dialogue-box {
+      position: absolute;
+      bottom: 40px;
+      width: 70%;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 12px 24px;
+      border: 2px solid #fff;
+      border-radius: 10px;
+      text-align: center;
     }
     .character {
       position: absolute;
-      bottom: 20px;
-      width: 200px;
-      height: auto;
+      bottom: 0;
+      height: 320px;
+      object-fit: contain;
     }
     .left-character {
-      left: 20px;
+      left: 0;
     }
     .right-character {
-      right: 20px;
+      right: 0;
     }
     .dialogue-text {
-      position: absolute;
-      bottom: 140px;
-      left: 50%;
-      transform: translateX(-50%);
+      font-size: 1rem;
+      line-height: 1.7;
       color: #fff;
-      font-size: 1.2rem;
-      line-height: 2;
-      text-align: center;
-      pointer-events: none;
-      background: none;
-      border: none;
-      width: 80%;
-      text-shadow: 1px 1px 3px #000, 0px 0px 2px #000;
+      text-shadow: 1px 1px 3px #000;
     }
     .speaker-name {
-      position: absolute;
-      bottom: 220px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1rem;
+      font-size: 0.75rem;
       color: #ffeb3b;
+      margin-bottom: 6px;
       text-shadow: 2px 2px #000;
     }
     .next-btn {
-      position: absolute;
-      bottom: 40px;
-      right: 40px;
-      z-index: 2;
+      margin-top: 12px;
       background: #3a4fa0;
       color: white;
       border: 2px solid #fff;
-      padding: 18px 44px;
-      border-radius: 8px;
+      padding: 10px 30px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 0.8rem;
       font-family: 'Press Start 2P', monospace;
       text-shadow: 3px 5px 1px #00000094;
       transition: background 0.2s;
@@ -93,13 +83,20 @@
 </head>
 <body>
   <div class="dialogue-container">
-    <img src="Small Dialogue Box.png" alt="Small Dialogue Box" class="dialogue-image" />
-    <img src="Pebble Mouth Closed.png" class="character left-character" id="pebble" />
-    <img src="Ham Mouth Closed.png" class="character right-character" id="ham" />
-    <div class="speaker-name" id="speakerName">Click to Start</div>
-    <div class="dialogue-text" id="dialogueText">Click below to begin the story...</div>
-    <button class="next-btn" onclick="nextDialogue()" id="nextBtn">Next</button>
+    <!-- Pebble on the left -->
+    <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/refs/heads/Test/ClientProject/front_end/PebbleMouthClosed.png" class="character left-character" id="pebble" />
+    
+    <!-- Ham on the right — image must be in same folder as HTML -->
+    <img src="HamMouthClosed.png" class="character right-character" id="ham" />
+
+    <!-- Dialogue box -->
+    <div class="dialogue-box">
+      <div class="speaker-name" id="speakerName">Click to Start</div>
+      <div class="dialogue-text" id="dialogueText">Click below to begin the story...</div>
+      <button class="next-btn" onclick="nextDialogue()" id="nextBtn">Next</button>
+    </div>
   </div>
+
   <script>
     const dialogues = [
       { speaker: "Pebble", text: "P1" },
@@ -123,18 +120,18 @@
         text.textContent = current.text;
         speaker.textContent = current.speaker;
 
-        // Show who is talking by adjusting opacity
+        // Highlight who’s speaking (the dramaaa)
         if (current.speaker === "Pebble") {
           pebbleImg.style.opacity = 1;
-          hamImg.style.opacity = 0.4;
+          hamImg.style.opacity = 0.3;
         } else {
-          pebbleImg.style.opacity = 0.4;
+          pebbleImg.style.opacity = 0.3;
           hamImg.style.opacity = 1;
         }
 
         currentIndex++;
       } else {
-        text.textContent = "The end of their convo! 💬✨";
+        text.textContent = "End of the convo! 💬✨";
         speaker.textContent = "";
         btn.disabled = true;
         btn.textContent = "Done";
