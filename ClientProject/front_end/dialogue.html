@@ -191,85 +191,91 @@
     <button class="next-btn" onclick="nextDialogue()" id="nextBtn">Next</button>
   </div>
 
-  <script>
-    const dialogues = [
-      { speaker: "Pebble", text: "P1" },
-      { speaker: "Pebble", text: "P2", popup: true },
-      { speaker: "Ham", text: "H3" },
-      { speaker: "Pebble", text: "P4" },
-      { speaker: "Ham", text: "H5", popup: true }
-    ];
+<script>
+  const dialogues = [
+    { speaker: "Pebble", text: "P1" },
+    { speaker: "Pebble", text: "P2", popup: true },
+    { speaker: "Ham", text: "H3" },
+    { speaker: "Pebble", text: "P4" },
+    { speaker: "Ham", text: "H5", popup: true }
+  ];
 
-    let currentIndex = 0;
-    let allowNext = true;
+  let currentIndex = 0;
+  let popupSubmitted = false;
 
-    function updateDialogue(index) {
-      const text = document.getElementById("dialogueText");
-      const speaker = document.getElementById("speakerName");
-      const pebbleImg = document.getElementById("pebble");
-      const hamImg = document.getElementById("ham");
-      const popupBox = document.getElementById("popupBox");
-      const backBtn = document.getElementById("backBtn");
-      const nextBtn = document.getElementById("nextBtn");
+  function updateDialogue(index) {
+    const text = document.getElementById("dialogueText");
+    const speaker = document.getElementById("speakerName");
+    const pebbleImg = document.getElementById("pebble");
+    const hamImg = document.getElementById("ham");
+    const popupBox = document.getElementById("popupBox");
+    const backBtn = document.getElementById("backBtn");
+    const nextBtn = document.getElementById("nextBtn");
 
-      const current = dialogues[index];
-      text.textContent = current.text;
-      speaker.textContent = current.speaker;
+    const current = dialogues[index];
+    text.textContent = current.text;
+    speaker.textContent = current.speaker;
 
-      pebbleImg.classList.toggle("active", current.speaker === "Pebble");
-      hamImg.classList.toggle("active", current.speaker === "Ham");
+    pebbleImg.classList.toggle("active", current.speaker === "Pebble");
+    hamImg.classList.toggle("active", current.speaker === "Ham");
 
-      if (current.popup) {
-        popupBox.style.display = "block";
-        nextBtn.disabled = true;
-        allowNext = false;
-      } else {
-        popupBox.style.display = "none";
-        document.querySelectorAll(".popupCheckbox").forEach(cb => cb.checked = false);
-        allowNext = true;
-        nextBtn.disabled = currentIndex >= dialogues.length - 1;
-      }
-
-      backBtn.disabled = index === 0;
+    if (current.popup && !popupSubmitted) {
+      popupBox.style.display = "block";
+      nextBtn.disabled = true;
+    } else {
+      popupBox.style.display = "none";
+      document.querySelectorAll(".popupCheckbox").forEach(cb => cb.checked = false);
+      nextBtn.disabled = index >= dialogues.length - 1;
     }
 
-    function nextDialogue() {
-      if (allowNext && currentIndex < dialogues.length - 1) {
-        currentIndex++;
-        updateDialogue(currentIndex);
-      }
+    backBtn.disabled = index === 0;
+  }
+
+  function nextDialogue() {
+    if (dialogues[currentIndex].popup && !popupSubmitted) return;
+    if (currentIndex < dialogues.length - 1) {
+      currentIndex++;
+      popupSubmitted = false;
+      updateDialogue(currentIndex);
     }
+  }
 
-    function prevDialogue() {
-      if (currentIndex > 0) {
-        currentIndex--;
-        updateDialogue(currentIndex);
-      }
+  function prevDialogue() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      popupSubmitted = false;
+      updateDialogue(currentIndex);
     }
+  }
 
-    function checkAnswers() {
-      const checkboxes = document.querySelectorAll(".popupCheckbox");
-      let allCorrect = true;
-      checkboxes.forEach(cb => {
-        if ((cb.checked && cb.value !== "1") || (!cb.checked && cb.value === "1")) {
-          allCorrect = false;
-        }
-      });
+  function checkAnswers() {
+    const checkboxes = document.querySelectorAll(".popupCheckbox");
+    let allCorrect = true;
+    checkboxes.forEach(cb => {
+      if ((cb.checked && cb.value !== "1") || (!cb.checked && cb.value === "1")) {
+        allCorrect = false;
+      }
+    });
 
-      const text = document.getElementById("dialogueText");
-      const speaker = document.getElementById("speakerName");
+    const text = document.getElementById("dialogueText");
+    const speaker = document.getElementById("speakerName");
+
+    if (allCorrect) {
       speaker.textContent = "Ham";
-      text.textContent = allCorrect ? "Correct ✅" : "Wrong ❌ Try again!";
-
-      if (allCorrect) {
-        allowNext = true;
-        document.getElementById("nextBtn").disabled = false;
-        document.getElementById("popupBox").style.display = "none";
-      }
+      text.textContent = "Correct ✅";
+      popupSubmitted = true;
+      setTimeout(() => {
+        nextDialogue();
+      }, 1000);
+    } else {
+      speaker.textContent = "Ham";
+      text.textContent = "Wrong ❌ Try again!";
     }
+  }
 
-    window.onload = () => updateDialogue(currentIndex);
-  </script>
+  window.onload = () => updateDialogue(currentIndex);
+</script>
+
 </body>
 </html>
 
