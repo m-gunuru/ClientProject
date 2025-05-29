@@ -20,25 +20,35 @@
       position: relative;
     }
 
+    @keyframes talk-bounce {
+      0%, 100% {
+        transform: scale(1.05);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
     .character {
       position: absolute;
-      bottom: 0;           
+      bottom: 0;
       object-fit: contain;
       transition: opacity 0.2s, height 0.2s;
       user-select: none;
       pointer-events: none;
       z-index: 1;
       opacity: 0.3;
-      transform: none; 
+      transform: none;
     }
 
     .character.active {
       opacity: 1;
       z-index: 2;
+      animation: talk-bounce 0.5s infinite ease-in-out;
     }
 
     .left-character {
-      left: 0;        
+      left: 0;
       height: 520px; /* Pebble slightly bigger */
     }
 
@@ -54,7 +64,7 @@
 
     .dialogue-box {
       position: absolute;
-      bottom: 20px; 
+      bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       width: 85vw;
@@ -166,7 +176,8 @@
       }
     }
   </style>
-</head><body>
+</head>
+<body>
   <div class="dialogue-container">
     <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/PebbleMouthClosed.png" class="character left-character" id="pebble" />
     <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/HamMouthClosed.png" class="character right-character" id="ham" />
@@ -278,4 +289,3 @@
 
 </body>
 </html>
-
