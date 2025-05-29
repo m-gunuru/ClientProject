@@ -40,6 +40,7 @@
       bottom: 0;
       height: 320px;
       object-fit: contain;
+      transition: opacity 0.2s;
     }
     .left-character {
       left: 0;
@@ -84,9 +85,9 @@
 <body>
   <div class="dialogue-container">
     <!-- Pebble on the left -->
-    <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/refs/heads/Test/ClientProject/front_end/PebbleMouthClosed.png" class="character left-character" id="pebble" />
-    
-    <!-- Ham on the right — image must be in same folder as HTML -->
+    <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/PebbleMouthClosed.png" class="character left-character" id="pebble" />
+
+    <!-- Ham on the right -->
     <img src="HamMouthClosed.png" class="character right-character" id="ham" />
 
     <!-- Dialogue box -->
@@ -120,7 +121,7 @@
         text.textContent = current.text;
         speaker.textContent = current.speaker;
 
-        // Highlight who’s speaking (the dramaaa)
+        // Highlight who’s speaking
         if (current.speaker === "Pebble") {
           pebbleImg.style.opacity = 1;
           hamImg.style.opacity = 0.3;
