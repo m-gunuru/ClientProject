@@ -23,14 +23,20 @@
     .character {
       position: absolute;
       bottom: 0;           
-      height: 500px;        
+      height: 320px;        
       object-fit: contain;
-      transition: opacity 0.2s;
+      transition: opacity 0.2s, height 0.2s;
       user-select: none;
       pointer-events: none;
       z-index: 1;
       opacity: 0.3;
       transform: none; 
+    }
+
+    .character.active {
+      height: 500px;
+      opacity: 1;
+      z-index: 2;
     }
 
     .left-character {
@@ -105,7 +111,9 @@
         height: 300px;
         bottom: 70px;
       }
-
+      .character.active {
+        height: 400px;
+      }
       .next-btn {
         font-size: 0.75rem;
         padding: 10px 20px;
@@ -118,6 +126,9 @@
       .character {
         height: 200px;
         bottom: 50px;
+      }
+      .character.active {
+        height: 300px;
       }
     }
   </style>
@@ -159,11 +170,11 @@
         speaker.textContent = current.speaker;
 
         if (current.speaker === "Pebble") {
-          pebbleImg.style.opacity = 1;
-          hamImg.style.opacity = 0.3;
+          pebbleImg.classList.add("active");
+          hamImg.classList.remove("active");
         } else {
-          pebbleImg.style.opacity = 0.3;
-          hamImg.style.opacity = 1;
+          pebbleImg.classList.remove("active");
+          hamImg.classList.add("active");
         }
 
         currentIndex++;
@@ -172,8 +183,8 @@
         speaker.textContent = "";
         btn.disabled = true;
         btn.textContent = "Done";
-        pebbleImg.style.opacity = 1;
-        hamImg.style.opacity = 1;
+        pebbleImg.classList.add("active");
+        hamImg.classList.add("active");
       }
     }
   </script>
