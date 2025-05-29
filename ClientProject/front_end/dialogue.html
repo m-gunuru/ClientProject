@@ -23,7 +23,6 @@
     .character {
       position: absolute;
       bottom: 0;           
-      height: 500px;        
       object-fit: contain;
       transition: opacity 0.2s, height 0.2s;
       user-select: none;
@@ -34,13 +33,17 @@
     }
 
     .character.active {
-      height: 500px;
       opacity: 1;
       z-index: 2;
     }
 
     .left-character {
       left: 0;        
+      height: 520px; /* Pebble slightly bigger */
+    }
+
+    .left-character.active {
+      height: 520px;
     }
 
     .right-character {
@@ -51,7 +54,7 @@
 
     .dialogue-box {
       position: absolute;
-      bottom: 50px; 
+      bottom: 20px; 
       left: 50%;
       transform: translateX(-50%);
       width: 85vw;
@@ -63,21 +66,27 @@
       box-shadow: 0 -4px 16px #000a;
       z-index: 2;
     }
-    /* Popup box styling */
+
     .popup-box {
       position: absolute;
       left: 50%;
-      bottom: 360px; /* Above the dialogue box */
+      bottom: 360px;
       transform: translateX(-50%);
       width: 85vw;
       max-width: 1000px;
       background: rgba(0, 0, 0, 0.85);
-      padding: 32px 32px 32px;
+      padding: 32px;
       border: 2.5px solid #fff;
       border-radius: 18px;
       box-shadow: 0 -4px 24px #000a;
       z-index: 3;
       display: none;
+    }
+
+    .popup-content label {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 1rem;
     }
 
     .speaker-name {
@@ -96,10 +105,9 @@
       min-height: 2em;
     }
 
-    .next-btn {
+    .next-btn, .back-btn {
       position: absolute;
       bottom: 20px;
-      right: 32px;
       background: #3a4fa0;
       color: white;
       border: 2px solid #fff;
@@ -113,12 +121,20 @@
       z-index: 3;
     }
 
-    .next-btn:disabled {
+    .next-btn {
+      right: 32px;
+    }
+
+    .back-btn {
+      left: 32px;
+    }
+
+    .next-btn:disabled, .back-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
 
-    .next-btn:hover:not(:disabled) {
+    .next-btn:hover:not(:disabled), .back-btn:hover:not(:disabled) {
       background: #1d2558;
     }
 
@@ -129,12 +145,6 @@
       }
       .character.active {
         height: 400px;
-      }
-      .next-btn {
-        font-size: 0.75rem;
-        padding: 10px 20px;
-        right: 20px;
-        bottom: 16px;
       }
       .popup-box {
         bottom: 150px;
@@ -162,12 +172,14 @@
     <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/PebbleMouthClosed.png" class="character left-character" id="pebble" />
     <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/HamMouthClosed.png" class="character right-character" id="ham" />
 
-    <!-- Popup box (initially hidden) -->
     <div class="popup-box" id="popupBox">
       <div class="popup-content">
-        <label style="display: flex; align-items: center; font-size: 1rem;">
-          <input type="checkbox" id="popupCheckbox" style="margin-right: 12px;"> Check me!
-        </label>
+        <p>Construct can be used in which of the following sentences:</p>
+        <label><input type="checkbox" class="popupCheckbox" value="1"> Molly wants to ____ a barn.</label>
+        <label><input type="checkbox" class="popupCheckbox" value="1"> Jane wants the town to ____ a community center.</label>
+        <label><input type="checkbox" class="popupCheckbox" value="1"> Paul used an organizer to ____ his essay.</label>
+        <label><input type="checkbox" class="popupCheckbox" value="0"> She construct the perfect pie. 🍰</label>
+        <button class="next-btn" style="position: relative; bottom: 0; margin-top: 12px;" onclick="checkAnswers()">Submit</button>
       </div>
     </div>
 
@@ -176,60 +188,78 @@
       <div class="dialogue-text" id="dialogueText">Click below to begin the story...</div>
     </div>
 
+    <button class="back-btn" onclick="prevDialogue()" id="backBtn" disabled>Back</button>
     <button class="next-btn" onclick="nextDialogue()" id="nextBtn">Next</button>
   </div>
 
   <script>
     const dialogues = [
       { speaker: "Pebble", text: "P1" },
-      { speaker: "Pebble", text: "P2", popup: true }, // Example with popup
+      { speaker: "Pebble", text: "P2", popup: true },
       { speaker: "Ham", text: "H3" },
       { speaker: "Pebble", text: "P4" },
-      { speaker: "Ham", text: "H5", popup: true } // Another popup example
+      { speaker: "Ham", text: "H5", popup: true }
     ];
 
     let currentIndex = 0;
 
-    function nextDialogue() {
+    function updateDialogue(index) {
       const text = document.getElementById("dialogueText");
       const speaker = document.getElementById("speakerName");
       const pebbleImg = document.getElementById("pebble");
       const hamImg = document.getElementById("ham");
-      const btn = document.getElementById("nextBtn");
       const popupBox = document.getElementById("popupBox");
+      const backBtn = document.getElementById("backBtn");
+      const nextBtn = document.getElementById("nextBtn");
 
-      if (currentIndex < dialogues.length) {
-        const current = dialogues[currentIndex];
-        text.textContent = current.text;
-        speaker.textContent = current.speaker;
+      const current = dialogues[index];
+      text.textContent = current.text;
+      speaker.textContent = current.speaker;
 
-        if (current.speaker === "Pebble") {
-          pebbleImg.classList.add("active");
-          hamImg.classList.remove("active");
-        } else {
-          pebbleImg.classList.remove("active");
-          hamImg.classList.add("active");
-        }
+      pebbleImg.classList.toggle("active", current.speaker === "Pebble");
+      hamImg.classList.toggle("active", current.speaker === "Ham");
 
-        // Show/hide popup depending on dialogue trait
-        if (current.popup) {
-          popupBox.style.display = "block";
-        } else {
-          popupBox.style.display = "none";
-          document.getElementById("popupCheckbox").checked = false;
-        }
-
-        currentIndex++;
+      if (current.popup) {
+        popupBox.style.display = "block";
       } else {
-        text.textContent = "End of the convo! 💬✨";
-        speaker.textContent = "";
-        btn.disabled = true;
-        btn.textContent = "Done";
-        pebbleImg.classList.add("active");
-        hamImg.classList.add("active");
         popupBox.style.display = "none";
+        document.querySelectorAll(".popupCheckbox").forEach(cb => cb.checked = false);
+      }
+
+      backBtn.disabled = index === 0;
+      nextBtn.disabled = index >= dialogues.length - 1;
+    }
+
+    function nextDialogue() {
+      if (currentIndex < dialogues.length - 1) {
+        currentIndex++;
+        updateDialogue(currentIndex);
       }
     }
+
+    function prevDialogue() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateDialogue(currentIndex);
+      }
+    }
+
+    function checkAnswers() {
+      const checkboxes = document.querySelectorAll(".popupCheckbox");
+      let allCorrect = true;
+      checkboxes.forEach(cb => {
+        if ((cb.checked && cb.value !== "1") || (!cb.checked && cb.value === "1")) {
+          allCorrect = false;
+        }
+      });
+
+      const text = document.getElementById("dialogueText");
+      const speaker = document.getElementById("speakerName");
+      speaker.textContent = "Ham";
+      text.textContent = allCorrect ? "Correct ✅" : "Wrong ❌ Try again!";
+    }
+
+    window.onload = () => updateDialogue(currentIndex);
   </script>
 </body>
 </html>
