@@ -240,7 +240,7 @@
   function typeText(text, i = 0) {
     if (i < text.length) {
       textElem.textContent += text.charAt(i);
-      typingTimeout = setTimeout(() => typeText(text, i + 1), 120);
+     typingTimeout = setTimeout(() => typeText(text, i + 1), 60);
     } else {
       nextBtn.disabled = currentIndex >= dialogues.length - 1;
     }
