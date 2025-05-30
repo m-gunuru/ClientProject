@@ -1,82 +1,36 @@
-// sign-in email input
-const emailUser = document.createElement('input');
-emailUser.placeholder = 'Email';
-emailUser.classList.add('createAcc', 'email');
-document.getElementById('userSign-container').appendChild(emailUser);
+// Import needed Firebase functions from CDN URLs
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 
-// code input
-const emailCode = document.createElement('input');
-emailCode.placeholder = '123456';
-emailCode.classList.add('createAcc', 'emailCode');
-document.getElementById('codeSign-container').appendChild(emailCode);
+// Your Firebase config — replace with your actual config
+import { firebaseConfig } from './firebaseConfig.js';
 
-// submit email button
-const submit = document.createElement('button');
-submit.textContent = 'Submit';
-submit.className = 'submit';
-document.getElementById('submit-container').appendChild(submit);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-// verify code button
-const submitCode = document.createElement('button');
-submitCode.textContent = 'Submit Code';
-submitCode.className = 'submitCode';
-document.getElementById('submitCode-container').appendChild(submitCode);
-submitCode.disabled = true;
+// This function gets called when the button is clicked
+window.registerUser = async function() {
+  const email = document.getElementById('emailInput').value.trim();
+  const password = document.getElementById('passwordInput').value.trim();
 
-submit.addEventListener('click', async () => {
-  const email = emailUser.value;
-
-  if (!email) {
-    alert('Please enter the correct email address.');
+  if (!email || !password) {
+    alert("Please enter both email and password.");
     return;
   }
 
-  try {
-    const response = await fetch('http://localhost:3000/send-code', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({email}),
-    });
+try {
+  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  const user = userCredential.user;
 
-    if (response.ok) {
-        alert('Verification code sent to your email.');
-        submitCode.disabled = false;
-    } else {
-        alert('Failed to send code. Please try again.');
-    }
-    
-  } catch (error) {
-    console.error('Error sending code:', error);
-    alert('An error occurred while sending the code.');
-  }
-});
+  // Send email verification
+  await sendEmailVerification(user);
+  alert("Account created! A verification email has been sent to " + email + ". Please verify your email before logging in.");
 
-submitCode.addEventListener('click', async() => {
-    const code = emailCode.value;
-    const email = emailUser.value;
-    
-    try {
-    const response = await fetch('http://localhost:3000/verify-code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, code: code })
-    });
+  // Redirect to another page
+  window.location.href = "GamePage.html";  // Change to your desired page
 
-    
-
-    const data = await response.json();
-
-    if (data.redirect) {
-      alert('Confirmation Success C:');
-      window.location.href = data.redirect;
-      
-    } else if (data.error) {
-      alert(data.error);
-    }
-
-  } catch (err) {
-    console.error('Verification failed:', err);
-    alert('An error occurred while verifying the code. Please try again.');
-  }
-});
-
+} catch (error) {
+  alert("Error: " + error.message);
+}
+};
