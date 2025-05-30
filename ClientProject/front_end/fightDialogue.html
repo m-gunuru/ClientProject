@@ -63,11 +63,11 @@
       box-shadow: 0 -4px 16px #000a;
       z-index: 2;
     }
-    /* Popup box styling */
+
     .popup-box {
       position: absolute;
       left: 50%;
-      bottom: 180px; /* Above the dialogue box */
+      bottom: 180px;
       transform: translateX(-50%);
       width: 85vw;
       max-width: 1000px;
@@ -122,6 +122,38 @@
       background: #1d2558;
     }
 
+    .fight-menu {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 40vh;
+      background-color: rgba(0, 0, 0, 0.85);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 5;
+      border-top: 3px solid #fff;
+      display: none;
+    }
+
+    .fight-button {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .fight-button img {
+      height: 100px;
+      width: auto;
+      image-rendering: pixelated;
+    }
+
+    .fight-button:hover img {
+      transform: scale(1.1);
+    }
+
     @media (max-width: 900px) {
       .character {
         height: 300px;
@@ -162,7 +194,6 @@
     <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/PebbleMouthClosed.png" class="character left-character" id="pebble" />
     <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/HamMouthClosed.png" class="character right-character" id="ham" />
 
-    <!-- Popup box (initially hidden) -->
     <div class="popup-box" id="popupBox">
       <div class="popup-content">
         <label style="display: flex; align-items: center; font-size: 1rem;">
@@ -177,15 +208,28 @@
     </div>
 
     <button class="next-btn" onclick="nextDialogue()" id="nextBtn">Next</button>
+
+    <!-- Fight Menu -->
+    <div class="fight-menu" id="fightMenu">
+      <button class="fight-button">
+        <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/AttackBtn.png" alt="Attack">
+      </button>
+      <button class="fight-button">
+        <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/DefendBtn.png" alt="Defend">
+      </button>
+      <button class="fight-button">
+        <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/HealBtn.png" alt="Heal">
+      </button>
+    </div>
   </div>
 
   <script>
     const dialogues = [
       { speaker: "Pebble", text: "P1" },
-      { speaker: "Pebble", text: "P2", popup: true }, // Example with popup
+      { speaker: "Pebble", text: "P2", popup: true },
       { speaker: "Ham", text: "H3" },
       { speaker: "Pebble", text: "P4" },
-      { speaker: "Ham", text: "H5", popup: true } // Another popup example
+      { speaker: "Ham", text: "H5", popup: true }
     ];
 
     let currentIndex = 0;
@@ -197,6 +241,7 @@
       const hamImg = document.getElementById("ham");
       const btn = document.getElementById("nextBtn");
       const popupBox = document.getElementById("popupBox");
+      const fightMenu = document.getElementById("fightMenu");
 
       if (currentIndex < dialogues.length) {
         const current = dialogues[currentIndex];
@@ -211,7 +256,6 @@
           hamImg.classList.add("active");
         }
 
-        // Show/hide popup depending on dialogue trait
         if (current.popup) {
           popupBox.style.display = "block";
         } else {
@@ -221,13 +265,12 @@
 
         currentIndex++;
       } else {
-        text.textContent = "End of the convo! 💬✨";
+        // End of dialogue — trigger fight menu
+        text.textContent = "";
         speaker.textContent = "";
-        btn.disabled = true;
-        btn.textContent = "Done";
-        pebbleImg.classList.add("active");
-        hamImg.classList.add("active");
+        btn.style.display = "none";
         popupBox.style.display = "none";
+        fightMenu.style.display = "flex";
       }
     }
   </script>
