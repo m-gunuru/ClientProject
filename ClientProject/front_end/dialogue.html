@@ -1,425 +1,531 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      background: url('image0.png') center center / cover no-repeat;
-      font-family: 'Press Start 2P', monospace;
-      color: white;
-      overflow: hidden;
-    }
+    <head>
+        <meta charset="UTF-8" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            html,
+            body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                background: url("image0.png") center center / cover no-repeat;
+                font-family: "Press Start 2P", monospace;
+                color: white;
+                overflow: hidden;
+            }
 
-    .dialogue-container {
-      width: 100vw;
-      height: 100vh;
-      position: relative;
-    }
+            .dialogue-container {
+                width: 100vw;
+                height: 100vh;
+                position: relative;
+            }
 
-    .character {
-      position: absolute;
-      bottom: 0;           
-      object-fit: contain;
-      transition: opacity 0.2s, height 0.2s, transform 0.3s ease;
-      user-select: none;
-      pointer-events: none;
-      z-index: 1;
-      opacity: 0.3;
-      transform: none; 
-    }
+            .character {
+                position: absolute;
+                bottom: 0;
+                object-fit: contain;
+                transition: opacity 0.2s, height 0.2s, transform 0.3s ease;
+                user-select: none;
+                pointer-events: none;
+                z-index: 1;
+                opacity: 0.3;
+                transform: none;
+            }
 
-    .character.active {
-      opacity: 1;
-      z-index: 2;
-    }
+            .character.active {
+                opacity: 1;
+                z-index: 2;
+            }
 
-    /* Bounce animation for talking */
-    @keyframes bounce-talk {
-      0% { transform: scale(1.5); }
-      30% { transform: scale(1.6) translateY(-15px); }
-      50% { transform: scale(1.5) translateY(0); }
-      70% { transform: scale(1.4) translateY(-8px); }
-      100% { transform: scale(1.5) translateY(0); }
-    }
+            /* Bounce animation for talking */
+            @keyframes bounce-talk {
+                0% {
+                    transform: scale(1.5);
+                }
+                30% {
+                    transform: scale(1.6) translateY(-15px);
+                }
+                50% {
+                    transform: scale(1.5) translateY(0);
+                }
+                70% {
+                    transform: scale(1.4) translateY(-8px);
+                }
+                100% {
+                    transform: scale(1.5) translateY(0);
+                }
+            }
 
-    .character.active.talking {
-      animation: bounce-talk 0.6s ease forwards;
-      opacity: 1 !important;
-    }
+            .character.active.talking {
+                animation: bounce-talk 0.6s ease forwards;
+                opacity: 1 !important;
+            }
 
-   .left-character {
-  left: 0;
-  height: 400px;
-  transform: translateX(0);
-}
+            .left-character {
+                left: 0;
+                height: 400px;
+                transform: translateX(0);
+            }
 
-.left-character.active {
-  height: 400px;
-  transform: translateX(200px);
-  transofrm: translateY(200px);/* ensures Pebble stays in frame when zoomed */
-}
+            .left-character.active {
+                height: 400px;
+                transform: translateX(200px);
+                transofrm: translateY(
+                    200px
+                ); /* ensures Pebble stays in frame when zoomed */
+            }
 
-#constructionGif {
-  display: none;
-  position: absolute;
-  left: 50%;
-  bottom: 380px;
-  transform: translateX(-50%);
-  width: 70vw;
-  max-width: 600px;
-  height: auto;
-  z-index: 3;
-}
+            #constructionGif {
+                display: none;
+                position: absolute;
+                left: 50%;
+                bottom: 380px;
+                transform: translateX(-50%);
+                width: 70vw;
+                max-width: 600px;
+                height: auto;
+                z-index: 3;
+            }
 
-.particle {
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  background: yellow;
-  border-radius: 50%;
-  animation: pop 0.6s ease-out forwards;
-  pointer-events: none;
-  z-index: 9999;
-}
+            .particle {
+                position: absolute;
+                width: 6px;
+                height: 6px;
+                background: yellow;
+                border-radius: 50%;
+                animation: pop 0.6s ease-out forwards;
+                pointer-events: none;
+                z-index: 9999;
+            }
 
-@keyframes pop {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(3);
-    opacity: 0;
-  }
-}
+            @keyframes pop {
+                0% {
+                    transform: scale(1);
+                    opacity: 1;
+                }
+                100% {
+                    transform: scale(3);
+                    opacity: 0;
+                }
+            }
 
+            .right-character {
+                right: 30px;
+                bottom: 0;
+                height: 320px;
+            }
 
-    .right-character {
-      right: 30px;
-      bottom: 0;
-      height: 320px;
-    }
+            .dialogue-box {
+                position: absolute;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 85vw;
+                max-width: 1000px;
+                background: rgba(0, 0, 0, 0.7);
+                padding: 24px 32px 60px;
+                border: 2.5px solid #fff;
+                border-radius: 18px;
+                box-shadow: 0 -4px 16px #000a;
+                z-index: 2;
+            }
 
-    .dialogue-box {
-      position: absolute;
-      bottom: 20px; 
-      left: 50%;
-      transform: translateX(-50%);
-      width: 85vw;
-      max-width: 1000px;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 24px 32px 60px;
-      border: 2.5px solid #fff;
-      border-radius: 18px;
-      box-shadow: 0 -4px 16px #000a;
-      z-index: 2;
-    }
+            .popup-box {
+                position: absolute;
+                left: 50%;
+                bottom: 360px;
+                transform: translateX(-50%);
+                width: 85vw;
+                max-width: 1000px;
+                background: rgba(0, 0, 0, 0.85);
+                padding: 32px;
+                border: 2.5px solid #fff;
+                border-radius: 18px;
+                box-shadow: 0 -4px 24px #000a;
+                z-index: 3;
+                display: none;
+            }
 
-    .popup-box {
-      position: absolute;
-      left: 50%;
-      bottom: 360px;
-      transform: translateX(-50%);
-      width: 85vw;
-      max-width: 1000px;
-      background: rgba(0, 0, 0, 0.85);
-      padding: 32px;
-      border: 2.5px solid #fff;
-      border-radius: 18px;
-      box-shadow: 0 -4px 24px #000a;
-      z-index: 3;
-      display: none;
-    }
+            .popup-content label {
+                display: block;
+                margin-bottom: 12px;
+                font-size: 1rem;
+            }
 
-    .popup-content label {
-      display: block;
-      margin-bottom: 12px;
-      font-size: 1rem;
-    }
+            .speaker-name {
+                font-size: 1rem;
+                color: #ffeb3b;
+                margin-bottom: 10px;
+                text-shadow: 2px 2px #000;
+                letter-spacing: 2px;
+            }
 
-    .speaker-name {
-      font-size: 1rem;
-      color: #ffeb3b;
-      margin-bottom: 10px;
-      text-shadow: 2px 2px #000;
-      letter-spacing: 2px;
-    }
+            .dialogue-text {
+                font-size: 1.1rem;
+                line-height: 1.8;
+                color: #fff;
+                text-shadow: 1px 1px 3px #000;
+                min-height: 2em;
+            }
 
-    .dialogue-text {
-      font-size: 1.1rem;
-      line-height: 1.8;
-      color: #fff;
-      text-shadow: 1px 1px 3px #000;
-      min-height: 2em;
-    }
+            .next-btn,
+            .back-btn {
+                position: absolute;
+                bottom: 20px;
+                background: #3a4fa0;
+                color: white;
+                border: 2px solid #fff;
+                padding: 12px 34px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 1rem;
+                font-family: "Press Start 2P", monospace;
+                text-shadow: 3px 5px 1px #00000094;
+                transition: background 0.2s;
+                z-index: 3;
+            }
 
-    .next-btn, .back-btn {
-      position: absolute;
-      bottom: 20px;
-      background: #3a4fa0;
-      color: white;
-      border: 2px solid #fff;
-      padding: 12px 34px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1rem;
-      font-family: 'Press Start 2P', monospace;
-      text-shadow: 3px 5px 1px #00000094;
-      transition: background 0.2s;
-      z-index: 3;
-    }
+            .next-btn {
+                right: 32px;
+            }
 
-    .next-btn {
-      right: 32px;
-    }
+            .back-btn {
+                left: 32px;
+            }
 
-    .back-btn {
-      left: 32px;
-    }
+            .next-btn:disabled,
+            .back-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
 
-    .next-btn:disabled, .back-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+            .next-btn:hover:not(:disabled),
+            .back-btn:hover:not(:disabled) {
+                background: #1d2558;
+            }
 
-    .next-btn:hover:not(:disabled), .back-btn:hover:not(:disabled) {
-      background: #1d2558;
-    }
+            @media (max-width: 900px) {
+                .character {
+                    height: 300px;
+                    bottom: 70px;
+                }
+                .character.active {
+                    height: 400px;
+                }
+                .popup-box {
+                    bottom: 150px;
+                    padding: 18px 10px 18px;
+                }
+            }
 
-    @media (max-width: 900px) {
-      .character {
-        height: 300px;
-        bottom: 70px;
-      }
-      .character.active {
-        height: 400px;
-      }
-      .popup-box {
-        bottom: 150px;
-        padding: 18px 10px 18px;
-      }
-    }
+            @media (max-width: 600px) {
+                .character {
+                    height: 200px;
+                    bottom: 50px;
+                }
+                .character.active {
+                    height: 300px;
+                }
+                .popup-box {
+                    bottom: 110px;
+                    padding: 10px 3vw 10px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="dialogue-container">
+            <img
+                src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/PebbleMouthClosed.png"
+                class="character left-character"
+                id="pebble"
+            />
+            <img
+                src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/HamMouthClosed.png"
+                class="character right-character"
+                id="ham"
+            />
+            <img
+                src="https://github.com/m-gunuru/ClientProject/blob/Test/ClientProject/front_end/construction1.gif?raw=true"
+                id="constructionGif"
+                style="
+                    display: none;
+                    position: absolute;
+                    left: 50%;
+                    bottom: 360px;
+                    transform: translateX(-50%);
+                    width: 85vw;
+                    max-width: 1000px;
+                    height: auto;
+                "
+            />
+            <div class="popup-box" id="popupBox">
+                <div class="popup-content">
+                    <p>
+                        Construct can be used in which of the following
+                        sentences:
+                    </p>
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="popupCheckbox"
+                            value="1"
+                        />
+                        Molly wants to ____ a barn.</label
+                    >
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="popupCheckbox"
+                            value="1"
+                        />
+                        Jane wants the town to ____ a community center.</label
+                    >
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="popupCheckbox"
+                            value="1"
+                        />
+                        Paul used an organizer to ____ his essay.</label
+                    >
+                    <button
+                        class="next-btn"
+                        style="position: relative; bottom: 0; margin-top: 12px"
+                        onclick="checkAnswers()"
+                    >
+                        Submit
+                    </button>
+                </div>
+            </div>
+            <div class="popup-box" id="popupBoxCreate">
+                <div class="popup-content">
+                    <p>
+                        Create can be used in which of the following sentences:
+                    </p>
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="popupCheckboxCreate"
+                            value="1"
+                        />
+                        Sarah loves to ____ models.</label
+                    >
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="popupCheckboxCreate"
+                            value="1"
+                        />
+                        We need to ____ a plan.</label
+                    >
+                    <label
+                        ><input
+                            type="checkbox"
+                            class="popupCheckboxCreate"
+                            value="1"
+                        />
+                        We will ____ an argument.</label
+                    >
+                    <button
+                        class="next-btn"
+                        style="position: relative; bottom: 0; margin-top: 12px"
+                        onclick="checkAnswers(true)"
+                    >
+                        Submit
+                    </button>
+                </div>
+            </div>
 
-    @media (max-width: 600px) {
-      .character {
-        height: 200px;
-        bottom: 50px;
-      }
-      .character.active {
-        height: 300px;
-      }
-      .popup-box {
-        bottom: 110px;
-        padding: 10px 3vw 10px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="dialogue-container">
-    <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/PebbleMouthClosed.png" class="character left-character" id="pebble" />
-    <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/HamMouthClosed.png" class="character right-character" id="ham" />
-<img src="https://github.com/m-gunuru/ClientProject/blob/Test/ClientProject/front_end/construction1.gif?raw=true" id="constructionGif" style="display: none; position: absolute; left: 50%; bottom: 360px; transform: translateX(-50%); width: 85vw; max-width: 1000px; height: auto;" />
-    <div class="popup-box" id="popupBox">
-      <div class="popup-content">
-        <p>Construct can be used in which of the following sentences:</p>
-        <label><input type="checkbox" class="popupCheckbox" value="1"> Molly wants to ____ a barn.</label>
-        <label><input type="checkbox" class="popupCheckbox" value="1"> Jane wants the town to ____ a community center.</label>
-        <label><input type="checkbox" class="popupCheckbox" value="1"> Paul used an organizer to ____ his essay.</label>
-        <button class="next-btn" style="position: relative; bottom: 0; margin-top: 12px;" onclick="checkAnswers()">Submit</button>
-      </div>
-    </div>
-    <div class="popup-box" id="popupBoxCreate">
-  <div class="popup-content">
-    <p>Create can be used in which of the following sentences:</p>
-    <label><input type="checkbox" class="popupCheckboxCreate" value="1"> Sarah loves to ____ models.</label>
-    <label><input type="checkbox" class="popupCheckboxCreate" value="1"> We need to ____ a plan.</label>
-    <label><input type="checkbox" class="popupCheckboxCreate" value="1"> We will ____ an argument.</label>
-    <button class="next-btn" style="position: relative; bottom: 0; margin-top: 12px;" onclick="checkAnswers(true)">Submit</button>
-  </div>
-</div>
+            <div class="dialogue-box">
+                <div class="speaker-name" id="speakerName">Click to Start</div>
+                <div class="dialogue-text" id="dialogueText">
+                    Click below to begin the story...
+                </div>
+            </div>
 
+            <button
+                class="back-btn"
+                onclick="prevDialogue()"
+                id="backBtn"
+                disabled
+            >
+                Back
+            </button>
+            <button class="next-btn" onclick="nextDialogue()" id="nextBtn">
+                Next
+            </button>
+        </div>
 
-    <div class="dialogue-box">
-      <div class="speaker-name" id="speakerName">Click to Start</div>
-      <div class="dialogue-text" id="dialogueText">Click below to begin the story...</div>
-    </div>
+        <script>
+              const dialogues = [
+              { speaker: "Pebble", text: "Meet Ham the Hammer! Ham, I need your help.. I need to build a house!" },
+              { speaker: "Ham", text: "Hey there Pebbles! It sounds like you want to construct a house!" },
+              { speaker: "Pebble", text: "Construct? What does that mean?" },
+              { speaker: "Ham", text: "I'll teach you! Construct has two roots: Con - Together, Struct - to build." },
+              { speaker: "Ham", text: "If you put these roots together, you make a new word, which means to make something!" },
+              { speaker: "Ham", text: "For example, I can construct a word by merging the two roots, ‘con’ and ‘struct’!" },
+              { speaker: "Ham", text: "I can also help you to construct a house!" },
+              { speaker: "Pebble", text: "Ham, I know \"construct\" means to build something, but how do I use it in different tenses?" },
+              { speaker: "Ham", text: "Great question, Pebbles! Let’s start with the base form — just construct itself." },
+              { speaker: "Ham", text: "We use construct in the simple present tense with I, you, we, and they.\nFor example: \"They construct bridges every year.\"" },
+              { speaker: "Pebble", text: "What about he or she?" },
+              { speaker: "Ham", text: "For he, she, or it, you add -s to make constructs.\nLike: \"She constructs a model airplane.\"" },
+              { speaker: "Pebble", text: "Okay, that makes sense. How do I talk about the past?" },
+              { speaker: "Ham", text: "For the past tense, add -ed to get constructed.\nExample: \"We constructed a treehouse last summer.\"" },
+              { speaker: "Pebble", text: "What if I want to say I’m doing it right now?" },
+              { speaker: "Ham", text: "Then you use the present continuous tense: am/is/are constructing.\nLike: \"I am constructing a new project.\"" },
+              { speaker: "Pebble", text: "How about the future?" },
+              { speaker: "Ham", text: "To talk about the future, use will construct.\nFor example: \"They will construct a new school next year.\"" },
+              { speaker: "Pebble", text: "So, to summarize, the base word is construct, and by adding different endings or helpers, I can change the tense?" },
+              { speaker: "Ham", text: "Exactly! Here's a quick recap:\n- Present simple: I/you/we/they construct, he/she/it constructs\n- Past simple: constructed\n- Present continuous: am/is/are constructing\n- Future simple: will construct" },
+              { speaker: "Pebble", text: "Got it! So these changes help me say when the building happens." },
+              { speaker: "Ham", text: "You got it, Pebble! Practice makes perfect!" },
+              { speaker: "Pebble", text: "H5", popup: true },
+              { speaker: "Ham", text: "Correct! All of these sentences can use construct!" },
+                { speaker: "Ham", text: "Alright Pebbles, now that you know 'construct' means to build or put together, let's see how it works in different sentences." },
+            { speaker: "Ham", text: "Sometimes, we construct things you can touch—like buildings or models." },
+            { speaker: "Ham", text: "Other times, we construct ideas, plans, or even arguments, which are less physical but just as important." },
+            { speaker: "Ham", text: "Look at these sentences:" },
+            { speaker: "Ham", text: "Sarah loves to ____ models." },
+            { speaker: "Ham", text: "We need to ____ a plan." },
+            { speaker: "Ham", text: "We will ____ an argument." },
+            { speaker: "Ham", text: "Can you select which sentences correctly use 'construct'? Take your time!" },
+            { speaker: "Pebble", text: "H5", popup: true, isCreateQuiz: true },
+            { speaker: "Ham", text: "Well done! All of these sentences use 'construct' correctly." },
+            { speaker: "Ham", text: "See how 'construct' isn't just for physical things, but also ideas? That makes it a powerful word!" },
+                  { speaker: "Pebble", text: "Got it! So.. about my house.." },
 
-    <button class="back-btn" onclick="prevDialogue()" id="backBtn" disabled>Back</button>
-    <button class="next-btn" onclick="nextDialogue()" id="nextBtn">Next</button>
-  </div>
+            { speaker: "Ham", text: "Wait a second! I don't work for free. I value knowledge. Prove to me that you learned something and I'll help you build your house." },
 
-<script>
-  const dialogues = [
-  { speaker: "Pebble", text: "Meet Ham the Hammer! Ham, I need your help.. I need to build a house!" },
-  { speaker: "Ham", text: "Hey there Pebbles! It sounds like you want to construct a house!" },
-  { speaker: "Pebble", text: "Construct? What does that mean?" },
-  { speaker: "Ham", text: "I'll teach you! Construct has two roots: Con - Together, Struct - to build." },
-  { speaker: "Ham", text: "If you put these roots together, you make a new word, which means to make something!" },
-  { speaker: "Ham", text: "For example, I can construct a word by merging the two roots, ‘con’ and ‘struct’!" },
-  { speaker: "Ham", text: "I can also help you to construct a house!" },
-  { speaker: "Pebble", text: "Ham, I know \"construct\" means to build something, but how do I use it in different tenses?" },
-  { speaker: "Ham", text: "Great question, Pebbles! Let’s start with the base form — just construct itself." },
-  { speaker: "Ham", text: "We use construct in the simple present tense with I, you, we, and they.\nFor example: \"They construct bridges every year.\"" },
-  { speaker: "Pebble", text: "What about he or she?" },
-  { speaker: "Ham", text: "For he, she, or it, you add -s to make constructs.\nLike: \"She constructs a model airplane.\"" },
-  { speaker: "Pebble", text: "Okay, that makes sense. How do I talk about the past?" },
-  { speaker: "Ham", text: "For the past tense, add -ed to get constructed.\nExample: \"We constructed a treehouse last summer.\"" },
-  { speaker: "Pebble", text: "What if I want to say I’m doing it right now?" },
-  { speaker: "Ham", text: "Then you use the present continuous tense: am/is/are constructing.\nLike: \"I am constructing a new project.\"" },
-  { speaker: "Pebble", text: "How about the future?" },
-  { speaker: "Ham", text: "To talk about the future, use will construct.\nFor example: \"They will construct a new school next year.\"" },
-  { speaker: "Pebble", text: "So, to summarize, the base word is construct, and by adding different endings or helpers, I can change the tense?" },
-  { speaker: "Ham", text: "Exactly! Here's a quick recap:\n- Present simple: I/you/we/they construct, he/she/it constructs\n- Past simple: constructed\n- Present continuous: am/is/are constructing\n- Future simple: will construct" },
-  { speaker: "Pebble", text: "Got it! So these changes help me say when the building happens." },
-  { speaker: "Ham", text: "You got it, Pebble! Practice makes perfect!" },
-  { speaker: "Pebble", text: "H5", popup: true },
-  { speaker: "Ham", text: "Correct! All of these sentences can use construct!" },
-    { speaker: "Ham", text: "Alright Pebbles, now that you know 'construct' means to build or put together, let's see how it works in different sentences." },
-{ speaker: "Ham", text: "Sometimes, we construct things you can touch—like buildings or models." },
-{ speaker: "Ham", text: "Other times, we construct ideas, plans, or even arguments, which are less physical but just as important." },
-{ speaker: "Ham", text: "Look at these sentences:" },
-{ speaker: "Ham", text: "Sarah loves to ____ models." },
-{ speaker: "Ham", text: "We need to ____ a plan." },
-{ speaker: "Ham", text: "We will ____ an argument." },
-{ speaker: "Ham", text: "Can you select which sentences correctly use 'construct'? Take your time!" },
-{ speaker: "Pebble", text: "H5", popup: true, isCreateQuiz: true },
-{ speaker: "Ham", text: "Well done! All of these sentences use 'construct' correctly." },
-{ speaker: "Ham", text: "See how 'construct' isn't just for physical things, but also ideas? That makes it a powerful word!" },
-      { speaker: "Pebble", text: "Got it! So.. about my house.." },
-    
-{ speaker: "Ham", text: "Wait a second! I don't work for free. I value knowledge. Prove to me that you learned something and I'll help you build your house." },
+            ];
 
-];
-
-  let currentIndex = 0;
-  let popupSubmitted = false;
-
-
-  const textElem = document.getElementById("dialogueText");
-  const speakerElem = document.getElementById("speakerName");
-  const pebbleImg = document.getElementById("pebble");
-  const hamImg = document.getElementById("ham");
-  const popupBox = document.getElementById("popupBox");
-  const backBtn = document.getElementById("backBtn");
-  const nextBtn = document.getElementById("nextBtn");
-
-  let typingTimeout;
-
-  function typeText(text, i = 0) {
-    if (i < text.length) {
-      textElem.textContent += text.charAt(i);
-     typingTimeout = setTimeout(() => typeText(text, i + 1), 60);
-    } else {
-      nextBtn.disabled = currentIndex >= dialogues.length - 1;
-    }
-  }
-
-  function updateDialogue(index) {
-    clearTimeout(typingTimeout);
-
-    const current = dialogues[index];
-    speakerElem.textContent = current.speaker;
-    const constructionGif = document.getElementById("constructionGif");
-if (
-  current.speaker === "Ham" &&
-  current.text === "I can also help you to construct a house!"
-) {
-  constructionGif.style.display = "block";
-} else {
-  constructionGif.style.display = "none";
-}
-    backBtn.disabled = index === 0;
-
-    if (current.popup && !popupSubmitted) {
-      popupBox.style.display = "block";
-      nextBtn.disabled = true;
-      textElem.textContent = ""; // Clear text waiting for popup
-      document.querySelectorAll(".popupCheckbox").forEach(cb => cb.checked = false);
-    } else {
-      popupBox.style.display = "none";
-      nextBtn.disabled = true; // Disable while typing
-      textElem.textContent = "";
-      typeText(current.text);
-    }
-
-    // Remove all active and talking classes first
-    pebbleImg.classList.remove("active", "talking");
-    hamImg.classList.remove("active", "talking");
-
-    // Add active and talking to current speaker to trigger bounce + scale
-    if (current.speaker === "Pebble") {
-      pebbleImg.classList.add("active", "talking");
-    } else if (current.speaker === "Ham") {
-      hamImg.classList.add("active", "talking");
-    }
-  }
-  function nextDialogue() {
-    if (dialogues[currentIndex].popup && !popupSubmitted) return;
-    if (currentIndex < dialogues.length - 1) {
-      currentIndex++;
-      popupSubmitted = false;
-      updateDialogue(currentIndex);
-    }
-  }
-
-  function prevDialogue() {
-    if (currentIndex > 0) {
-      currentIndex--;
-      popupSubmitted = false;
-      updateDialogue(currentIndex);
-    }
-  }
-
-  function checkAnswers(isCreate = false) {
-  const selector = isCreate ? ".popupCheckboxCreate" : ".popupCheckbox";
-  const checkboxes = document.querySelectorAll(selector);
-  let allCorrect = true;
-
-  checkboxes.forEach(cb => {
-    if ((cb.checked && cb.value !== "1") || (!cb.checked && cb.value === "1")) {
-      allCorrect = false;
-    }
-  });
-
-  if (allCorrect) {
-    speakerElem.textContent = "Ham";
-    textElem.textContent = "Correct ✅";
-    popupSubmitted = true;
-    setTimeout(() => {
-      nextDialogue();
-    }, 1000);
-  } else {
-    speakerElem.textContent = "Ham";
-    textElem.textContent = "Wrong ❌ Try again!";
-  }
-}
-
-  function createParticles(x, y) {
-  for (let i = 0; i < 10; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    p.style.left = `${x + Math.random() * 20 - 10}px`;
-    p.style.top = `${y + Math.random() * 20 - 10}px`;
-    document.body.appendChild(p);
-    setTimeout(() => p.remove(), 600);
-  }
-}
-
-document.querySelectorAll(".next-btn, .back-btn").forEach(btn => {
-  btn.addEventListener("click", e => {
-    createParticles(e.clientX, e.clientY);
-  });
-});
+              let currentIndex = 0;
+              let popupSubmitted = false;
 
 
-  window.onload = () => updateDialogue(currentIndex);
-  
-</script>
+              const textElem = document.getElementById("dialogueText");
+              const speakerElem = document.getElementById("speakerName");
+              const pebbleImg = document.getElementById("pebble");
+              const hamImg = document.getElementById("ham");
+              const popupBox = document.getElementById("popupBox");
+              const backBtn = document.getElementById("backBtn");
+              const nextBtn = document.getElementById("nextBtn");
 
-</body>
+              let typingTimeout;
+
+              function typeText(text, i = 0) {
+                if (i < text.length) {
+                  textElem.textContent += text.charAt(i);
+                 typingTimeout = setTimeout(() => typeText(text, i + 1), 60);
+                } else {
+                  nextBtn.disabled = currentIndex >= dialogues.length - 1;
+                }
+              }
+
+              function updateDialogue(index) {
+                clearTimeout(typingTimeout);
+
+                const current = dialogues[index];
+                speakerElem.textContent = current.speaker;
+                const constructionGif = document.getElementById("constructionGif");
+            if (
+              current.speaker === "Ham" &&
+              current.text === "I can also help you to construct a house!"
+            ) {
+              constructionGif.style.display = "block";
+            } else {
+              constructionGif.style.display = "none";
+            }
+                backBtn.disabled = index === 0;
+
+                if (current.popup && !popupSubmitted) {
+                  popupBox.style.display = "block";
+                  nextBtn.disabled = true;
+                  textElem.textContent = ""; // Clear text waiting for popup
+                  document.querySelectorAll(".popupCheckbox").forEach(cb => cb.checked = false);
+                } else {
+                  popupBox.style.display = "none";
+                  nextBtn.disabled = true; // Disable while typing
+                  textElem.textContent = "";
+                  typeText(current.text);
+                }
+
+                // Remove all active and talking classes first
+                pebbleImg.classList.remove("active", "talking");
+                hamImg.classList.remove("active", "talking");
+
+                // Add active and talking to current speaker to trigger bounce + scale
+                if (current.speaker === "Pebble") {
+                  pebbleImg.classList.add("active", "talking");
+                } else if (current.speaker === "Ham") {
+                  hamImg.classList.add("active", "talking");
+                }
+              }
+              function nextDialogue() {
+                if (dialogues[currentIndex].popup && !popupSubmitted) return;
+                if (currentIndex < dialogues.length - 1) {
+                  currentIndex++;
+                  popupSubmitted = false;
+                  updateDialogue(currentIndex);
+                }
+              }
+
+              function prevDialogue() {
+                if (currentIndex > 0) {
+                  currentIndex--;
+                  popupSubmitted = false;
+                  updateDialogue(currentIndex);
+                }
+              }
+
+              function checkAnswers(isCreate = false) {
+              const selector = isCreate ? ".popupCheckboxCreate" : ".popupCheckbox";
+              const checkboxes = document.querySelectorAll(selector);
+              let allCorrect = true;
+
+              checkboxes.forEach(cb => {
+                if ((cb.checked && cb.value !== "1") || (!cb.checked && cb.value === "1")) {
+                  allCorrect = false;
+                }
+              });
+
+              if (allCorrect) {
+                speakerElem.textContent = "Ham";
+                textElem.textContent = "Correct ✅";
+                popupSubmitted = true;
+                setTimeout(() => {
+                  nextDialogue();
+                }, 1000);
+              } else {
+                speakerElem.textContent = "Ham";
+                textElem.textContent = "Wrong ❌ Try again!";
+              }
+            }
+
+              function createParticles(x, y) {
+              for (let i = 0; i < 10; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = `${x + Math.random() * 20 - 10}px`;
+                p.style.top = `${y + Math.random() * 20 - 10}px`;
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 600);
+              }
+            }
+
+            document.querySelectorAll(".next-btn, .back-btn").forEach(btn => {
+              btn.addEventListener("click", e => {
+                createParticles(e.clientX, e.clientY);
+              });
+            });
+
+
+              window.onload = () => updateDialogue(currentIndex);
+        </script>
+    </body>
 </html>
