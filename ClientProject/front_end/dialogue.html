@@ -235,9 +235,9 @@
     <div class="popup-box" id="popupBoxCreate">
   <div class="popup-content">
     <p>Create can be used in which of the following sentences:</p>
-    <label><input type="checkbox" class="popupCheckboxCreate" value="1"> Sarah loves to ____ art.</label>
+    <label><input type="checkbox" class="popupCheckboxCreate" value="1"> Sarah loves to ____ models.</label>
     <label><input type="checkbox" class="popupCheckboxCreate" value="1"> We need to ____ a plan.</label>
-    <label><input type="checkbox" class="popupCheckboxCreate" value="1"> He wants to ____ a new app.</label>
+    <label><input type="checkbox" class="popupCheckboxCreate" value="1"> We will ____ an argument.</label>
     <button class="next-btn" style="position: relative; bottom: 0; margin-top: 12px;" onclick="checkAnswers(true)">Submit</button>
   </div>
 </div>
@@ -261,20 +261,38 @@
   { speaker: "Ham", text: "If you put these roots together, you make a new word, which means to make something!" },
   { speaker: "Ham", text: "For example, I can construct a word by merging the two roots, ‘con’ and ‘struct’!" },
   { speaker: "Ham", text: "I can also help you to construct a house!" },
-  { speaker: "Pebble", text: "Ah I see, so that would mean..." },
+  { speaker: "Pebble", text: "Ham, I know \"construct\" means to build something, but how do I use it in different tenses?" },
+  { speaker: "Ham", text: "Great question, Pebbles! Let’s start with the base form — just construct itself." },
+  { speaker: "Ham", text: "We use construct in the simple present tense with I, you, we, and they.\nFor example: \"They construct bridges every year.\"" },
+  { speaker: "Pebble", text: "What about he or she?" },
+  { speaker: "Ham", text: "For he, she, or it, you add -s to make constructs.\nLike: \"She constructs a model airplane.\"" },
+  { speaker: "Pebble", text: "Okay, that makes sense. How do I talk about the past?" },
+  { speaker: "Ham", text: "For the past tense, add -ed to get constructed.\nExample: \"We constructed a treehouse last summer.\"" },
+  { speaker: "Pebble", text: "What if I want to say I’m doing it right now?" },
+  { speaker: "Ham", text: "Then you use the present continuous tense: am/is/are constructing.\nLike: \"I am constructing a new project.\"" },
+  { speaker: "Pebble", text: "How about the future?" },
+  { speaker: "Ham", text: "To talk about the future, use will construct.\nFor example: \"They will construct a new school next year.\"" },
+  { speaker: "Pebble", text: "So, to summarize, the base word is construct, and by adding different endings or helpers, I can change the tense?" },
+  { speaker: "Ham", text: "Exactly! Here's a quick recap:\n- Present simple: I/you/we/they construct, he/she/it constructs\n- Past simple: constructed\n- Present continuous: am/is/are constructing\n- Future simple: will construct" },
+  { speaker: "Pebble", text: "Got it! So these changes help me say when the building happens." },
+  { speaker: "Ham", text: "You got it, Pebble! Practice makes perfect!" },
   { speaker: "Pebble", text: "H5", popup: true },
-  { speaker: "Ham", text: "Correct! Now let's talk about another word: Create!" },
-  { speaker: "Pebble", text: "Create? What's the difference between construct and create?" },
-  { speaker: "Ham", text: "Great question! The root of *create* comes from Latin: *creare*, meaning 'to bring into existence' or 'to make'." },
-  { speaker: "Ham", text: "Construct means to build, usually something physical. But *create* is broader—it includes ideas, art, or stories!" },
-  { speaker: "Pebble", text: "Oh! So I can create a song or a drawing!" },
-  { speaker: "Ham", text: "Exactly! Let's test that too..." },
-  { speaker: "Pebble", text: "H5-create", popup: true, isCreateQuiz: true },
-  { speaker: "Ham", text: "Create can be used in these sentences:\n Sarah loves to create art.\n We need to create a plan.\n He wants to create a new app!" },
-  { speaker: "Ham", text: "Sarah loves to create art — she's bringing new artwork into existence!" },
-  { speaker: "Ham", text: "We need to create a plan — you're making something new, an idea or method." },
-  { speaker: "Ham", text: "He wants to create a new app — he's inventing a digital product, so we say 'create'!" },
-  { speaker: "Ham", text: "Awesome work! Now let's go build your house together!" },
+  { speaker: "Ham", text: "Correct! All of these sentences can use construct!" },
+    { speaker: "Ham", text: "Alright Pebbles, now that you know 'construct' means to build or put together, let's see how it works in different sentences." },
+{ speaker: "Ham", text: "Sometimes, we construct things you can touch—like buildings or models." },
+{ speaker: "Ham", text: "Other times, we construct ideas, plans, or even arguments, which are less physical but just as important." },
+{ speaker: "Ham", text: "Look at these sentences:" },
+{ speaker: "Ham", text: "Sarah loves to ____ models." },
+{ speaker: "Ham", text: "We need to ____ a plan." },
+{ speaker: "Ham", text: "We will ____ an argument." },
+{ speaker: "Ham", text: "Can you select which sentences correctly use 'construct'? Take your time!" },
+{ speaker: "Pebble", text: "H5", popup: true, isCreateQuiz: true },
+{ speaker: "Ham", text: "Well done! All of these sentences use 'construct' correctly." },
+{ speaker: "Ham", text: "See how 'construct' isn't just for physical things, but also ideas? That makes it a powerful word!" },
+      { speaker: "Pebble", text: "Got it! So.. about my house.." },
+    
+{ speaker: "Ham", text: "Wait a second! I don't work for free. I value knowledge. Prove to me that you learned something and I'll help you build your house." },
+
 ];
 
   let currentIndex = 0;
