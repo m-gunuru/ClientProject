@@ -279,7 +279,6 @@
 
   let currentIndex = 0;
   let popupSubmitted = false;
-  let visitedIndices = new Set();
 
 
   const textElem = document.getElementById("dialogueText");
@@ -301,52 +300,45 @@
     }
   }
 
- function updateDialogue(index) {
-  clearTimeout(typingTimeout);
+  function updateDialogue(index) {
+    clearTimeout(typingTimeout);
 
-  const current = dialogues[index];
-  speakerElem.textContent = current.speaker;
-  const constructionGif = document.getElementById("constructionGif");
-
-  constructionGif.style.display = current.text.includes("construct a house") ? "block" : "none";
-
-  backBtn.disabled = index === 0;
-
-  document.getElementById("popupBox").style.display = "none";
-  document.getElementById("popupBoxCreate").style.display = "none";
-
-  nextBtn.disabled = true;
-
-  if (current.popup && !popupSubmitted) {
-    if (current.isCreateQuiz) {
-      document.getElementById("popupBoxCreate").style.display = "block";
-    } else {
-      document.getElementById("popupBox").style.display = "block";
-    }
-    textElem.textContent = "";
-    return;
-  }
-
-  textElem.textContent = "";
-  if (!visitedIndices.has(index)) {
-    typeText(current.text);
-  } else {
-    textElem.textContent = current.text;
-    nextBtn.disabled = currentIndex >= dialogues.length - 1;
-  }
-
-  visitedIndices.add(index);
-
-  pebbleImg.classList.remove("active", "talking");
-  hamImg.classList.remove("active", "talking");
-
-  if (current.speaker === "Pebble") {
-    pebbleImg.classList.add("active", "talking");
-  } else if (current.speaker === "Ham") {
-    hamImg.classList.add("active", "talking");
-  }
+    const current = dialogues[index];
+    speakerElem.textContent = current.speaker;
+    const constructionGif = document.getElementById("constructionGif");
+if (
+  current.speaker === "Ham" &&
+  current.text === "I can also help you to construct a house!"
+) {
+  constructionGif.style.display = "block";
+} else {
+  constructionGif.style.display = "none";
 }
+    backBtn.disabled = index === 0;
 
+    if (current.popup && !popupSubmitted) {
+      popupBox.style.display = "block";
+      nextBtn.disabled = true;
+      textElem.textContent = ""; // Clear text waiting for popup
+      document.querySelectorAll(".popupCheckbox").forEach(cb => cb.checked = false);
+    } else {
+      popupBox.style.display = "none";
+      nextBtn.disabled = true; // Disable while typing
+      textElem.textContent = "";
+      typeText(current.text);
+    }
+
+    // Remove all active and talking classes first
+    pebbleImg.classList.remove("active", "talking");
+    hamImg.classList.remove("active", "talking");
+
+    // Add active and talking to current speaker to trigger bounce + scale
+    if (current.speaker === "Pebble") {
+      pebbleImg.classList.add("active", "talking");
+    } else if (current.speaker === "Ham") {
+      hamImg.classList.add("active", "talking");
+    }
+  }
   function nextDialogue() {
     if (dialogues[currentIndex].popup && !popupSubmitted) return;
     if (currentIndex < dialogues.length - 1) {
@@ -407,6 +399,7 @@ document.querySelectorAll(".next-btn, .back-btn").forEach(btn => {
 
 
   window.onload = () => updateDialogue(currentIndex);
+  
 </script>
 
 </body>
