@@ -361,7 +361,20 @@
                 Next
             </button>
         </div>
+        <!-- Settings Button -->
+<button id="settingsBtn" style="position:fixed; top:20px; right:20px; z-index:1000;">
+  ⚙️
+</button>
 
+<!-- Settings Modal -->
+<div id="settingsModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.3); z-index:2000; padding:24px; min-width:260px;">
+  <h2>Settings</h2>
+  <label for="volumeSlider">Volume:</label>
+  <input type="range" id="volumeSlider" min="0" max="100" step="1"><span id="volumeValue"></span>%
+  <br><br>
+  <button id="saveSettingsBtn">Save</button>
+  <button id="closeSettingsBtn">Close</button>
+</div>
         <script>
               const dialogues = [
               { speaker: "Pebble", text: "Meet Ham the Hammer! Ham, I need your help.. I need to build a house!" },
@@ -546,7 +559,45 @@
             });
 
 
-              window.onload = () => updateDialogue(currentIndex);
+              window.onload = function() {
+  updateDialogue(currentIndex);
+
+  // Settings logic starts here
+  function loadSettings() {
+    const settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
+    document.getElementById('volumeSlider').value = settings.volume;
+    document.getElementById('volumeValue').textContent = settings.volume;
+    return settings;
+  }
+
+  function saveSettings() {
+    const volume = parseInt(document.getElementById('volumeSlider').value, 10);
+    localStorage.setItem('gameSettings', JSON.stringify({ volume }));
+    alert('Settings saved!');
+    // Optionally, call your game's audio volume update here
+    // if (window.setGameVolume) setGameVolume(volume);
+  }
+
+  const modal = document.getElementById('settingsModal');
+  document.getElementById('settingsBtn').onclick = function() {
+    modal.style.display = 'block';
+    loadSettings();
+  };
+  document.getElementById('closeSettingsBtn').onclick = function() {
+    modal.style.display = 'none';
+  };
+  document.getElementById('saveSettingsBtn').onclick = function() {
+    saveSettings();
+    modal.style.display = 'none';
+  };
+  document.getElementById('volumeSlider').oninput = function() {
+    document.getElementById('volumeValue').textContent = this.value;
+  };
+
+  // Apply settings on load (optional)
+  loadSettings();
+  // if (window.setGameVolume) setGameVolume(settings.volume);
+};
         </script>
     </body>
 </html>
