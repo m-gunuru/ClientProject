@@ -10,26 +10,13 @@
       box-sizing: border-box;
     }
 
-    @font-face {
-      font-family: 'AppleII';
-      src: url('Apple II Pro.otf');
-      font-weight: normal;
-      font-style: normal;
-    }
-
     body {
-      background: #203162;
+      background: rgb(0, 0, 0);
       font-family: 'Press Start 2P', monospace, sans-serif;
-      color: white;
     }
 
     .hero {
-      background-image: url("image.png");
-      background-attachment: fixed;
-      background-size: cover;
-      background-position: top;
-      height: 1000px;
-      width: 100%;
+      background: rgb(255, 255, 255);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -41,31 +28,14 @@
     }
 
     .hero h3 {
+      color: white;
       font-size: 35px;
-      font-family: 'AppleII';
+      font-family: 'Press Start 2P';
       text-align: center;
-      white-space: normal; /* allow wrap */
+      white-space: normal; 
       padding-right: 5px;
       max-width: 1000px;
     }
-
-    .start {
-      background-color: #1e518c;
-      color: #ffffff;
-      font-family: 'Press Start 2P';
-      font-size: 20px;
-      width: 175px;
-      height: 65px;
-      position: absolute;
-      text-align: center;
-      top: 350px;
-      left: 650px;
-      border: 2px solid rgba(255, 255, 255, 0.778);
-      border-radius: 0; 
-      box-shadow: 4px 4px 0 #00000094; 
-      text-shadow: 2px 3px 2px #00000094;
-    }
-
 
   </style>
 </head> 
@@ -73,10 +43,9 @@
   <div class="hero"> 
     <h3 id="typing-text"></h3>
   </div>
-  <div id="start-container"></div>
 
   <script>
-    const fullText = `Welcome! Click the button below to begin your adventure!`;
+    const fullText = `Welcome Traveler! What is your name:`;
     const h3 = document.getElementById('typing-text');
 
     let i = 0;
@@ -89,6 +58,5 @@
     }
     type();
   </script>
-  <script src = "GamePage.js"></script>
 </body>
 </html>
