@@ -545,36 +545,38 @@
                 });
             });
 
-            window.onload = function() {
-                // Settings logic starts here
-                function loadSettings() {
-                    const settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
-                    document.getElementById('volumeSlider').value = settings.volume;
-                    document.getElementById('volumeValue').textContent = settings.volume;
-                    return settings;
-                }
-                function saveSettings() {
-                    const volume = parseInt(document.getElementById('volumeSlider').value, 10);
-                    localStorage.setItem('gameSettings', JSON.stringify({ volume }));
-                    alert('Settings saved!');
-                }
-                const modal = document.getElementById('settingsModal');
-                document.getElementById('settingsBtn').onclick = function() {
-                    modal.style.display = 'block';
-                    loadSettings();
-                };
-                document.getElementById('closeSettingsBtn').onclick = function() {
-                    modal.style.display = 'none';
-                };
-                document.getElementById('saveSettingsBtn').onclick = function() {
-                    saveSettings();
-                    modal.style.display = 'none';
-                };
-                document.getElementById('volumeSlider').oninput = function() {
-                    document.getElementById('volumeValue').textContent = this.value;
-                };
-                loadSettings();
-            };
+           window.onload = function() {
+    // Settings logic starts here
+    function loadSettings() {
+        const settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
+        document.getElementById('volumeSlider').value = settings.volume;
+        document.getElementById('volumeValue').textContent = settings.volume;
+        document.getElementById('bg-music').volume = settings.volume / 100;
+        return settings;
+    }
+    function saveSettings() {
+        const volume = parseInt(document.getElementById('volumeSlider').value, 10);
+        localStorage.setItem('gameSettings', JSON.stringify({ volume }));
+        alert('Settings saved!');
+    }
+    const modal = document.getElementById('settingsModal');
+    document.getElementById('settingsBtn').onclick = function() {
+        modal.style.display = 'block';
+        loadSettings();
+    };
+    document.getElementById('closeSettingsBtn').onclick = function() {
+        modal.style.display = 'none';
+    };
+    document.getElementById('saveSettingsBtn').onclick = function() {
+        saveSettings();
+        modal.style.display = 'none';
+    };
+    document.getElementById('volumeSlider').oninput = function() {
+        document.getElementById('volumeValue').textContent = this.value;
+        document.getElementById('bg-music').volume = this.value / 100;
+    };
+    loadSettings();
+};
         </script>
     </body>
 </html>
