@@ -17,11 +17,78 @@
                 color: white;
                 overflow: hidden;
             }
-
             .dialogue-container {
                 width: 100vw;
                 height: 100vh;
                 position: relative;
+            }
+
+            /* --- Start overlay styles --- */
+            #start-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(255,255,255,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                transition: opacity 0.8s;
+            }
+            #start-overlay.fade-out {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            /* Start button only: white/clearish */
+            #start-btn {
+                background: rgba(255,255,255,0.8);
+                color: #333;
+                border: 2px solid #fff;
+                border-radius: 12px;
+                font-size: 1.2em;
+                font-family: "Press Start 2P", monospace;
+                padding: 18px 36px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                cursor: pointer;
+                min-width: 120px;
+                transition: background 0.3s, box-shadow 0.3s;
+            }
+            #start-btn:hover {
+                background: rgba(255,255,255,1);
+                box-shadow: 0 4px 16px rgba(0,0,0,0.22);
+            }
+
+            /* --- Responsive GIFs --- */
+            img[src$=".gif"], #constructionGif, #puzzleGif {
+                max-width: 100% !important;
+                width: auto !important;
+                height: auto !important;
+                display: block;
+                margin: auto;
+                object-fit: contain !important;
+            }
+
+            /* Restore blue style for all game buttons */
+            .next-btn,
+            .back-btn,
+            .button,
+            #settingsBtn {
+                background: #3a4fa0 !important;
+                color: white !important;
+                border: 2px solid #fff !important;
+                border-radius: 8px !important;
+                font-size: 1rem !important;
+                font-family: "Press Start 2P", monospace;
+                padding: 12px 34px !important;
+                text-shadow: 3px 5px 1px #00000094;
+                transition: background 0.2s;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            }
+            .next-btn:hover:not(:disabled),
+            .back-btn:hover:not(:disabled),
+            .button:hover,
+            #settingsBtn:hover {
+                background: #1d2558 !important;
             }
 
             .character {
@@ -41,7 +108,6 @@
                 z-index: 2;
             }
 
-            /* Bounce animation for talking */
             @keyframes bounce-talk {
                 0% {
                     transform: scale(1.5);
@@ -59,21 +125,18 @@
                     transform: scale(1.5) translateY(0);
                 }
             }
-
             .character.active.talking {
                 animation: bounce-talk 0.6s ease forwards;
                 opacity: 1 !important;
             }
-
             .left-character {
                 left: 0;
                 height: 400px;
                 transform: translateX(0);
             }
-
             .left-character.active {
                 height: 400px;
-                transform: translateY(-600px); /* ensures Pebble stays in frame when zoomed */
+                transform: translateY(-600px);
             }
 
             #constructionGif,
@@ -88,7 +151,6 @@
                 height: auto;
                 z-index: 3;
             }
-
             .particle {
                 position: absolute;
                 width: 6px;
@@ -99,24 +161,15 @@
                 pointer-events: none;
                 z-index: 9999;
             }
-
             @keyframes pop {
-                0% {
-                    transform: scale(1);
-                    opacity: 1;
-                }
-                100% {
-                    transform: scale(3);
-                    opacity: 0;
-                }
+                0% { transform: scale(1); opacity: 1; }
+                100% { transform: scale(3); opacity: 0; }
             }
-
             .right-character {
                 right: 30px;
                 bottom: 0;
                 height: 320px;
             }
-
             .dialogue-box {
                 position: absolute;
                 bottom: 20px;
@@ -131,7 +184,6 @@
                 box-shadow: 0 -4px 16px #000a;
                 z-index: 2;
             }
-
             .popup-box {
                 position: absolute;
                 left: 50%;
@@ -147,13 +199,11 @@
                 z-index: 3;
                 display: none;
             }
-
             .popup-content label {
                 display: block;
                 margin-bottom: 12px;
                 font-size: 1rem;
             }
-
             .speaker-name {
                 font-size: 1rem;
                 color: #ffeb3b;
@@ -161,7 +211,6 @@
                 text-shadow: 2px 2px #000;
                 letter-spacing: 2px;
             }
-
             .dialogue-text {
                 font-size: 1.1rem;
                 line-height: 1.8;
@@ -169,88 +218,39 @@
                 text-shadow: 1px 1px 3px #000;
                 min-height: 2em;
             }
-
             .next-btn,
             .back-btn {
                 position: absolute;
                 bottom: 20px;
-                background: #3a4fa0;
-                color: white;
-                border: 2px solid #fff;
-                padding: 12px 34px;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 1rem;
-                font-family: "Press Start 2P", monospace;
-                text-shadow: 3px 5px 1px #00000094;
-                transition: background 0.2s;
                 z-index: 3;
             }
-
-            .button {
-              background-color: #3a4fa0;   /* or your actual button color */
-              color: white;
-              border: none;
-              border-radius: 8px;
-              padding: 10px 24px;
-              font-size: 16px;
-              cursor: pointer;
-              min-width: 100px;
-              transition: background 0.2s;
-            }
-            .button:hover {
-              background-color: #31448f;   /* darker shade for hover */
-            }
-
-            .next-btn {
-                right: 32px;
-            }
-
-            .back-btn {
-                left: 32px;
-            }
-
+            .next-btn { right: 32px; }
+            .back-btn { left: 32px; }
             .next-btn:disabled,
             .back-btn:disabled {
                 opacity: 0.5;
                 cursor: not-allowed;
             }
-
-            .next-btn:hover:not(:disabled),
-            .back-btn:hover:not(:disabled) {
-                background: #1d2558;
-            }
-
             @media (max-width: 900px) {
-                .character {
-                    height: 300px;
-                    bottom: 70px;
-                }
-                .character.active {
-                    height: 400px;
-                }
-                .popup-box {
-                    bottom: 150px;
-                    padding: 18px 10px 18px;
-                }
+                .character { height: 300px; bottom: 70px; }
+                .character.active { height: 400px; }
+                .popup-box { bottom: 150px; padding: 18px 10px 18px; }
             }
-
             @media (max-width: 600px) {
-                .character {
-                    height: 200px;
-                    bottom: 50px;
-                }
-                .character.active {
-                    height: 300px;
-                }
-                .popup-box {
-                    bottom: 110px;
-                    padding: 10px 3vw 10px;
-                }
+                .character { height: 200px; bottom: 50px; }
+                .character.active { height: 300px; }
+                .popup-box { bottom: 110px; padding: 10px 3vw 10px; }
             }
         </style>
     </head>
     <body>
+        <!-- Start Overlay and Audio Player -->
+        <div id="start-overlay">
+            <button id="start-btn">Start</button>
+        </div>
+        <audio id="bg-music" loop>
+            <source src="https://github.com/m-gunuru/ClientProject/blob/Test/ClientProject/front_end/Pokemon%20BW2%20Iris%20Battle%20Remix.mp3?raw=true" type="audio/mpeg">
+        </audio>
         <div class="dialogue-container">
             <img
                 src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/PebbleMouthClosed.png"
@@ -265,69 +265,22 @@
             <img
                 src="https://github.com/m-gunuru/ClientProject/blob/Test/ClientProject/front_end/construction1.gif?raw=true"
                 id="constructionGif"
-                style="
-                    display: none;
-                    position: absolute;
-                    left: 50%;
-                    bottom: 360px;
-                    transform: translateX(-50%);
-                    width: 85vw;
-                    max-width: 1000px;
-                    height: auto;
-                "
+                style="display: none; position: absolute; left: 50%; bottom: 360px; transform: translateX(-50%); width: 85vw; max-width: 1000px; height: auto;"
             />
-            <!-- NEW: Puzzle Gif element -->
             <img
                 src="https://github.com/m-gunuru/ClientProject/blob/Test/ClientProject/front_end/puzzle.gif?raw=true"
                 id="puzzleGif"
-                style="
-                    display: none;
-                    position: absolute;
-                    left: 50%;
-                    bottom: 360px;
-                    transform: translateX(-50%);
-                    width: 85vw;
-                    max-width: 1000px;
-                    height: auto;
-                "
+                style="display: none; position: absolute; left: 50%; bottom: 360px; transform: translateX(-50%); width: 85vw; max-width: 1000px; height: auto;"
             />
             <div class="popup-box" id="popupBox">
                 <div class="popup-content">
                     <p>
-                        Construct can be used in which of the following
-                        sentences:
+                        Construct can be used in which of the following sentences:
                     </p>
-                    <label
-                        ><input
-                            type="checkbox"
-                            class="popupCheckbox"
-                            value="1"
-                        />
-                        Molly wants to ____ a barn.</label
-                    >
-                    <label
-                        ><input
-                            type="checkbox"
-                            class="popupCheckbox"
-                            value="1"
-                        />
-                        Jane wants the town to ____ a community center.</label
-                    >
-                    <label
-                        ><input
-                            type="checkbox"
-                            class="popupCheckbox"
-                            value="1"
-                        />
-                        Paul used an organizer to ____ his essay.</label
-                    >
-                    <button
-                        class="next-btn"
-                        style="position: relative; bottom: 0; margin-top: 12px"
-                        onclick="checkAnswers()"
-                    >
-                        Submit
-                    </button>
+                    <label><input type="checkbox" class="popupCheckbox" value="1" /> Molly wants to ____ a barn.</label>
+                    <label><input type="checkbox" class="popupCheckbox" value="1" /> Jane wants the town to ____ a community center.</label>
+                    <label><input type="checkbox" class="popupCheckbox" value="1" /> Paul used an organizer to ____ his essay.</label>
+                    <button class="next-btn" style="position: relative; bottom: 0; margin-top: 12px" onclick="checkAnswers()">Submit</button>
                 </div>
             </div>
             <div class="popup-box" id="popupBoxCreate">
@@ -335,137 +288,142 @@
                     <p>
                         Create can be used in which of the following sentences:
                     </p>
-                    <label
-                        ><input
-                            type="checkbox"
-                            class="popupCheckboxCreate"
-                            value="1"
-                        />
-                        Sarah loves to ____ models.</label
-                    >
-                    <label
-                        ><input
-                            type="checkbox"
-                            class="popupCheckboxCreate"
-                            value="1"
-                        />
-                        We need to ____ a plan.</label
-                    >
-                    <label
-                        ><input
-                            type="checkbox"
-                            class="popupCheckboxCreate"
-                            value="1"
-                        />
-                        We will ____ an argument.</label
-                    >
-                    <button
-                        class="next-btn"
-                        style="position: relative; bottom: 0; margin-top: 12px"
-                        onclick="checkAnswers(true)"
-                    >
-                        Submit
-                    </button>
+                    <label><input type="checkbox" class="popupCheckboxCreate" value="1" /> Sarah loves to ____ models.</label>
+                    <label><input type="checkbox" class="popupCheckboxCreate" value="1" /> We need to ____ a plan.</label>
+                    <label><input type="checkbox" class="popupCheckboxCreate" value="1" /> We will ____ an argument.</label>
+                    <button class="next-btn" style="position: relative; bottom: 0; margin-top: 12px" onclick="checkAnswers(true)">Submit</button>
                 </div>
             </div>
-
             <div class="dialogue-box">
                 <div class="speaker-name" id="speakerName">Click to Start</div>
                 <div class="dialogue-text" id="dialogueText">
                     Click below to begin the story...
                 </div>
             </div>
-
-            <button
-                class="back-btn"
-                onclick="prevDialogue()"
-                id="backBtn"
-                disabled
-            >
-                Back
-            </button>
-            <button class="next-btn" onclick="nextDialogue()" id="nextBtn">
-                Next
-            </button>
+            <button class="back-btn" onclick="prevDialogue()" id="backBtn" disabled>Back</button>
+            <button class="next-btn" onclick="nextDialogue()" id="nextBtn">Next</button>
         </div>
         <!-- Settings Button -->
         <button id="settingsBtn" class="button" style="position:fixed; top:20px; right:20px; z-index:1000; min-width: 100px;">
           Settings
         </button>
-
         <!-- Settings Modal -->
-        <div id="settingsModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#3a4fa0; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.3); z-index:1001; padding:30px;">
+        <div id="settingsModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#3a4fa0; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.3); z-index:2000; padding:30px; color:#fff;">
           <h2>Settings</h2>
           <label for="volumeSlider">Volume:</label>
           <input type="range" id="volumeSlider" min="0" max="100" step="1"><span id="volumeValue"></span>%
           <br><br>
-          <button id="saveSettingsBtn">Save</button>
-          <button id="closeSettingsBtn">Close</button>
+          <button id="saveSettingsBtn" class="button">Save</button>
+          <button id="closeSettingsBtn" class="button">Close</button>
         </div>
         <script>
-              const dialogues = [
-              { speaker: "Pebble", text: "Meet Ham the Hammer! Ham, I need your help.. I need to build a house!" },
-              { speaker: "Ham", text: "Hey there Pebbles! It sounds like you want to construct a house!" },
-              { speaker: "Pebble", text: "Construct? What does that mean?" },
-              { speaker: "Ham", text: "I'll teach you! Construct has two roots: Con - Together, Struct - to build." },
-              { speaker: "Ham", text: "If you put these roots together, you make a new word, which means to make something!" },
-              { speaker: "Ham", text: "For example, I can construct a word by merging the two roots, ‘con’ and ‘struct’!" },
-              { speaker: "Ham", text: "I can also help you to construct a house!" },
-              { speaker: "Pebble", text: "Ham, I know \"construct\" means to build something, but how do I use it in different tenses?" },
-              { speaker: "Ham", text: "Great question, Pebbles! Let’s start with the base form — just construct itself." },
-              { speaker: "Ham", text: "We use construct in the simple present tense with I, you, we, and they.\nFor example: \"They construct bridges every year.\"" },
-              { speaker: "Pebble", text: "What about he or she?" },
-              { speaker: "Ham", text: "For he, she, or it, you add -s to make constructs.\nLike: \"She constructs a model airplane.\"" },
-              { speaker: "Pebble", text: "Okay, that makes sense. How do I talk about the past?" },
-              { speaker: "Ham", text: "For the past tense, add -ed to get constructed.\nExample: \"We constructed a treehouse last summer.\"" },
-              { speaker: "Pebble", text: "What if I want to say I’m doing it right now?" },
-              { speaker: "Ham", text: "Then you use the present continuous tense: am/is/are constructing.\nLike: \"I am constructing a new project.\"" },
-              { speaker: "Pebble", text: "How about the future?" },
-              { speaker: "Ham", text: "To talk about the future, use will construct.\nFor example: \"They will construct a new school next year.\"" },
-              { speaker: "Pebble", text: "So, to summarize, the base word is construct, and by adding different endings or helpers, I can change the tense?" },
-              { speaker: "Ham", text: "Exactly! Here's a quick recap:\n- Present simple: I/you/we/they construct, he/she/it constructs\n- Past simple: constructed\n- Present continuous: am/is/are constructing\n- Future: will construct" },
-              { speaker: "Pebble", text: "Got it! So these changes help me say when the building happens." },
-              { speaker: "Ham", text: "You got it, Pebble! Practice makes perfect!" },
-              { speaker: "Pebble", text: "H5", popup: true },
-              { speaker: "Ham", text: "Correct! All of these sentences can use construct!" },
-              { speaker: "Ham", text: "Alright Pebbles, now that you know 'construct' means to build or put together, let's see how it works in different sentences." },
-              { speaker: "Ham", text: "Sometimes, we construct things you can touch—like buildings or models." },
-              { speaker: "Ham", text: "Other times, we construct ideas, plans, or even arguments, which are less physical but just as important." },
-              { speaker: "Ham", text: "Look at these sentences:" },
-              { speaker: "Ham", text: "Sarah loves to ____ models." },
-              { speaker: "Ham", text: "We need to ____ a plan." },
-              { speaker: "Ham", text: "We will ____ an argument." },
-              { speaker: "Ham", text: "Can you select which sentences correctly use 'construct'? Take your time!" },
-              { speaker: "Pebble", text: "H5", popup: true, isCreateQuiz: true },
-              { speaker: "Ham", text: "Well done! All of these sentences use 'construct' correctly." },
-              { speaker: "Ham", text: "See how 'construct' isn't just for physical things, but also ideas? That makes it a powerful word!" },
-              { speaker: "Pebble", text: "Got it! So.. about my house.." },
-              { speaker: "Ham", text: "Wait a second! I don't work for free. I value knowledge. Prove to me that you learned something and I'll help you build your house." }
-              ];
+            // --- Start Overlay and Music Logic ---
+            let gameStarted = false;
+            let currentIndex = 0;
+            let popupSubmitted = false;
+            let typingTimeout;
 
-              let currentIndex = 0;
-              let popupSubmitted = false;
-
-              const textElem = document.getElementById("dialogueText");
-              const speakerElem = document.getElementById("speakerName");
-              const pebbleImg = document.getElementById("pebble");
-              const hamImg = document.getElementById("ham");
-              const popupBox = document.getElementById("popupBox");
-              const backBtn = document.getElementById("backBtn");
-              const nextBtn = document.getElementById("nextBtn");
-
-              let typingTimeout;
-
-              function typeText(text, i = 0) {
-                if (i < text.length) {
-                  textElem.textContent += text.charAt(i);
-                  typingTimeout = setTimeout(() => typeText(text, i + 1), 60);
-                } else {
-                  nextBtn.disabled = currentIndex >= dialogues.length - 1;
+            function startGame() {
+                document.getElementById('start-overlay').classList.add('fade-out');
+                document.querySelector('.dialogue-container').style.filter = "none";
+                // Fade in music
+                const music = document.getElementById('bg-music');
+                if (music) {
+                    music.volume = 0;
+                    music.play();
+                    let vol = 0;
+                    const fadeIn = setInterval(() => {
+                        if (vol < 1) {
+                            vol += 0.05;
+                            music.volume = Math.min(vol, 1);
+                        } else {
+                            clearInterval(fadeIn);
+                        }
+                    }, 50);
+                    music.addEventListener('ended', function() {
+                        this.currentTime = 0;
+                        this.play();
+                    });
                 }
-              }
+                if (!gameStarted) {
+                    updateDialogue(currentIndex);
+                    gameStarted = true;
+                }
+            }
 
-              function updateDialogue(index) {
+            window.addEventListener("DOMContentLoaded", function() {
+                document.querySelector('.dialogue-container').style.filter = "blur(1.8px)";
+                document.getElementById('start-btn').onclick = startGame;
+                // Do not call updateDialogue() here!
+                // Make all GIFs responsive
+                document.querySelectorAll('img').forEach(img => {
+                    if (img.src.endsWith('.gif')) {
+                        img.style.maxWidth = '100%';
+                        img.style.height = 'auto';
+                        img.style.display = 'block';
+                        img.style.objectFit = 'contain';
+                    }
+                });
+            });
+
+            const dialogues = [
+                { speaker: "Pebble", text: "Meet Ham the Hammer! Ham, I need your help.. I need to build a house!" },
+                { speaker: "Ham", text: "Hey there Pebbles! It sounds like you want to construct a house!" },
+                { speaker: "Pebble", text: "Construct? What does that mean?" },
+                { speaker: "Ham", text: "I'll teach you! Construct has two roots: Con - Together, Struct - to build." },
+                { speaker: "Ham", text: "If you put these roots together, you make a new word, which means to make something!" },
+                { speaker: "Ham", text: "For example, I can construct a word by merging the two roots, ‘con’ and ‘struct’!" },
+                { speaker: "Ham", text: "I can also help you to construct a house!" },
+                { speaker: "Pebble", text: "Ham, I know \"construct\" means to build something, but how do I use it in different tenses?" },
+                { speaker: "Ham", text: "Great question, Pebbles! Let’s start with the base form — just construct itself." },
+                { speaker: "Ham", text: "We use construct in the simple present tense with I, you, we, and they.\nFor example: \"They construct bridges every year.\"" },
+                { speaker: "Pebble", text: "What about he or she?" },
+                { speaker: "Ham", text: "For he, she, or it, you add -s to make constructs.\nLike: \"She constructs a model airplane.\"" },
+                { speaker: "Pebble", text: "Okay, that makes sense. How do I talk about the past?" },
+                { speaker: "Ham", text: "For the past tense, add -ed to get constructed.\nExample: \"We constructed a treehouse last summer.\"" },
+                { speaker: "Pebble", text: "What if I want to say I’m doing it right now?" },
+                { speaker: "Ham", text: "Then you use the present continuous tense: am/is/are constructing.\nLike: \"I am constructing a new project.\"" },
+                { speaker: "Pebble", text: "How about the future?" },
+                { speaker: "Ham", text: "To talk about the future, use will construct.\nFor example: \"They will construct a new school next year.\"" },
+                { speaker: "Pebble", text: "So, to summarize, the base word is construct, and by adding different endings or helpers, I can change the tense?" },
+                { speaker: "Ham", text: "Exactly! Here's a quick recap:\n- Present simple: I/you/we/they construct, he/she/it constructs\n- Past simple: constructed\n- Present continuous: am/is/are constructing\n- Future: will construct" },
+                { speaker: "Pebble", text: "Got it! So these changes help me say when the building happens." },
+                { speaker: "Ham", text: "You got it, Pebble! Practice makes perfect!" },
+                { speaker: "Pebble", text: "H5", popup: true },
+                { speaker: "Ham", text: "Correct! All of these sentences can use construct!" },
+                { speaker: "Ham", text: "Alright Pebbles, now that you know 'construct' means to build or put together, let's see how it works in different sentences." },
+                { speaker: "Ham", text: "Sometimes, we construct things you can touch—like buildings or models." },
+                { speaker: "Ham", text: "Other times, we construct ideas, plans, or even arguments, which are less physical but just as important." },
+                { speaker: "Ham", text: "Look at these sentences:" },
+                { speaker: "Ham", text: "Sarah loves to ____ models." },
+                { speaker: "Ham", text: "We need to ____ a plan." },
+                { speaker: "Ham", text: "We will ____ an argument." },
+                { speaker: "Ham", text: "Can you select which sentences correctly use 'construct'? Take your time!" },
+                { speaker: "Pebble", text: "H5", popup: true, isCreateQuiz: true },
+                { speaker: "Ham", text: "Well done! All of these sentences use 'construct' correctly." },
+                { speaker: "Ham", text: "See how 'construct' isn't just for physical things, but also ideas? That makes it a powerful word!" },
+                { speaker: "Pebble", text: "Got it! So.. about my house.." },
+                { speaker: "Ham", text: "Wait a second! I don't work for free. I value knowledge. Prove to me that you learned something and I'll help you build your house." }
+            ];
+
+            const textElem = document.getElementById("dialogueText");
+            const speakerElem = document.getElementById("speakerName");
+            const pebbleImg = document.getElementById("pebble");
+            const hamImg = document.getElementById("ham");
+            const popupBox = document.getElementById("popupBox");
+            const backBtn = document.getElementById("backBtn");
+            const nextBtn = document.getElementById("nextBtn");
+
+            function typeText(text, i = 0) {
+                if (i < text.length) {
+                    textElem.textContent += text.charAt(i);
+                    typingTimeout = setTimeout(() => typeText(text, i + 1), 60);
+                } else {
+                    nextBtn.disabled = currentIndex >= dialogues.length - 1;
+                }
+            }
+
+            function updateDialogue(index) {
                 clearTimeout(typingTimeout);
 
                 const current = dialogues[index];
@@ -473,162 +431,150 @@
                 const constructionGif = document.getElementById("constructionGif");
                 const puzzleGif = document.getElementById("puzzleGif");
 
-                // Show the construction gif at the old spot
                 if (
-                  current.speaker === "Ham" &&
-                  current.text === "I can also help you to construct a house!"
+                    current.speaker === "Ham" &&
+                    current.text === "I can also help you to construct a house!"
                 ) {
-                  constructionGif.style.display = "block";
+                    constructionGif.style.display = "block";
                 } else {
-                  constructionGif.style.display = "none";
+                    constructionGif.style.display = "none";
                 }
 
-                // Show the puzzle gif on the designated line
                 if (
-                  current.speaker === "Ham" &&
-                  current.text === "If you put these roots together, you make a new word, which means to make something!"
+                    current.speaker === "Ham" &&
+                    current.text === "If you put these roots together, you make a new word, which means to make something!"
                 ) {
-                  puzzleGif.style.display = "block";
+                    puzzleGif.style.display = "block";
                 } else {
-                  puzzleGif.style.display = "none";
+                    puzzleGif.style.display = "none";
                 }
 
                 backBtn.disabled = index === 0;
 
-                // NEW CONDITIONAL LOGIC FOR POPUP TYPES
                 const createPopupBox = document.getElementById("popupBoxCreate");
                 if (current.popup && !popupSubmitted) {
-                  // Hide both popups initially
-                  popupBox.style.display = "none";
-                  createPopupBox.style.display = "none";
-
-                  // Show the right popup
-                  if (current.isCreateQuiz) {
-                    createPopupBox.style.display = "block";
-                    document
-                      .querySelectorAll(".popupCheckboxCreate")
-                      .forEach(cb => (cb.checked = false));
-                  } else {
-                    popupBox.style.display = "block";
-                    document
-                      .querySelectorAll(".popupCheckbox")
-                      .forEach(cb => (cb.checked = false));
-                  }
-
-                  nextBtn.disabled = true;
-                  textElem.textContent = ""; // Clear dialogue while quiz is open
+                    popupBox.style.display = "none";
+                    createPopupBox.style.display = "none";
+                    if (current.isCreateQuiz) {
+                        createPopupBox.style.display = "block";
+                        document
+                            .querySelectorAll(".popupCheckboxCreate")
+                            .forEach(cb => (cb.checked = false));
+                    } else {
+                        popupBox.style.display = "block";
+                        document
+                            .querySelectorAll(".popupCheckbox")
+                            .forEach(cb => (cb.checked = false));
+                    }
+                    nextBtn.disabled = true;
+                    textElem.textContent = ""; // Clear dialogue while quiz is open
                 } else {
-                  popupBox.style.display = "none";
-                  createPopupBox.style.display = "none";
-                  nextBtn.disabled = true; // Disable while typing
-                  textElem.textContent = "";
-                  typeText(current.text);
+                    popupBox.style.display = "none";
+                    createPopupBox.style.display = "none";
+                    nextBtn.disabled = true; // Disable while typing
+                    textElem.textContent = "";
+                    typeText(current.text);
                 }
 
-                // Set character bounce/active
                 pebbleImg.classList.remove("active", "talking");
                 hamImg.classList.remove("active", "talking");
 
                 if (current.speaker === "Pebble") {
-                  pebbleImg.classList.add("active", "talking");
+                    pebbleImg.classList.add("active", "talking");
                 } else if (current.speaker === "Ham") {
-                  hamImg.classList.add("active", "talking");
+                    hamImg.classList.add("active", "talking");
                 }
-              }
+            }
 
-              function nextDialogue() {
+            function nextDialogue() {
                 if (dialogues[currentIndex].popup && !popupSubmitted) return;
                 if (currentIndex < dialogues.length - 1) {
-                  currentIndex++;
-                  popupSubmitted = false;
-                  updateDialogue(currentIndex);
+                    currentIndex++;
+                    popupSubmitted = false;
+                    updateDialogue(currentIndex);
                 }
-              }
+            }
 
-              function prevDialogue() {
+
+            function prevDialogue() {
                 if (currentIndex > 0) {
-                  currentIndex--;
-                  popupSubmitted = false;
-                  updateDialogue(currentIndex);
+                    currentIndex--;
+                    popupSubmitted = false;
+                    updateDialogue(currentIndex);
                 }
-              }
+            }
 
-              function checkAnswers(isCreate = false) {
+            function checkAnswers(isCreate = false) {
                 const selector = isCreate ? ".popupCheckboxCreate" : ".popupCheckbox";
                 const checkboxes = document.querySelectorAll(selector);
                 let allCorrect = true;
 
                 checkboxes.forEach(cb => {
-                  if ((cb.checked && cb.value !== "1") || (!cb.checked && cb.value === "1")) {
-                    allCorrect = false;
-                  }
+                    if ((cb.checked && cb.value !== "1") || (!cb.checked && cb.value === "1")) {
+                        allCorrect = false;
+                    }
                 });
 
                 if (allCorrect) {
-                  speakerElem.textContent = "Ham";
-                  textElem.textContent = "Correct ✅";
-                  popupSubmitted = true;
-                  setTimeout(() => {
-                    nextDialogue();
-                  }, 1000);
+                    speakerElem.textContent = "Ham";
+                    textElem.textContent = "Correct ✅";
+                    popupSubmitted = true;
+                    setTimeout(() => {
+                        nextDialogue();
+                    }, 1000);
                 } else {
-                  speakerElem.textContent = "Ham";
-                  textElem.textContent = "Wrong ❌ Try again!";
+                    speakerElem.textContent = "Ham";
+                    textElem.textContent = "Wrong ❌ Try again!";
                 }
-              }
+            }
 
-              function createParticles(x, y) {
+            function createParticles(x, y) {
                 for (let i = 0; i < 10; i++) {
-                  const p = document.createElement('div');
-                  p.className = 'particle';
-                  p.style.left = `${x + Math.random() * 20 - 10}px`;
-                  p.style.top = `${y + Math.random() * 20 - 10}px`;
-                  document.body.appendChild(p);
-                  setTimeout(() => p.remove(), 600);
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    p.style.left = `${x + Math.random() * 20 - 10}px`;
+                    p.style.top = `${y + Math.random() * 20 - 10}px`;
+                    document.body.appendChild(p);
+                    setTimeout(() => p.remove(), 600);
                 }
-              }
+            }
 
-              document.querySelectorAll(".next-btn, .back-btn").forEach(btn => {
+            document.querySelectorAll(".next-btn, .back-btn").forEach(btn => {
                 btn.addEventListener("click", e => {
-                  createParticles(e.clientX, e.clientY);
+                    createParticles(e.clientX, e.clientY);
                 });
-              });
+            });
 
-              window.onload = function() {
-                updateDialogue(currentIndex);
+            window.onload = function() {
                 // Settings logic starts here
                 function loadSettings() {
-                  const settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
-                  document.getElementById('volumeSlider').value = settings.volume;
-                  document.getElementById('volumeValue').textContent = settings.volume;
-                  return settings;
+                    const settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
+                    document.getElementById('volumeSlider').value = settings.volume;
+                    document.getElementById('volumeValue').textContent = settings.volume;
+                    return settings;
                 }
                 function saveSettings() {
-                  const volume = parseInt(document.getElementById('volumeSlider').value, 10);
-                  localStorage.setItem('gameSettings', JSON.stringify({ volume }));
-                  alert('Settings saved!');
-                  // Optionally, call your game's audio volume update here
-                  // if (window.setGameVolume) setGameVolume(volume);
+                    const volume = parseInt(document.getElementById('volumeSlider').value, 10);
+                    localStorage.setItem('gameSettings', JSON.stringify({ volume }));
+                    alert('Settings saved!');
                 }
                 const modal = document.getElementById('settingsModal');
                 document.getElementById('settingsBtn').onclick = function() {
-                  modal.style.display = 'block';
-                  loadSettings();
+                    modal.style.display = 'block';
+                    loadSettings();
                 };
                 document.getElementById('closeSettingsBtn').onclick = function() {
-                  modal.style.display = 'none';
+                    modal.style.display = 'none';
                 };
                 document.getElementById('saveSettingsBtn').onclick = function() {
-                  saveSettings();
-                  modal.style.display = 'none';
+                    saveSettings();
+                    modal.style.display = 'none';
                 };
                 document.getElementById('volumeSlider').oninput = function() {
-                  document.getElementById('volumeValue').textContent = this.value;
+                    document.getElementById('volumeValue').textContent = this.value;
                 };
-                // Apply settings on load (optional)
                 loadSettings();
-                // if (window.setGameVolume) setGameVolume(settings.volume);
-              };
+            };
         </script>
     </body>
 </html>
