@@ -13,7 +13,35 @@
       color: white;
       overflow: hidden;
     }
-
+      #musicSettingsBtn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 20;
+      background: #111;
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-family: 'Press Start 2P', monospace;
+      cursor: pointer;
+    }
+    #musicSettingsPanel {
+      display: none;
+      position: fixed;
+      top: 50px;
+      right: 10px;
+      z-index: 30;
+      background: #222;
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: 1.5px solid #fff;
+    }
+    #musicVolume {
+      vertical-align: middle;
+      margin-left: 8px;
+    }
+    
     .dialogue-container {
       width: 100vw;
       height: 100vh;
@@ -203,6 +231,15 @@
   </style>
 </head>
 <body>
+   <audio id="battleMusic" src="Pokemon%20XY%20Legendary%20Battle%20Remix.mp3" preload="auto"></audio>
+
+  <!-- Music settings button and panel -->
+  <button id="musicSettingsBtn">Music Settings</button>
+  <div id="musicSettingsPanel">
+    <label>Volume:
+      <input type="range" id="musicVolume" min="0" max="1" step="0.01" value="1">
+    </label>
+  </div>
   <div class="dialogue-container">
     <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/PebbleMouthClosed.png" class="character left-character" id="pebble" />
     <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/HamMouthClosed.png" class="character right-character" id="ham" />
@@ -239,6 +276,20 @@
   </div>
 
   <script>
+     let musicStarted = false;
+    const battleMusic = document.getElementById('battleMusic');
+    const musicSettingsBtn = document.getElementById('musicSettingsBtn');
+    const musicSettingsPanel = document.getElementById('musicSettingsPanel');
+    const musicVolume = document.getElementById('musicVolume');
+
+    // Show/hide music settings panel
+    musicSettingsBtn.onclick = function() {
+      musicSettingsPanel.style.display = musicSettingsPanel.style.display === "none" ? "block" : "none";
+    };
+    // Adjust volume live
+    musicVolume.oninput = function() {
+      battleMusic.volume = this.value;
+    };
     const dialogues = [
       { speaker: "Ham", text: "If you wanna prove your worth…you need to prove your WITS!" },
       { speaker: "Pebble", text: "Bring it on!" },
@@ -334,8 +385,16 @@
 
       typeChar();
     }
+    
 
     function nextDialogue() {
+      if (!musicStarted) {
+        battleMusic.currentTime = 0;
+        battleMusic.volume = musicVolume.value;
+        battleMusic.loop = true;
+        battleMusic.play();
+        musicStarted = true;
+      }
       if (isTyping) {
         clearTimeout(typingTimeout);
         const fullText = dialogues[currentIndex - 1]?.text || "";
