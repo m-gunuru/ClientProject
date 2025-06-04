@@ -5,7 +5,6 @@
   <title>Sign-Up</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <style>
-    /* Your styles here, unchanged */
     * {
       margin: 0;
       padding: 0;
@@ -50,10 +49,10 @@
         left: 550px;
     }
     .email {
-        top: 200px;
+        top: 250px;
     }
     .emailCode {
-        top: 300px;
+        top: 350px;
     }
     .submit {
       background-color: #1e518c;
@@ -64,7 +63,7 @@
       height: 65px;
       position: absolute;
       text-align: center;
-      top: 425px;
+      top: 450px;
       left: 580px;
       border: 2px solid rgba(255, 255, 255, 0.778);
       border-radius: 0; 
@@ -72,12 +71,36 @@
       text-shadow: 2px 3px 2px #00000094;
       cursor: pointer;
     }
+    .instructions {
+      color: rgb(255, 255, 255);
+      position: absolute;
+      top: 165px;
+      left:200px;
+      text-align: center;
+      text-shadow: 2px 3px 2px #00000094;
+      animation: typing 4.5s steps(55) forwards, blink 1.25s infinite;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 73%; }
+    }
+
+    @keyframes blink {
+      from { border-color: transparent; }
+      to { border-color: white; }
+    }
   </style>
 </head>
 <body>
 
   <div class="hero">
     <h1>Sign-Up</h1>
+  </div>
+
+  <div class="instructions">
+    <h3> Please enter your email and create your own password.</h3>
   </div>
 
   <input type="email" id="emailInput" class="createAcc email" placeholder="email" />
