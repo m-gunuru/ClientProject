@@ -26,6 +26,7 @@ const logPass = document.createElement('input');
 logPass.placeholder = 'Password';
 logPass.classList.add('log', 'logPass');
 logPass.id = 'passInput';
+logPass.type = 'password';
 document.getElementById('password-container').appendChild(logPass);
 
 
