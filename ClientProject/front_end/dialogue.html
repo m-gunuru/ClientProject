@@ -324,32 +324,40 @@
             let typingTimeout;
 
             function startGame() {
-                document.getElementById('start-overlay').classList.add('fade-out');
-                document.querySelector('.dialogue-container').style.filter = "none";
-                // Fade in music
-                const music = document.getElementById('bg-music');
-                if (music) {
-                    music.volume = 0;
-                    music.play();
-                    let vol = 0;
-                    const fadeIn = setInterval(() => {
-                        if (vol < 1) {
-                            vol += 0.05;
-                            music.volume = Math.min(vol, 1);
-                        } else {
-                            clearInterval(fadeIn);
-                        }
-                    }, 50);
-                    music.addEventListener('ended', function() {
-                        this.currentTime = 0;
-                        this.play();
-                    });
-                }
-                if (!gameStarted) {
-                    updateDialogue(currentIndex);
-                    gameStarted = true;
-                }
-            }
+    document.getElementById('start-overlay').classList.add('fade-out');
+    document.querySelector('.dialogue-container').style.filter = "none";
+    const music = document.getElementById('bg-music');
+    // Load volume from settings or use 100 as default
+    let settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
+    let volume = (typeof settings.volume === "number") ? settings.volume : 100;
+    music.volume = volume / 100;
+    // Play music in response to user click
+    music.play().catch(e => {
+        // If play fails, show a message or ignore
+        console.warn("Music play failed:", e);
+    });
+    // Optionally fade in music if you want
+    
+    let vol = 0;
+    music.volume = vol;
+    const fadeIn = setInterval(() => {
+        if (vol < volume / 100) {
+            vol += 0.05;
+            music.volume = Math.min(vol, volume / 100);
+        } else {
+            clearInterval(fadeIn);
+        }
+    }, 50);
+    
+    music.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.play();
+    });
+    if (!gameStarted) {
+        updateDialogue(currentIndex);
+        gameStarted = true;
+    }
+}
 
             window.addEventListener("DOMContentLoaded", function() {
                 document.querySelector('.dialogue-container').style.filter = "blur(1.8px)";
