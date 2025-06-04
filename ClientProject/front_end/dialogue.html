@@ -430,7 +430,15 @@
                     nextBtn.disabled = currentIndex >= dialogues.length - 1;
                 }
             }
+// Make sure this matches your actual function name for next dialogue
+function handleSkipDialogue(event) {
+  if (event.key === 's' || event.key === 'S') {
+    // Replace 'nextDialogue' with your actual function name
+    nextDialogue();
+  }
+}
 
+document.addEventListener('keydown', handleSkipDialogue);
             function updateDialogue(index) {
                 clearTimeout(typingTimeout);
 
