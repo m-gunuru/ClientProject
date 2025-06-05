@@ -271,9 +271,8 @@
         </div>
         <!-- Background music for the game -->
         <audio id="bg-music" loop>
-          <source src="https://github.com/m-gunuru/ClientProject/blob/Test/ClientProject/front_end/Pokemon%20BW2%20Iris%20Battle%20Remix.mp3?raw=true" type="audio/mpeg">
+            <source src="https://github.com/m-gunuru/ClientProject/blob/Test/ClientProject/front_end/Pokemon%20BW2%20Iris%20Battle%20Remix.mp3?raw=true" type="audio/mpeg">
         </audio>
-        
         <div class="dialogue-container">
             <!-- Character Sprites -->
             <img
@@ -567,15 +566,26 @@
 
         // dialogue navigation
         function nextDialogue() {
-            if (dialogues[currentIndex].popup && !popupSubmitted) return;
-            if (currentIndex < dialogues.length - 1) {
-                currentIndex++;
-                popupSubmitted = false;
-                updateDialogue(currentIndex);
-            } else {
-                window.location.href = "fightDialogue.html"; //redirect to fight screen
-            }
+    if (dialogues[currentIndex].popup && !popupSubmitted) return;
+    if (currentIndex < dialogues.length - 1) {
+        currentIndex++;
+        popupSubmitted = false;
+        updateDialogue(currentIndex);
+
+        // Redirect after Ham's last line
+        const current = dialogues[currentIndex];
+        if (
+            current.speaker === "Ham" &&
+            current.text === "Wait a second! I don't work for free. I value knowledge. Prove to me that you learned something and I'll help you build your house."
+        ) {
+            setTimeout(() => {
+                window.location.href = "fightDialogue.html";
+            }, 4000); // Optional: delay so user sees the line
         }
+    } else {
+        window.location.href = "fightDialogue.html";
+    }
+}
 
         function prevDialogue() {
             if (currentIndex > 0) {
