@@ -62,20 +62,25 @@
       z-index: 2;
     }
     .popup-box {
-      position: absolute;
-      left: 50%;
-      bottom: 180px;
-      transform: translateX(-50%);
-      width: 85vw;
-      max-width: 1000px;
-      background: rgba(0, 0, 0, 0.85);
-      padding: 32px 32px 32px;
-      border: 2.5px solid #fff;
-      border-radius: 18px;
-      box-shadow: 0 -4px 24px #000a;
-      z-index: 3;
-      display: none;
-    }
+  position: absolute;
+  left: 50%;
+  bottom: 250px; /* increase this value to move the popup up */
+  transform: translateX(-50%);
+  width: 85vw;
+  max-width: 1000px;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 32px;
+  border: 2.5px solid #fff;
+  border-radius: 18px;
+  box-shadow: 0 -4px 24px #000a;
+  z-index: 3;
+  display: none;
+}
+
+.popup-box .next-btn {
+  margin-left: 32px; /* Move the submit button to the right */
+}
+
     .popup-content label {
       display: block;
       margin-bottom: 12px;
