@@ -161,7 +161,6 @@
                 position: absolute;
                 width: 6px;
                 height: 6px;
-                background: yellow;
                 border-radius: 50%;
                 animation: pop 0.6s ease-out forwards;
                 pointer-events: none;
@@ -307,7 +306,7 @@
             <div class="popup-box" id="popupBoxCreate">
                 <div class="popup-content">
                     <p>
-                        Create can be used in which of the following sentences:
+                        Construct can be used in which of the following sentences:
                     </p>
                     <label><input type="checkbox" class="popupCheckboxCreate" value="1" /> Sarah loves to ____ models.</label>
                     <label><input type="checkbox" class="popupCheckboxCreate" value="1" /> We need to ____ a plan.</label>
@@ -348,33 +347,40 @@
 
             // Called when the player clicks Start
             function startGame() {
-                document.getElementById('start-overlay').classList.add('fade-out');
-                document.querySelector('.dialogue-container').style.filter = "none";
-                // Fade in music
-                const music = document.getElementById('bg-music');
-                if (music) {
-                    music.volume = 0;
-                    music.play();
-                    let vol = 0;
-                    const fadeIn = setInterval(() => {
-                        if (vol < 1) {
-                            vol += 0.05;
-                            music.volume = Math.min(vol, 1);
-                        } else {
-                            clearInterval(fadeIn);
-                        }
-                    }, 50);
-                    // Loop music
-                    music.addEventListener('ended', function() {
-                        this.currentTime = 0;
-                        this.play();
-                    });
-                }
-                if (!gameStarted) {
-                    updateDialogue(currentIndex);
-                    gameStarted = true;
-                }
-            }
+    document.getElementById('start-overlay').classList.add('fade-out');
+    document.querySelector('.dialogue-container').style.filter = "none";
+    const music = document.getElementById('bg-music');
+    // Load volume from settings or use 100 as default
+    let settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
+    let volume = (typeof settings.volume === "number") ? settings.volume : 100;
+    music.volume = volume / 100;
+    // Play music in response to user click
+    music.play().catch(e => {
+        // If play fails, show a message or ignore
+        console.warn("Music play failed:", e);
+    });
+    // Optionally fade in music if you want
+    
+    let vol = 0;
+    music.volume = vol;
+    const fadeIn = setInterval(() => {
+        if (vol < volume / 100) {
+            vol += 0.05;
+            music.volume = Math.min(vol, volume / 100);
+        } else {
+            clearInterval(fadeIn);
+        }
+    }, 50);
+    
+    music.addEventListener('ended', function() {
+        this.currentTime = 0;
+        this.play();
+    });
+    if (!gameStarted) {
+        updateDialogue(currentIndex);
+        gameStarted = true;
+    }
+}
 
 
             // On page load: blur game, set up start button, make GIFs responsive
@@ -421,10 +427,6 @@
                 { speaker: "Ham", text: "Alright Pebbles, now that you know 'construct' means to build or put together, let's see how it works in different sentences." },
                 { speaker: "Ham", text: "Sometimes, we construct things you can touch—like buildings or models." },
                 { speaker: "Ham", text: "Other times, we construct ideas, plans, or even arguments, which are less physical but just as important." },
-                { speaker: "Ham", text: "Look at these sentences:" },
-                { speaker: "Ham", text: "Sarah loves to ____ models." },
-                { speaker: "Ham", text: "We need to ____ a plan." },
-                { speaker: "Ham", text: "We will ____ an argument." },
                 { speaker: "Ham", text: "Can you select which sentences correctly use 'construct'? Take your time!" },
                 { speaker: "Pebble", text: "H5", popup: true, isCreateQuiz: true },
                 { speaker: "Ham", text: "Well done! All of these sentences use 'construct' correctly." },
@@ -451,8 +453,15 @@
                     nextBtn.disabled = currentIndex >= dialogues.length - 1;
                 }
             }
+// Make sure this matches your actual function name for next dialogue
+function handleSkipDialogue(event) {
+  if (event.key === 's' || event.key === 'S') {
+    // Replace 'nextDialogue' with your actual function name
+    nextDialogue();
+  }
+}
 
-            // Update Dialogue and UI for Current Index 
+document.addEventListener('keydown', handleSkipDialogue);
             function updateDialogue(index) {
                 clearTimeout(typingTimeout);
 
@@ -531,7 +540,6 @@
                 }
             }
 
-
             function prevDialogue() {
                 if (currentIndex > 0) {
                     currentIndex--;
@@ -572,6 +580,7 @@
                     p.className = 'particle';
                     p.style.left = `${x + Math.random() * 20 - 10}px`;
                     p.style.top = `${y + Math.random() * 20 - 10}px`;
+                    p.style.background = `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}`;
                     document.body.appendChild(p);
                     setTimeout(() => p.remove(), 600);
                 }
@@ -583,36 +592,38 @@
                 });
             });
 
-            window.onload = function() {
-                // settings logic
-                function loadSettings() {
-                    const settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
-                    document.getElementById('volumeSlider').value = settings.volume;
-                    document.getElementById('volumeValue').textContent = settings.volume;
-                    return settings;
-                }
-                function saveSettings() {
-                    const volume = parseInt(document.getElementById('volumeSlider').value, 10);
-                    localStorage.setItem('gameSettings', JSON.stringify({ volume }));
-                    alert('Settings saved!');
-                }
-                const modal = document.getElementById('settingsModal');
-                document.getElementById('settingsBtn').onclick = function() {
-                    modal.style.display = 'block';
-                    loadSettings();
-                };
-                document.getElementById('closeSettingsBtn').onclick = function() {
-                    modal.style.display = 'none';
-                };
-                document.getElementById('saveSettingsBtn').onclick = function() {
-                    saveSettings();
-                    modal.style.display = 'none';
-                };
-                document.getElementById('volumeSlider').oninput = function() {
-                    document.getElementById('volumeValue').textContent = this.value;
-                };
-                loadSettings();
-            };
+           window.onload = function() {
+    // Settings logic starts here
+    function loadSettings() {
+        const settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
+        document.getElementById('volumeSlider').value = settings.volume;
+        document.getElementById('volumeValue').textContent = settings.volume;
+        document.getElementById('bg-music').volume = settings.volume / 100;
+        return settings;
+    }
+    function saveSettings() {
+        const volume = parseInt(document.getElementById('volumeSlider').value, 10);
+        localStorage.setItem('gameSettings', JSON.stringify({ volume }));
+        alert('Settings saved!');
+    }
+    const modal = document.getElementById('settingsModal');
+    document.getElementById('settingsBtn').onclick = function() {
+        modal.style.display = 'block';
+        loadSettings();
+    };
+    document.getElementById('closeSettingsBtn').onclick = function() {
+        modal.style.display = 'none';
+    };
+    document.getElementById('saveSettingsBtn').onclick = function() {
+        saveSettings();
+        modal.style.display = 'none';
+    };
+    document.getElementById('volumeSlider').oninput = function() {
+        document.getElementById('volumeValue').textContent = this.value;
+        document.getElementById('bg-music').volume = this.value / 100;
+    };
+    loadSettings();
+};
         </script>
     </body>
 </html>
