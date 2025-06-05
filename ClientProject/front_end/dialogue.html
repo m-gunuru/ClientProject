@@ -256,6 +256,12 @@
                 .character.active { height: 300px; }
                 .popup-box { bottom: 110px; padding: 10px 3vw 10px; }
             }
+            /* color of highlighted text */
+            .highlight {
+                color: #ff1313;
+                font-weight: bold;
+            }
+
         </style>
     </head>
     <body>
@@ -347,40 +353,40 @@
 
             // Called when the player clicks Start
             function startGame() {
-    document.getElementById('start-overlay').classList.add('fade-out');
-    document.querySelector('.dialogue-container').style.filter = "none";
-    const music = document.getElementById('bg-music');
-    // Load volume from settings or use 100 as default
-    let settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
-    let volume = (typeof settings.volume === "number") ? settings.volume : 100;
-    music.volume = volume / 100;
-    // Play music in response to user click
-    music.play().catch(e => {
-        // If play fails, show a message or ignore
-        console.warn("Music play failed:", e);
-    });
-    // Optionally fade in music if you want
+                document.getElementById('start-overlay').classList.add('fade-out');
+                document.querySelector('.dialogue-container').style.filter = "none";
+                const music = document.getElementById('bg-music');
+                // Load volume from settings or use 100 as default
+                let settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
+                let volume = (typeof settings.volume === "number") ? settings.volume : 100;
+                music.volume = volume / 100;
+                // Play music in response to user click
+                music.play().catch(e => {
+                // If play fails, show a message or ignore
+                console.warn("Music play failed:", e);
+                });
+                // Optionally fade in music if you want
     
-    let vol = 0;
-    music.volume = vol;
-    const fadeIn = setInterval(() => {
-        if (vol < volume / 100) {
-            vol += 0.05;
-            music.volume = Math.min(vol, volume / 100);
-        } else {
-            clearInterval(fadeIn);
-        }
-    }, 50);
+                let vol = 0;
+                music.volume = vol;
+                const fadeIn = setInterval(() => {
+                    if (vol < volume / 100) {
+                        vol += 0.05;
+                        music.volume = Math.min(vol, volume / 100);
+                    } else {
+                        clearInterval(fadeIn);
+                    }
+                }, 50);
     
-    music.addEventListener('ended', function() {
-        this.currentTime = 0;
-        this.play();
-    });
-    if (!gameStarted) {
-        updateDialogue(currentIndex);
-        gameStarted = true;
-    }
-}
+                music.addEventListener('ended', function() {
+                    this.currentTime = 0;
+                    this.play();
+                });
+                if (!gameStarted) {
+                    updateDialogue(currentIndex);
+                    gameStarted = true;
+                }
+            }
 
 
             // On page load: blur game, set up start button, make GIFs responsive
@@ -403,7 +409,7 @@
                 { speaker: "Pebble", text: "Meet Ham the Hammer! Ham, I need your help.. I need to build a house!" },
                 { speaker: "Ham", text: "Hey there Pebbles! It sounds like you want to construct a house!" },
                 { speaker: "Pebble", text: "Construct? What does that mean?" },
-                { speaker: "Ham", text: "I'll teach you! Construct has two roots: Con - Together, Struct - to build." },
+                { speaker: "Ham", text: "I'll teach you! *Construct* has two roots:  *Con - Together*, *Struct - to build*." },
                 { speaker: "Ham", text: "If you put these roots together, you make a new word, which means to make something!" },
                 { speaker: "Ham", text: "For example, I can construct a word by merging the two roots, ‘con’ and ‘struct’!" },
                 { speaker: "Ham", text: "I can also help you to construct a house!" },
@@ -434,6 +440,7 @@
                 { speaker: "Pebble", text: "Got it! So.. about my house.." },
                 { speaker: "Ham", text: "Wait a second! I don't work for free. I value knowledge. Prove to me that you learned something and I'll help you build your house." }
             ];
+        
 
             // DOM Elements 
             const textElem = document.getElementById("dialogueText");
@@ -445,185 +452,214 @@
             const nextBtn = document.getElementById("nextBtn");
 
             // Typewriter Effect for Dialogue Text
-            function typeText(text, i = 0) {
-                if (i < text.length) {
-                    textElem.textContent += text.charAt(i);
-                    typingTimeout = setTimeout(() => typeText(text, i + 1), 60);
+            function typeTextWithHighlight(text, i = 0) {
+                // Replace *word* with <span class="highlight">word</span>
+                const html = text.replace(/\*([^*]+)\*/g, '<span class="highlight">$1</span>');
+                // Strip tags to get plain text length for typing
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                const plain = temp.textContent || temp.innerText || "";
+                // Build up the HTML up to the i-th character
+                let count = 0, result = "";
+                function walk(node) {
+                    if (count >= i) return;
+                    if (node.nodeType === 3) { // Text node
+                        let remain = i - count;
+                        result += node.nodeValue.slice(0, remain);
+                        count += Math.min(remain, node.nodeValue.length);
+                    } else if (node.nodeType === 1) { // Element node
+                        result += `<${node.nodeName.toLowerCase()}${[...node.attributes].map(a=>` ${a.name}="${a.value}"`).join("")}>`;
+                        for (let child of node.childNodes) walk(child);
+                        result += `</${node.nodeName.toLowerCase()}>`;
+                    }
+                }
+                for (let child of temp.childNodes) walk(child);
+                textElem.innerHTML = result;
+                if (i < plain.length) {
+                    typingTimeout = setTimeout(() => typeTextWithHighlight(text, i + 1), 60);
                 } else {
+                    textElem.innerHTML = html;
                     nextBtn.disabled = currentIndex >= dialogues.length - 1;
                 }
             }
-// Make sure this matches your actual function name for next dialogue
-function handleSkipDialogue(event) {
-  if (event.key === 's' || event.key === 'S') {
-    // Replace 'nextDialogue' with your actual function name
-    nextDialogue();
-  }
-}
 
-document.addEventListener('keydown', handleSkipDialogue);
-            function updateDialogue(index) {
+        // Make sure this matches your actual function name for next dialogue
+        function handleSkipDialogue(event) {
+            if (event.key === 's' || event.key === 'S') {
+                const current = dialogues[currentIndex];
                 clearTimeout(typingTimeout);
+                // Show full highlighted text instantly
+                textElem.innerHTML = current.text.replace(/\*([^*]+)\*/g, '<span class="highlight">$1</span>');
+                nextBtn.disabled = currentIndex >= dialogues.length - 1;
+            }
+        }
+        document.addEventListener('keydown', handleSkipDialogue);
 
-                const current = dialogues[index];
-                speakerElem.textContent = current.speaker;
-                const constructionGif = document.getElementById("constructionGif");
-                const puzzleGif = document.getElementById("puzzleGif");
-                // Show/hide GIFs based on dialogue
-                if (
-                    current.speaker === "Ham" &&
-                    current.text === "I can also help you to construct a house!"
-                ) {
-                    constructionGif.style.display = "block";
-                } else {
-                    constructionGif.style.display = "none";
-                }
 
-                if (
-                    current.speaker === "Ham" &&
-                    current.text === "If you put these roots together, you make a new word, which means to make something!"
-                ) {
-                    puzzleGif.style.display = "block";
-                } else {
-                    puzzleGif.style.display = "none";
-                }
 
-                // Disable back button
-                backBtn.disabled = index === 0;
+        document.addEventListener('keydown', handleSkipDialogue);
+        function updateDialogue(index) {
+            clearTimeout(typingTimeout);
 
-                 // Handle popups for quizzes
-                const createPopupBox = document.getElementById("popupBoxCreate");
-                if (current.popup && !popupSubmitted) {
-                    popupBox.style.display = "none";
-                    createPopupBox.style.display = "none";
-                    if (current.isCreateQuiz) {
-                        createPopupBox.style.display = "block";
-                        document
-                            .querySelectorAll(".popupCheckboxCreate")
-                            .forEach(cb => (cb.checked = false));
-                    } else {
-                        popupBox.style.display = "block";
-                        document
-                            .querySelectorAll(".popupCheckbox")
-                            .forEach(cb => (cb.checked = false));
-                    }
-                    nextBtn.disabled = true;
-                    textElem.textContent = ""; // Clear dialogue while quiz is open
-                } else {
-                    popupBox.style.display = "none";
-                    createPopupBox.style.display = "none";
-                    nextBtn.disabled = true; // Disable until typing is done
-                    textElem.textContent = "";
-                    typeText(current.text);
-                }
-
-                // Animate character sprites
-                pebbleImg.classList.remove("active", "talking");
-                hamImg.classList.remove("active", "talking");
-
-                if (current.speaker === "Pebble") {
-                    pebbleImg.classList.add("active", "talking");
-                } else if (current.speaker === "Ham") {
-                    hamImg.classList.add("active", "talking");
-                }
+            const current = dialogues[index];
+            speakerElem.textContent = current.speaker;
+            const constructionGif = document.getElementById("constructionGif");
+            const puzzleGif = document.getElementById("puzzleGif");
+            // Show/hide GIFs based on dialogue
+            if (
+                current.speaker === "Ham" &&
+                current.text === "I can also help you to construct a house!"
+            ) {
+                constructionGif.style.display = "block";
+            } else {
+                constructionGif.style.display = "none";
             }
 
-            // dialogue navigation
-            function nextDialogue() {
-                if (dialogues[currentIndex].popup && !popupSubmitted) return;
-                if (currentIndex < dialogues.length - 1) {
-                    currentIndex++;
-                    popupSubmitted = false;
-                    updateDialogue(currentIndex);
+            if (
+            current.speaker === "Ham" &&
+                current.text === "If you put these roots together, you make a new word, which means to make something!"
+            ) {
+                puzzleGif.style.display = "block";
+            } else {
+                puzzleGif.style.display = "none";
+            }
+
+            // Disable back button
+            backBtn.disabled = index === 0;
+
+            // Handle popups for quizzes
+            const createPopupBox = document.getElementById("popupBoxCreate");
+            if (current.popup && !popupSubmitted) {
+                popupBox.style.display = "none";
+                createPopupBox.style.display = "none";
+                if (current.isCreateQuiz) {
+                    createPopupBox.style.display = "block";
+                    document
+                        .querySelectorAll(".popupCheckboxCreate")
+                        .forEach(cb => (cb.checked = false));
                 } else {
-                    window.location.href = "fightDialogue.html"; //redirect to fight screen
+                    popupBox.style.display = "block";
+                    document
+                        .querySelectorAll(".popupCheckbox")
+                        .forEach(cb => (cb.checked = false));
                 }
+                nextBtn.disabled = true;
+                textElem.textContent = ""; // Clear dialogue while quiz is open
+            } else {
+                popupBox.style.display = "none";
+                createPopupBox.style.display = "none";
+                nextBtn.disabled = true; // Disable until typing is done
+                textElem.textContent = "";
+                typeTextWithHighlight(current.text);
             }
 
-            function prevDialogue() {
-                if (currentIndex > 0) {
-                    currentIndex--;
-                    popupSubmitted = false;
-                    updateDialogue(currentIndex);
-                }
+            // Animate character sprites
+            pebbleImg.classList.remove("active", "talking");
+            hamImg.classList.remove("active", "talking");
+
+            if (current.speaker === "Pebble") {
+                pebbleImg.classList.add("active", "talking");
+            } else if (current.speaker === "Ham") {
+                hamImg.classList.add("active", "talking");
             }
+        }
 
-            // checking quiz answers
-            function checkAnswers(isCreate = false) {
-                const selector = isCreate ? ".popupCheckboxCreate" : ".popupCheckbox";
-                const checkboxes = document.querySelectorAll(selector);
-                let allCorrect = true;
-
-                checkboxes.forEach(cb => {
-                    if ((cb.checked && cb.value !== "1") || (!cb.checked && cb.value === "1")) {
-                        allCorrect = false;
-                    }
-                });
-
-                if (allCorrect) {
-                    speakerElem.textContent = "Ham";
-                    textElem.textContent = "Correct ✅";
-                    popupSubmitted = true;
-                    setTimeout(() => {
-                        nextDialogue();
-                    }, 1000);
-                } else {
-                    speakerElem.textContent = "Ham";
-                    textElem.textContent = "Wrong ❌ Try again!";
-                }
+        // dialogue navigation
+        function nextDialogue() {
+            if (dialogues[currentIndex].popup && !popupSubmitted) return;
+            if (currentIndex < dialogues.length - 1) {
+                currentIndex++;
+                popupSubmitted = false;
+                updateDialogue(currentIndex);
+            } else {
+                window.location.href = "fightDialogue.html"; //redirect to fight screen
             }
+        }
 
-            // Particle Animation on Button Clicks 
-            function createParticles(x, y) {
-                for (let i = 0; i < 10; i++) {
-                    const p = document.createElement('div');
-                    p.className = 'particle';
-                    p.style.left = `${x + Math.random() * 20 - 10}px`;
-                    p.style.top = `${y + Math.random() * 20 - 10}px`;
-                    p.style.background = `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}`;
-                    document.body.appendChild(p);
-                    setTimeout(() => p.remove(), 600);
-                }
+        function prevDialogue() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                popupSubmitted = false;
+                updateDialogue(currentIndex);
             }
+        }
 
-            document.querySelectorAll(".next-btn, .back-btn").forEach(btn => {
-                btn.addEventListener("click", e => {
-                    createParticles(e.clientX, e.clientY);
-                });
+        // checking quiz answers
+        function checkAnswers(isCreate = false) {
+            const selector = isCreate ? ".popupCheckboxCreate" : ".popupCheckbox";
+            const checkboxes = document.querySelectorAll(selector);
+            let allCorrect = true;
+
+            checkboxes.forEach(cb => {
+                if ((cb.checked && cb.value !== "1") || (!cb.checked && cb.value === "1")) {
+                    allCorrect = false;
+                }
             });
 
-           window.onload = function() {
-    // Settings logic starts here
-    function loadSettings() {
-        const settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
-        document.getElementById('volumeSlider').value = settings.volume;
-        document.getElementById('volumeValue').textContent = settings.volume;
-        document.getElementById('bg-music').volume = settings.volume / 100;
-        return settings;
-    }
-    function saveSettings() {
-        const volume = parseInt(document.getElementById('volumeSlider').value, 10);
-        localStorage.setItem('gameSettings', JSON.stringify({ volume }));
-        alert('Settings saved!');
-    }
-    const modal = document.getElementById('settingsModal');
-    document.getElementById('settingsBtn').onclick = function() {
-        modal.style.display = 'block';
-        loadSettings();
-    };
-    document.getElementById('closeSettingsBtn').onclick = function() {
-        modal.style.display = 'none';
-    };
-    document.getElementById('saveSettingsBtn').onclick = function() {
-        saveSettings();
-        modal.style.display = 'none';
-    };
-    document.getElementById('volumeSlider').oninput = function() {
-        document.getElementById('volumeValue').textContent = this.value;
-        document.getElementById('bg-music').volume = this.value / 100;
-    };
-    loadSettings();
-};
+            if (allCorrect) {
+                speakerElem.textContent = "Ham";
+                textElem.textContent = "Correct ✅";
+                popupSubmitted = true;
+                setTimeout(() => {
+                    nextDialogue();
+                }, 1000);
+            } else {
+                speakerElem.textContent = "Ham";
+                textElem.textContent = "Wrong ❌ Try again!";
+            }
+        }
+
+        // Particle Animation on Button Clicks 
+        function createParticles(x, y) {
+            for (let i = 0; i < 10; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = `${x + Math.random() * 20 - 10}px`;
+                p.style.top = `${y + Math.random() * 20 - 10}px`;
+                p.style.background = `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}`;
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 600);
+            }
+        }
+
+        document.querySelectorAll(".next-btn, .back-btn").forEach(btn => {
+            btn.addEventListener("click", e => {
+                createParticles(e.clientX, e.clientY);
+            });
+        });
+
+        window.onload = function() {
+            // Settings logic starts here
+            function loadSettings() {
+                const settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
+                document.getElementById('volumeSlider').value = settings.volume;
+                document.getElementById('volumeValue').textContent = settings.volume;
+                document.getElementById('bg-music').volume = settings.volume / 100;
+                return settings;
+            }
+            function saveSettings() {
+                const volume = parseInt(document.getElementById('volumeSlider').value, 10);
+                localStorage.setItem('gameSettings', JSON.stringify({ volume }));
+                alert('Settings saved!');
+            }
+            const modal = document.getElementById('settingsModal');
+            document.getElementById('settingsBtn').onclick = function() {
+                modal.style.display = 'block';
+                loadSettings();
+            };
+            document.getElementById('closeSettingsBtn').onclick = function() {
+                odal.style.display = 'none';
+            };
+            document.getElementById('saveSettingsBtn').onclick = function() {
+                saveSettings();
+             modal.style.display = 'none';
+            };
+            document.getElementById('volumeSlider').oninput = function() {
+                document.getElementById('volumeValue').textContent = this.value;
+                document.getElementById('bg-music').volume = this.value / 100;
+            };
+            loadSettings();
+        };
         </script>
     </body>
 </html>
