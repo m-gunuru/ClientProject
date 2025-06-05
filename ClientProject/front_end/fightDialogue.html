@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: url('https://raw.githubusercontent.com/m-gunuru/ClientProject/refs/heads/Test/ClientProject/front_end/FINAL-BG-FOR-NOW.png') center center / cover no-repeat;
+      font-family: 'Press Start 2P', monospace;
+      color: white;
+      overflow: hidden;
+    }
+      #musicSettingsBtn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 20;
+      background: #111;
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-family: 'Press Start 2P', monospace;
+      cursor: pointer;
+    }
+    #musicSettingsPanel {
+      display: none;
+      position: fixed;
+      top: 50px;
+      right: 10px;
+      z-index: 30;
+      background: #222;
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: 1.5px solid #fff;
+    }
+    #musicVolume {
+      vertical-align: middle;
+      margin-left: 8px;
+    }
+    
+    .dialogue-container {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    .character {
+      position: absolute;
+      bottom: 0;
+      height: 320px;
+      object-fit: contain;
+      transition: opacity 0.2s, height 0.2s, right 0.2s, left 0.2s, transform 0.2s;
+      user-select: none;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.3;
+      transform: none;
+    }
+    .character.active {
+      height: 500px;
+      opacity: 1;
+      z-index: 2;
+    }
+    .left-character {
+      left: 0;
+    }
+    .right-character {
+      right: 30px;
+      bottom: 0;
+      height: 320px;
+    }
+    .ham-hit {
+      transform: translateX(60px) scale(1.05) rotate(-3deg);
+      transition: transform 0.15s cubic-bezier(.5,-0.5,.5,1.5);
+    }
+    .dialogue-box {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 85vw;
+      max-width: 1000px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 24px 32px 60px;
+      border: 2.5px solid #fff;
+      border-radius: 18px;
+      box-shadow: 0 -4px 16px #000a;
+      z-index: 2;
+    }
+    .popup-box {
+  position: absolute;
+  left: 50%;
+  bottom: 250px; /* increase this value to move the popup up */
+  transform: translateX(-50%);
+  width: 85vw;
+  max-width: 1000px;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 32px;
+  border: 2.5px solid #fff;
+  border-radius: 18px;
+  box-shadow: 0 -4px 24px #000a;
+  z-index: 3;
+  display: none;
+}
+
+.popup-box .next-btn {
+  margin-left: 32px; /* Move the submit button to the right */
+}
+
+    .popup-content label {
+      display: block;
+      margin-bottom: 12px;
+      font-size: 1rem;
+    }
+    .speaker-name {
+      font-size: 1rem;
+      color: #ffeb3b;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px #000;
+      letter-spacing: 2px;
+    }
+    .dialogue-text {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #fff;
+      text-shadow: 1px 1px 3px #000;
+      min-height: 2em;
+    }
+    .next-btn {
+      position: absolute;
+      bottom: 20px;
+      right: 32px;
+      background: url('Fight.png') center center / cover no-repeat;
+      color: white;
+      border: 2px solid #fff;
+      padding: 12px 34px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-family: 'Press Start 2P', monospace;
+      text-shadow: 3px 5px 1px #00000094;
+      transition: background 0.2s;
+      z-index: 3;
+    }
+    .next-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .next-btn:hover:not(:disabled) {
+      background: #1d2558;
+    }
+    .fight-menu {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 40vh;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 5;
+      display: none;
+    }
+    .fight-button {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .fight-button img {
+      height: 220px;
+      width: auto;
+      image-rendering: pixelated;
+    }
+    .fight-button:hover img {
+      transform: scale(1.1);
+    }
+
+    #pebbleHealth, #hamHealth {
+      position: absolute;
+      top: 20px;
+      font-size: 1rem;
+      text-shadow: 1px 1px 4px black;
+    }
+
+    #pebbleHealth {
+      left: 30px;
+    }
+
+    #hamHealth {
+      right: 30px;
+    }
+
+    @media (max-width: 900px) {
+      .character {
+        height: 300px;
+        bottom: 70px;
+      }
+      .character.active {
+        height: 400px;
+      }
+      .next-btn {
+        font-size: 0.75rem;
+        padding: 10px 20px;
+        right: 20px;
+        bottom: 16px;
+      }
+      .popup-box {
+        bottom: 150px;
+        padding: 18px 10px 18px;
+      }
+    }
+    @media (max-width: 600px) {
+      .character {
+        height: 200px;
+        bottom: 50px;
+      }
+      .character.active {
+        height: 300px;
+      }
+      .popup-box {
+        bottom: 110px;
+        padding: 10px 3vw 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+<audio id="battleMusic" preload="auto" loop>
+  <source src="Pokemon XY Legendary Battle Remix.mp3" type="audio/mpeg">
+</audio>
+
+  <!-- Music settings button and panel -->
+  <button id="musicSettingsBtn">Music Settings</button>
+  <div id="musicSettingsPanel">
+    <label>Volume:
+      <input type="range" id="musicVolume" min="0" max="1" step="0.01" value="1">
+    </label>
+  </div>
+  <div class="dialogue-container">
+    <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/PebbleMouthClosed.png" class="character left-character" id="pebble" />
+    <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/HamMouthClosed.png" class="character right-character" id="ham" />
+
+
+    <div id="pebbleHealth">Pebbles ❤️: 3</div>
+    <div id="hamHealth">Ham ❤️: 3</div>
+
+    <!-- Quiz Popup for "Construct" -->
+    <div class="popup-box" id="popupBoxConstruct">
+      <div class="popup-content">
+        <p>
+          Construct can be used in which of the following sentences:
+        </p>
+        <label><input type="checkbox" class="popupCheckbox" value="1" /> Molly wants to ____ a barn.</label>
+        <label><input type="checkbox" class="popupCheckbox" value="1" /> Jane wants the town to ____ a community center.</label>
+        <label><input type="checkbox" class="popupCheckbox" value="1" /> Paul used an organizer to ____ his essay.</label>
+        <button class="next-btn" style="position: relative; bottom: 0; margin-top: 12px" onclick="checkAnswers()">Submit</button>
+      </div>
+    </div>
+    <!-- Quiz Popup for "Create" -->
+    <div class="popup-box" id="popupBoxCreate">
+      <div class="popup-content">
+        <p>
+          Create can be used in which of the following sentences:
+        </p>
+        <label><input type="checkbox" class="popupCheckboxCreate" value="1" /> Sarah loves to ____ models.</label>
+        <label><input type="checkbox" class="popupCheckboxCreate" value="1" /> We need to ____ a plan.</label>
+        <label><input type="checkbox" class="popupCheckboxCreate" value="1" /> We will ____ an argument.</label>
+        <button class="next-btn" style="position: relative; bottom: 0; margin-top: 12px" onclick="checkAnswers(true)">Submit</button>
+      </div>
+    </div>
+    <!-- Quiz Popup for "Combine" -->
+    <div class="popup-box" id="popupBoxCombine">
+      <div class="popup-content">
+        <p>
+          Combine can be used in which of the following sentences:
+        </p>
+        <label><input type="checkbox" class="popupCheckboxCombine" value="1" /> Let's ____ our ideas to make a great project.</label>
+        <label><input type="checkbox" class="popupCheckboxCombine" value="1" /> The chef will ____ different spices.</label>
+        <label><input type="checkbox" class="popupCheckboxCombine" value="1" /> We need to ____ our efforts to win.</label>
+        <button class="next-btn" style="position: relative; bottom: 0; margin-top: 12px" onclick="checkAnswers('combine')">Submit</button>
+      </div>
+    </div>
+
+    <!-- Heal Quiz Popup -->
+    <div class="popup-box" id="popupBoxHeal">
+      <div class="popup-content">
+        <p>
+          Heal Quiz: What is the synonym of "assist"?
+        </p>
+        <label><input type="radio" name="healQuiz" value="help" /> Help</label>
+        <label><input type="radio" name="healQuiz" value="jump" /> Jump</label>
+        <label><input type="radio" name="healQuiz" value="paint" /> Paint</label>
+        <button class="next-btn" style="position: relative; bottom: 0; margin-top: 12px" onclick="checkHealAnswer()">Submit</button>
+      </div>
+    </div>
+
+    <div class="dialogue-box">
+      <div class="speaker-name" id="speakerName">Click to Start</div>
+      <div class="dialogue-text" id="dialogueText">Click below to begin the story...</div>
+    </div>
+
+    <button class="next-btn" onclick="nextDialogue()" id="nextBtn">Next</button>
+
+<div class="fight-menu" id="fightMenu">
+  <button class="fight-button" onclick="handleFight()">
+    <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/FightBtn.png" alt="Fight">
+  </button>
+  <button class="fight-button" onclick="handleHeal()">
+    <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/HealBtn.png" alt="Heal">
+  </button>
+  <button class="fight-button" onclick="handleRunAway()">
+    <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/RunawayBtn.png" alt="Run">
+  </button>
+</div>
+
+
+  <script>
+    let musicStarted = false;
+const battleMusic = document.getElementById('battleMusic');
+const musicSettingsBtn = document.getElementById('musicSettingsBtn');
+const musicSettingsPanel = document.getElementById('musicSettingsPanel');
+const musicVolume = document.getElementById('musicVolume');
+
+function startMusicIfNeeded() {
+  if (!musicStarted) {
+    battleMusic.volume = musicVolume.value;
+    battleMusic.play().catch(() => {}); // prevent uncaught promise if autoplay blocked
+    musicStarted = true;
+  }
+}
+
+// Start music on first user interaction
+document.body.addEventListener('click', startMusicIfNeeded, { once: true });
+
+// Show/hide music settings panel
+musicSettingsBtn.onclick = function() {
+  musicSettingsPanel.style.display = musicSettingsPanel.style.display === "none" ? "block" : "none";
+};
+
+// Adjust volume live
+musicVolume.oninput = function() {
+  battleMusic.volume = this.value;
+};
+
+// Start music on first user interaction
+document.body.addEventListener('click', startMusicIfNeeded, { once: true });
+
+// Show/hide music settings panel
+musicSettingsBtn.onclick = function() {
+  musicSettingsPanel.style.display = musicSettingsPanel.style.display === "none" ? "block" : "none";
+};
+// Adjust volume live
+musicVolume.oninput = function() {
+  battleMusic.volume = this.value;
+};
+
+    const dialogues = [
+      { speaker: "Ham", text: "Ready to battle? Show me your wits!" },
+      { speaker: "Pebble", text: "Bring it on!" },
+      { speaker: "Ham", text: "Let's see if you can handle 'construct'!" },
+      { speaker: "Ham", text: "", popup: "construct" }
+    ];
+
+    let currentIndex = 0;
+    let isTyping = false;
+    let typingTimeout;
+    let pebbleLives = 3;
+    let hamLives = 3;
+    let quizAttempts = 0;
+    const MAX_ATTEMPTS = 2;
+    let fightMenuReady = false;
+
+    const hamTaunts = [
+      "Ha! Not so fast, Pebble!",
+      "You'll have to do better than that!",
+      "Is that all you've got?",
+      "Missed me! Try again if you dare!",
+      "You're losing your edge, Pebble!"
+    ];
+    function getRandomHamTaunt() {
+      return hamTaunts[Math.floor(Math.random() * hamTaunts.length)];
+    }
+
+    function updateHealth() {
+      document.getElementById("pebbleHealth").textContent = `Pebbles ❤️: ${pebbleLives}`;
+      document.getElementById("hamHealth").textContent = `Ham ❤️: ${hamLives}`;
+    }
+
+   function handleFight() {
+  // Find the last Ham line to determine what to do next
+  let lastHam = null;
+  for (let i = currentIndex - 1; i >= 0; i--) {
+    if (dialogues[i] && dialogues[i].speaker === "Ham") {
+      lastHam = dialogues[i].text;
+      break;
+    }
+  }
+
+  // All possible taunts and heal grumble
+  const taunts = [
+    "Ha! Not so fast, Pebble!",
+    "You'll have to do better than that!",
+    "Is that all you've got?",
+    "Missed me! Try again if you dare!",
+    "You're losing your edge, Pebble!",
+    "You regained a life... (grumble)"
+  ];
+
+  // Decide what to add next
+  if (lastHam === "Oof! That stung!" || taunts.includes(lastHam)) {
+    dialogues.push({ speaker: "Ham", text: "Let's see if you can handle 'create'!" });
+    dialogues.push({ speaker: "Ham", text: "", popup: "create" });
+    currentIndex = dialogues.length - 2; // point to new Ham line
+  } else if (lastHam === "Not bad! But can you handle the next one?" || taunts.includes(lastHam)) {
+    dialogues.push({ speaker: "Ham", text: "Let's see if you can handle 'combine'!" });
+    dialogues.push({ speaker: "Ham", text: "", popup: "combine" });
+    currentIndex = dialogues.length - 2;
+  } else if (lastHam === "You did it! I'm out of tricks!") {
+    // Insert the win line if not already present
+    if (
+      !dialogues[currentIndex] ||
+      dialogues[currentIndex].text !== "No way... You actually beat me!"
+    ) {
+      dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "No way... You actually beat me!" });
+    }
+    hideFightMenu();
+    nextDialogue();
+    return;
+  }
+
+  hideFightMenu();
+  nextDialogue();
+}
+
+
+    function handleHeal() {
+  if (pebbleLives >= 3) {
+    alert("Pebble is already at full health!");
+    return;
+  }
+  hideFightMenu(); // Hide the fight menu when heal is clicked
+  document.getElementById('popupBoxHeal').style.display = 'block';
+  document.querySelectorAll('input[name="healQuiz"]').forEach(r => r.checked = false);
+}
+
+    function checkHealAnswer() {
+  const radios = document.querySelectorAll('input[name="healQuiz"]');
+  let selected = null;
+  radios.forEach(r => { if (r.checked) selected = r.value; });
+  const popup = document.getElementById('popupBoxHeal');
+  const oldFeedback = popup.querySelector('.quiz-feedback');
+  if (oldFeedback) oldFeedback.remove();
+
+  if (selected === "help") {
+    pebbleLives = Math.min(pebbleLives + 1, 3);
+    updateHealth();
+    popup.style.display = 'none';
+    // Insert Ham's frustrated dialogue and show it
+    dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "You regained a life... (grumble)" });
+    nextDialogue();
+  } else {
+    const feedback = document.createElement('div');
+    feedback.className = 'quiz-feedback';
+    feedback.style.color = 'pink';
+    feedback.style.marginTop = '10px';
+    feedback.textContent = `Wrong ❌ Try again!`;
+    popup.querySelector('.popup-content').appendChild(feedback);
+    setTimeout(() => {
+      if (feedback.parentNode) feedback.parentNode.removeChild(feedback);
+    }, 1000);
+  }
+}
+
+    function handleRunAway() {
+      // Placeholder for run logic
+    }
+
+    function checkWinLose() {
+      if (hamLives <= 0) {
+        dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "No way... You actually beat me!" });
+        nextDialogue();
+        setTimeout(() => {
+          window.location.href = "dialogue.html";
+        }, 1200);
+        return;
+      }
+      if (pebbleLives <= 0) {
+        setTimeout(() => {
+          window.location.href = "dialogue.html";
+        }, 600);
+      }
+    }
+
+    function typeText(element, text, callback) {
+      let i = 0;
+      element.textContent = "";
+      isTyping = true;
+      function typeChar() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          typingTimeout = setTimeout(typeChar, 75);
+        } else {
+          isTyping = false;
+          if (callback) callback();
+        }
+      }
+      typeChar();
+    }
+
+    function showQuizPopup(type) {
+      document.getElementById('nextBtn').disabled = true;
+      quizAttempts = 0;
+      if (type === "construct") {
+        document.getElementById('popupBoxConstruct').style.display = 'block';
+        document.querySelectorAll('.popupCheckbox').forEach(cb => cb.checked = false);
+      } else if (type === "create") {
+        document.getElementById('popupBoxCreate').style.display = 'block';
+        document.querySelectorAll('.popupCheckboxCreate').forEach(cb => cb.checked = false);
+      } else if (type === "combine") {
+        document.getElementById('popupBoxCombine').style.display = 'block';
+        document.querySelectorAll('.popupCheckboxCombine').forEach(cb => cb.checked = false);
+      }
+    }
+
+    function hideQuizPopups() {
+      document.getElementById('popupBoxConstruct').style.display = 'none';
+      document.getElementById('popupBoxCreate').style.display = 'none';
+      document.getElementById('popupBoxCombine').style.display = 'none';
+      document.getElementById('popupBoxHeal').style.display = 'none';
+    }
+
+    function animateHamHit() {
+      const hamImg = document.getElementById("ham");
+      hamImg.classList.add("ham-hit");
+      setTimeout(() => {
+        hamImg.classList.remove("ham-hit");
+      }, 180);
+    }
+
+    function nextDialogue() {
+  // If text is still typing, finish it instantly
+  if (isTyping) {
+    clearTimeout(typingTimeout);
+    const fullText = dialogues[currentIndex - 1]?.text || "";
+    document.getElementById("dialogueText").textContent = fullText;
+    isTyping = false;
+    return;
+  }
+
+  // Redirect after win line is shown and Next is pressed
+  if (
+    currentIndex > 0 &&
+    dialogues[currentIndex - 1] &&
+    dialogues[currentIndex - 1].text === "No way... You actually beat me!"
+  ) {
+    setTimeout(() => {
+      window.location.href = "dialogue.html";
+    }, 800);
+    return;
+  }
+
+  if (hamLives <= 0 || pebbleLives <= 0) {
+    return;
+  }
+
+  const text = document.getElementById("dialogueText");
+  const speaker = document.getElementById("speakerName");
+  const pebbleImg = document.getElementById("pebble");
+  const hamImg = document.getElementById("ham");
+  const btn = document.getElementById("nextBtn");
+  const fightMenu = document.getElementById("fightMenu");
+  const dialogueBox = document.querySelector(".dialogue-box");
+
+  hideQuizPopups();
+
+  // After first line, show fight menu
+  if (currentIndex === 1 && !fightMenuReady) {
+    fightMenuReady = true;
+    btn.style.display = "none";
+    dialogueBox.style.display = "none";
+    fightMenu.style.display = "flex";
+    pebbleImg.style.display = "none";
+    hamImg.style.display = "none";
+    return;
+  }
+
+  // Only show fight menu after a Ham line if the next dialogue is NOT a quiz
+  if (
+    fightMenuReady &&
+    currentIndex > 1 &&
+    dialogues[currentIndex - 1] &&
+    dialogues[currentIndex - 1].speaker === "Ham" &&
+    !dialogues[currentIndex - 1].popup &&
+    (
+      !dialogues[currentIndex] ||
+      !dialogues[currentIndex].popup
+    )
+  ) {
+    fightMenuReady = false;
+    btn.style.display = "none";
+    dialogueBox.style.display = "none";
+    fightMenu.style.display = "flex";
+    pebbleImg.style.display = "none";
+    hamImg.style.display = "none";
+    return;
+  }
+
+  if (currentIndex < dialogues.length) {
+    const current = dialogues[currentIndex];
+    speaker.textContent = current.speaker || "";
+    if (current.speaker === "Pebble") {
+      pebbleImg.classList.add("active");
+      hamImg.classList.remove("active");
+    } else if (current.speaker === "Ham") {
+      pebbleImg.classList.remove("active");
+      hamImg.classList.add("active");
+    } else {
+      pebbleImg.classList.remove("active");
+      hamImg.classList.remove("active");
+    }
+
+    if (current.popup) {
+      showQuizPopup(current.popup);
+      text.textContent = "";
+      currentIndex++;
+      return;
+    }
+
+    btn.style.display = "inline-block";
+    dialogueBox.style.display = "block";
+    pebbleImg.style.display = "";
+    hamImg.style.display = "";
+
+    btn.disabled = true;
+    typeText(text, current.text, () => {
+      btn.disabled = false;
+    });
+
+    currentIndex++;
+  } else {
+    text.textContent = "";
+    speaker.textContent = "";
+    btn.style.display = "none";
+    fightMenu.style.display = "flex";
+    pebbleImg.style.display = "none";
+    hamImg.style.display = "none";
+    dialogueBox.style.display = "none";
+  }
+}
+
+function handleRunAway() {
+  hideFightMenu();
+  document.getElementById("nextBtn").style.display = "none"; // hides the Next button
+
+  // Set speaker and dialogue text
+  document.getElementById("speakerName").textContent = "Ham";
+  typeText(document.getElementById("dialogueText"), "I'll test you another day...", () => {
+    // Delay before redirecting (e.g., 2 seconds = 2000 ms)
+    setTimeout(() => {
+      window.location.href = "dialogue.html";
+    }, 2000);
+  });
+}
+
+
+    function checkAnswers(type = false) {
+      let selector, popupBox;
+      if (type === "combine") {
+        selector = ".popupCheckboxCombine";
+        popupBox = document.getElementById('popupBoxCombine');
+      } else if (type === true) {
+        selector = ".popupCheckboxCreate";
+        popupBox = document.getElementById('popupBoxCreate');
+      } else {
+        selector = ".popupCheckbox";
+        popupBox = document.getElementById('popupBoxConstruct');
+      }
+      const checkboxes = document.querySelectorAll(selector);
+      let allCorrect = true;
+      checkboxes.forEach(cb => {
+        if ((cb.checked && cb.value !== "1") || (!cb.checked && cb.value === "1")) {
+          allCorrect = false;
+        }
+      });
+
+      const oldFeedback = popupBox.querySelector('.quiz-feedback');
+      if (oldFeedback) oldFeedback.remove();
+
+      if (hamLives <= 0 || pebbleLives <= 0) {
+        return;
+      }
+
+      if (allCorrect) {
+        hamLives--;
+        updateHealth();
+        animateHamHit();
+
+        setTimeout(() => {
+          popupBox.style.display = 'none';
+          document.getElementById('nextBtn').disabled = false;
+
+          // Only insert Ham's line after quiz
+          if (type === "construct" || type === false) {
+            dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "Oof! That stung!" });
+          } else if (type === true) {
+            dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "Not bad! But can you handle the next one?" });
+          } else if (type === "combine") {
+            dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "You did it! I'm out of tricks!" });
+            if (hamLives <= 0) {
+              dialogues.splice(currentIndex + 1, 0, { speaker: "Ham", text: "No way... You actually beat me!" });
+            }
+          }
+
+          nextDialogue();
+          checkWinLose();
+        }, 600);
+      } else {
+        quizAttempts++;
+        if (quizAttempts >= MAX_ATTEMPTS) {
+          pebbleLives--;
+          updateHealth();
+
+          setTimeout(() => {
+            popupBox.style.display = 'none';
+            document.getElementById('nextBtn').disabled = false;
+            const taunt = getRandomHamTaunt();
+            dialogues.splice(currentIndex, 0, { speaker: "Ham", text: taunt });
+            nextDialogue();
+            checkWinLose();
+          }, 600);
+        } else {
+          const feedback = document.createElement('div');
+          feedback.className = 'quiz-feedback';
+          feedback.style.color = 'pink';
+          feedback.style.marginTop = '10px';
+          feedback.textContent = `Wrong ❌ Try again! (${MAX_ATTEMPTS - quizAttempts} tries left)`;
+          popupBox.querySelector('.popup-content').appendChild(feedback);
+          setTimeout(() => {
+            if (feedback.parentNode) feedback.parentNode.removeChild(feedback);
+          }, 1000);
+        }
+      }
+    }
+
+    function showFightMenu() {
+      document.getElementById("fightMenu").style.display = "flex";
+      document.querySelector(".dialogue-box").style.display = "none";
+      document.getElementById("nextBtn").style.display = "none";
+      document.getElementById("pebble").style.display = "none";
+      document.getElementById("ham").style.display = "none";
+    }
+    function hideFightMenu() {
+      document.getElementById("fightMenu").style.display = "none";
+      document.querySelector(".dialogue-box").style.display = "block";
+      document.getElementById("nextBtn").style.display = "inline-block";
+      document.getElementById("pebble").style.display = "";
+      document.getElementById("ham").style.display = "";
+    }
+
+    window.onload = function() {
+      updateHealth();
+      currentIndex = 0;
+      fightMenuReady = false;
+      document.getElementById("fightMenu").style.display = "none";
+      document.querySelector(".dialogue-box").style.display = "block";
+      document.getElementById("nextBtn").style.display = "inline-block";
+      document.getElementById("pebble").style.display = "";
+      document.getElementById("ham").style.display = "";
+      nextDialogue();
+    };
+  </script>
+</body>
+</html>

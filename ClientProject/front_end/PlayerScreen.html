@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <img id = "gameBG" src="https://raw.githubusercontent.com/m-gunuru/ClientProject/refs/heads/Test/ClientProject/front_end/image0.png">
+  <style>
+    body {
+      background-color: black;
+    }
+    h2 {
+      color: white;
+      font-family: 'Press Start 2P';
+      text-align: center;
+      position: fixed;
+      width: 50ch;
+      overflow: hidden;
+      white-space: normal;
+      animation: typing 4s steps(80) forwards, blink 0.75s infinite;
+      left: 50px;
+      top: 200px;
+     
+    }
+    #gameBG {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 1;
+      transition: opacity 1s ease;
+    }
+    #gameBG.fade {
+      opacity: 0;
+    }
+    @keyframes blink {
+      from { border-color: transparent; }
+      to { border-color: white; }
+    }
+
+
+  </style>
+</head> 
+<body>
+  <div>
+    <h2 id = "typewriter" class = "typing"> </h2>
+  </div>
+  <script>
+    const text = "A long time ago...a cat fell from the sky. His name was Pebbles and this is his story.";
+    const typewriter = document.getElementById('typewriter');
+    let index = 0;
+
+    function type() {
+      if (index < text.length) {
+        typewriter.textContent += text.charAt(index);
+        index++;
+        setTimeout(type, 100); 
+    }
+  }
+
+    type();
+  </script>
+</body>
+</html>

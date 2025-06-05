@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sign-Up</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #203162;
+      font-family: 'Press Start 2P';
+    }
+    .hero {
+      background-image: url("image.png");
+      background-attachment: fixed;
+      background-size: cover;
+      background-position: top;
+      height: 1000px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: -250px;
+      font-size: 25px;
+      text-shadow: 3px 5px 2px #000000d7;
+    }
+    .hero h1 {
+      color: rgb(255, 255, 255);
+      position: absolute;
+      top: 50px;
+      text-align: center;
+    }
+    .createAcc {
+        background-color: #1e518c;
+        color: white;
+        font-family: 'Press Start 2P';
+        font-size: 20px;
+        width: 350px;
+        height: 50px;
+        position: absolute;
+        border: 2px solid rgba(255, 255, 255, 0.778);
+        box-shadow: 4px 4px 0 #00000094; 
+        text-shadow: 2px 3px 2px #00000094;
+        text-align: center;
+        left: 550px;
+    }
+    .email {
+        top: 250px;
+    }
+    .emailCode {
+        top: 350px;
+    }
+    .submit {
+      background-color: #1e518c;
+      color: #ffffff;
+      font-family: 'Press Start 2P';
+      font-size: 20px;
+      width: 300px;
+      height: 65px;
+      position: absolute;
+      text-align: center;
+      top: 450px;
+      left: 580px;
+      border: 2px solid rgba(255, 255, 255, 0.778);
+      border-radius: 0; 
+      box-shadow: 4px 4px 0 #00000094; 
+      text-shadow: 2px 3px 2px #00000094;
+      cursor: pointer;
+    }
+    .instructions {
+      color: rgb(255, 255, 255);
+      position: absolute;
+      top: 165px;
+      left:200px;
+      text-align: center;
+      text-shadow: 2px 3px 2px #00000094;
+      animation: typing 4.5s steps(55) forwards, blink 1.25s infinite;
+      border-right: .15em solid white;
+      margin: 0 auto;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 73%; }
+    }
+
+    @keyframes blink {
+      from { border-color: transparent; }
+      to { border-color: white; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <h1>Sign-Up</h1>
+  </div>
+
+  <div class="instructions">
+    <h3> Please enter your email and create your own password.</h3>
+  </div>
+
+  <input type="email" id="emailInput" class="createAcc email" placeholder="email" />
+  <input type="password" id="passwordInput" class="createAcc emailCode" placeholder="password" />
+
+  <div id="submit-container">
+    <button class="submit" onclick="registerUser()">Create Account</button>
+  </div>
+
+  <script type="module" src="SignInPage.js"></script>
+</body>
+</html>
