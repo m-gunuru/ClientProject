@@ -10,14 +10,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "firebase": "^11.8.1",
     "nodemailer": "^7.0.3",
-=======
->>>>>>> origin/Test
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

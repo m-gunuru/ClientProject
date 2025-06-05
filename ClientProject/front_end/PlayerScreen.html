@@ -3,59 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <img id = "gameBG" src="https://raw.githubusercontent.com/m-gunuru/ClientProject/refs/heads/Test/ClientProject/front_end/image0.png">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
-      background: rgb(0, 0, 0);
-      font-family: 'Press Start 2P', monospace, sans-serif;
+      background-color: black;
     }
-
-    .hero {
-      background: rgb(255, 255, 255);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: -250px;
-      font-size: 25px;
-      text-shadow: 2px 3px 3px #00000082;
-      padding: 20px;
-      text-align: center;
-    }
-
-    .hero h3 {
+    h2 {
       color: white;
-      font-size: 35px;
       font-family: 'Press Start 2P';
       text-align: center;
-      white-space: normal; 
-      padding-right: 5px;
-      max-width: 1000px;
+      position: fixed;
+      width: 50ch;
+      overflow: hidden;
+      white-space: normal;
+      animation: typing 4s steps(80) forwards, blink 0.75s infinite;
+      left: 50px;
+      top: 200px;
+     
     }
+    #gameBG {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 1;
+      transition: opacity 1s ease;
+    }
+    #gameBG.fade {
+      opacity: 0;
+    }
+    @keyframes blink {
+      from { border-color: transparent; }
+      to { border-color: white; }
+    }
+
 
   </style>
 </head> 
 <body>
-  <div class="hero"> 
-    <h3 id="typing-text"></h3>
+  <div>
+    <h2 id = "typewriter" class = "typing"> </h2>
   </div>
-
   <script>
-    const fullText = `Welcome Traveler! What is your name:`;
-    const h3 = document.getElementById('typing-text');
+    const text = "A long time ago...a cat fell from the sky. His name was Pebbles and this is his story.";
+    const typewriter = document.getElementById('typewriter');
+    let index = 0;
 
-    let i = 0;
     function type() {
-      if (i < fullText.length) {
-        h3.textContent += fullText.charAt(i);
-        i++;
-        setTimeout(type, 50);
-      }
+      if (index < text.length) {
+        typewriter.textContent += text.charAt(index);
+        index++;
+        setTimeout(type, 100); 
     }
+  }
+
     type();
   </script>
 </body>

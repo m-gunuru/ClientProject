@@ -13,7 +13,35 @@
       color: white;
       overflow: hidden;
     }
-
+      #musicSettingsBtn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 20;
+      background: #111;
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-family: 'Press Start 2P', monospace;
+      cursor: pointer;
+    }
+    #musicSettingsPanel {
+      display: none;
+      position: fixed;
+      top: 50px;
+      right: 10px;
+      z-index: 30;
+      background: #222;
+      padding: 12px 20px;
+      border-radius: 8px;
+      border: 1.5px solid #fff;
+    }
+    #musicVolume {
+      vertical-align: middle;
+      margin-left: 8px;
+    }
+    
     .dialogue-container {
       width: 100vw;
       height: 100vh;
@@ -127,12 +155,10 @@
       bottom: 0;
       width: 100%;
       height: 40vh;
-      background-color: rgba(0, 0, 0, 0.85);
       display: flex;
       justify-content: space-around;
       align-items: center;
       z-index: 5;
-      border-top: 3px solid #fff;
       display: none;
     }
 
@@ -145,13 +171,28 @@
     }
 
     .fight-button img {
-      height: 100px;
+      height: 220px;
       width: auto;
       image-rendering: pixelated;
     }
 
     .fight-button:hover img {
       transform: scale(1.1);
+    }
+
+    #pebbleHealth, #hamHealth {
+      position: absolute;
+      top: 20px;
+      font-size: 1rem;
+      text-shadow: 1px 1px 4px black;
+    }
+
+    #pebbleHealth {
+      left: 30px;
+    }
+
+    #hamHealth {
+      right: 30px;
     }
 
     @media (max-width: 900px) {
@@ -190,9 +231,21 @@
   </style>
 </head>
 <body>
+   <audio id="battleMusic" src="Pokemon%20XY%20Legendary%20Battle%20Remix.mp3" preload="auto"></audio>
+
+  <!-- Music settings button and panel -->
+  <button id="musicSettingsBtn">Music Settings</button>
+  <div id="musicSettingsPanel">
+    <label>Volume:
+      <input type="range" id="musicVolume" min="0" max="1" step="0.01" value="1">
+    </label>
+  </div>
   <div class="dialogue-container">
     <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/PebbleMouthClosed.png" class="character left-character" id="pebble" />
     <img src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/HamMouthClosed.png" class="character right-character" id="ham" />
+
+    <div id="pebbleHealth">Pebbles ❤️: 3</div>
+    <div id="hamHealth">Ham ❤️: 3</div>
 
     <div class="popup-box" id="popupBox">
       <div class="popup-content">
@@ -209,32 +262,147 @@
 
     <button class="next-btn" onclick="nextDialogue()" id="nextBtn">Next</button>
 
-    <!-- Fight Menu -->
     <div class="fight-menu" id="fightMenu">
-      <button class="fight-button">
+      <button class="fight-button" onclick="handleFight()">
         <img src="FightBtn.png" alt="Fight">
       </button>
-      <button class="fight-button">
+      <button class="fight-button" onclick="handleHeal()">
         <img src="HealBtn.png" alt="Heal">
       </button>
-      <button class="fight-button">
+      <button class="fight-button" onclick="handleRunAway()">
         <img src="RunawayBtn.png" alt="Run">
       </button>
     </div>
   </div>
 
   <script>
+     let musicStarted = false;
+    const battleMusic = document.getElementById('battleMusic');
+    const musicSettingsBtn = document.getElementById('musicSettingsBtn');
+    const musicSettingsPanel = document.getElementById('musicSettingsPanel');
+    const musicVolume = document.getElementById('musicVolume');
+
+    // Show/hide music settings panel
+    musicSettingsBtn.onclick = function() {
+      musicSettingsPanel.style.display = musicSettingsPanel.style.display === "none" ? "block" : "none";
+    };
+    // Adjust volume live
+    musicVolume.oninput = function() {
+      battleMusic.volume = this.value;
+    };
     const dialogues = [
-      { speaker: "Pebble", text: "P1" },
-      { speaker: "Pebble", text: "P2", popup: true },
-      { speaker: "Ham", text: "H3" },
-      { speaker: "Pebble", text: "P4" },
-      { speaker: "Ham", text: "H5", popup: true }
+      { speaker: "Ham", text: "If you wanna prove your worth…you need to prove your WITS!" },
+      { speaker: "Pebble", text: "Bring it on!" },
+      { speaker: "Ham", text: "Prove to me that you learned ‘construct’, and I’ll help you make this place a home." }
     ];
 
     let currentIndex = 0;
+    let isTyping = false;
+    let typingTimeout;
+    let pebbleLives = 3;
+    let hamLives = 3;
+
+    function updateHealth() {
+      document.getElementById("pebbleHealth").textContent = `Pebbles ❤️: ${pebbleLives}`;
+      document.getElementById("hamHealth").textContent = `Ham ❤️: ${hamLives}`;
+    }
+
+    function askQuestion(questionText, correctAnswer, onCorrect, onIncorrect) {
+      const userAnswer = prompt(questionText);
+      if (userAnswer && userAnswer.trim().toLowerCase() === correctAnswer.toLowerCase()) {
+        onCorrect();
+      } else {
+        onIncorrect();
+      }
+      updateHealth();
+      checkWinLose();
+    }
+
+    function handleFight() {
+      askQuestion(
+        "What does the word 'construct' mean?",
+        "to build",
+        () => {
+          hamLives--;
+          alert("Correct! You hit Ham!");
+        },
+        () => {
+          pebbleLives--;
+          alert("Incorrect! Ham strikes back!");
+        }
+      );
+    }
+
+    function handleHeal() {
+      if (pebbleLives < 3) {
+        askQuestion(
+          "Use 'construct' in a sentence.",
+          "i will construct a house",
+          () => {
+            pebbleLives++;
+            alert("You healed a life!");
+          },
+          () => {
+            alert("Incorrect! No healing for you.");
+          }
+        );
+      } else {
+        alert("You are already at full health!");
+      }
+    }
+
+    function handleRunAway() {
+      alert("Ham: I'll see you another day...");
+      document.getElementById("fightMenu").style.display = "none";
+    }
+
+    function checkWinLose() {
+      const fightMenu = document.getElementById("fightMenu");
+      if (hamLives <= 0) {
+        alert("You defeated Ham! Well done.");
+        fightMenu.style.display = "none";
+      } else if (pebbleLives <= 0) {
+        alert("Pebbles has fainted... Try again.");
+        fightMenu.style.display = "none";
+      }
+    }
+
+    function typeText(element, text, callback) {
+      let i = 0;
+      element.textContent = "";
+      isTyping = true;
+
+      function typeChar() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          typingTimeout = setTimeout(typeChar, 75);
+        } else {
+          isTyping = false;
+          if (callback) callback();
+        }
+      }
+
+      typeChar();
+    }
+    
 
     function nextDialogue() {
+      if (!musicStarted) {
+        battleMusic.currentTime = 0;
+        battleMusic.volume = musicVolume.value;
+        battleMusic.loop = true;
+        battleMusic.play();
+        musicStarted = true;
+      }
+      if (isTyping) {
+        clearTimeout(typingTimeout);
+        const fullText = dialogues[currentIndex - 1]?.text || "";
+        document.getElementById("dialogueText").textContent = fullText;
+        isTyping = false;
+        return;
+      }
+
       const text = document.getElementById("dialogueText");
       const speaker = document.getElementById("speakerName");
       const pebbleImg = document.getElementById("pebble");
@@ -242,10 +410,10 @@
       const btn = document.getElementById("nextBtn");
       const popupBox = document.getElementById("popupBox");
       const fightMenu = document.getElementById("fightMenu");
+      const dialogueBox = document.querySelector(".dialogue-box");
 
       if (currentIndex < dialogues.length) {
         const current = dialogues[currentIndex];
-        text.textContent = current.text;
         speaker.textContent = current.speaker;
 
         if (current.speaker === "Pebble") {
@@ -256,21 +424,19 @@
           hamImg.classList.add("active");
         }
 
-        if (current.popup) {
-          popupBox.style.display = "block";
-        } else {
-          popupBox.style.display = "none";
-          document.getElementById("popupCheckbox").checked = false;
-        }
-
+        popupBox.style.display = "none";
+        typeText(text, current.text);
         currentIndex++;
       } else {
-        // End of dialogue — trigger fight menu
         text.textContent = "";
         speaker.textContent = "";
         btn.style.display = "none";
         popupBox.style.display = "none";
         fightMenu.style.display = "flex";
+
+        pebbleImg.style.display = "none";
+        hamImg.style.display = "none";
+        dialogueBox.style.display = "none";
       }
     }
   </script>

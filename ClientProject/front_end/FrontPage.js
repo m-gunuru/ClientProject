@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 import { firebaseConfig } from './firebaseConfig.js';
@@ -49,7 +48,7 @@ async function checkUser() {
 
     if (user.emailVerified) {
       alert("Login Successful! Loading you into the game...");
-      window.location.href = "PlayerScreen.html";
+      window.location.href = "Dialogue.html";
     } else {
       alert("Verify your email before logging in.");
     }
@@ -59,6 +58,3 @@ async function checkUser() {
 }
 
 
-=======
-import React from 'react';
->>>>>>> origin/Test

@@ -28,6 +28,6 @@ try {
   window.location.href = "FrontPage.html";  
 
 } catch (error) {
-  alert("Error: Please enter a valid email.");
+  alert("Error:" + error);
 }
 };
