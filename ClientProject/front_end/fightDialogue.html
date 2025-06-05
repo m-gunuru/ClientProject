@@ -13,30 +13,32 @@
       color: white;
       overflow: hidden;
     }
-      #musicSettingsBtn {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 20;
-      background: #111;
-      color: #fff;
-      border: 2px solid #fff;
-      border-radius: 6px;
-      padding: 5px 12px;
-      font-family: 'Press Start 2P', monospace;
-      cursor: pointer;
-    }
-    #musicSettingsPanel {
-      display: none;
-      position: fixed;
-      top: 50px;
-      right: 10px;
-      z-index: 30;
-      background: #222;
-      padding: 12px 20px;
-      border-radius: 8px;
-      border: 1.5px solid #fff;
-    }
+     #musicSettingsBtn {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  background: #111;
+  color: #fff;
+  border: 2px solid #fff;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-family: 'Press Start 2P', monospace;
+  cursor: pointer;
+}
+#musicSettingsPanel {
+  display: none;
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  background: #222;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: 1.5px solid #fff;
+}
     #musicVolume {
       vertical-align: middle;
       margin-left: 8px;
@@ -231,7 +233,7 @@
   </style>
 </head>
 <body>
-   <audio id="battleMusic" src="Pokemon%20XY%20Legendary%20Battle%20Remix.mp3" preload="auto"></audio>
+  <audio id="battleMusic" src="https://github.com/m-gunuru/ClientProject/raw/Test/ClientProject/front_end/Pokemon%20XY%20Legendary%20Battle%20Remix.mp3" preload="auto"></audio>
 
   <!-- Music settings button and panel -->
   <button id="musicSettingsBtn">Music Settings</button>
