@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Moveable Character Game</title>
+    <title>Parkour Character Game</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
     <style>
         html, body {
@@ -13,16 +13,38 @@
             font-family: "Press Start 2P", monospace;
             overflow: hidden;
         }
+        #game-area {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
         #character {
             position: absolute;
-            left: 50vw;
-            bottom: 0;
             width: 120px;
             height: auto;
-            transition: filter 0.2s;
             z-index: 2;
             user-select: none;
             pointer-events: none;
+            transition: filter 0.2s;
+        }
+        #character.flipped {
+            transform: scaleX(-1);
+        }
+        .platform {
+            position: absolute;
+            background: #c8a963;
+            border: 3px solid #886d3a;
+            border-radius: 8px;
+            z-index: 1;
+            box-shadow: 0 4px 12px #000a;
+        }
+        #ground {
+            position: absolute;
+            left: 0;
+            width: 100vw;
+            background: #835c34;
+            border-top: 5px solid #fff5e0;
+            z-index: 1;
         }
         #settingsBtn {
             background: #3a4fa0;
@@ -79,17 +101,18 @@
     </style>
 </head>
 <body>
-    <!-- Background music -->
     <audio id="bg-music" preload="auto" loop>
       <source src="Pokemon BW2 Iris Battle Remix.mp3" type="audio/mpeg">
     </audio>
-    <!-- Character -->
-    <!-- Character -->
-<img 
-    id="character" 
-    src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/output-onlinegiftools.gif" 
-    alt="Character" 
-/>
+    <div id="game-area">
+        <!-- Character -->
+        <img 
+            id="character" 
+            src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/output-onlinegiftools.gif" 
+            alt="Character" 
+        />
+        <!-- Ground and platforms will be injected here -->
+    </div>
     <!-- Settings Button -->
     <button id="settingsBtn">Settings</button>
     <!-- Settings Modal -->
@@ -146,24 +169,114 @@
         loadSettings();
     };
 
-    // --- Character Movement Logic ---
+    // --- Game & Platform Logic ---
     const char = document.getElementById('character');
-    const charWidth = 120; // px, must match CSS
-    let pos = { x: window.innerWidth/2 - charWidth/2, y: 0 }; // x from left, y from bottom
+    const charWidth = 120;
+    const charHeight = 120; // Approximate height for collision
+    const gameArea = document.getElementById('game-area');
+
+    // --- Ground and Platforms ---
+    const groundHeight = 180; // px from bottom
+    // Platform format: [x, y, width, height] (y from bottom)
+    const platforms = [
+        [350, 340, 130, 25],
+        [600, 250, 110, 25],
+        [900, 210, 110, 25],
+        [1200, 370, 140, 25],
+        [190, 420, 100, 25],
+        [800, 520, 100, 25],
+        [window.innerWidth-300, 320, 160, 25]
+    ];
+
+    // Draw ground
+    function drawGround() {
+        let ground = document.getElementById('ground');
+        if (!ground) {
+            ground = document.createElement('div');
+            ground.id = "ground";
+            gameArea.appendChild(ground);
+        }
+        ground.style.bottom = '0px';
+        ground.style.height = groundHeight+'px';
+    }
+
+    // Draw platforms
+    function drawPlatforms() {
+        // Remove old platforms
+        Array.from(document.getElementsByClassName('platform')).forEach(e=>e.remove());
+        for (let i=0; i<platforms.length; i++) {
+            const [x, y, w, h] = platforms[i];
+            let pf = document.createElement('div');
+            pf.className = 'platform';
+            pf.style.left = x+'px';
+            pf.style.bottom = y+'px';
+            pf.style.width = w+'px';
+            pf.style.height = h+'px';
+            gameArea.appendChild(pf);
+        }
+    }
+
+    function redrawAll() {
+        drawGround();
+        drawPlatforms();
+    }
+    redrawAll();
+
+    // --- Character Movement Logic ---
+    let pos = { x: 200, y: groundHeight }; // Start on the ground, shifted from left edge
     let velocity = { x: 0, y: 0 };
-    let move = { left: false, right: false, up: false, down: false, jump: false };
-    let onGround = true;
+    let move = { left: false, right: false, jump: false };
+    let onGround = false;
+    let lastDirection = "right";
     const speed = 5;
     const jumpStrength = 17;
     const gravity = 0.9;
-    const floor = 0; // y = 0 is the ground
+
+    function rectsIntersect(ax, ay, aw, ah, bx, by, bw, bh) {
+        return (ax < bx + bw &&
+                ax + aw > bx &&
+                ay < by + bh &&
+                ay + ah > by);
+    }
+
+    function getStandingPlatform() {
+        // Returns the y of the platform the character is standing on, or null
+        // We'll use a small vertical tolerance for collision
+        for(let i=0; i<platforms.length; i++) {
+            const [x, y, w, h] = platforms[i];
+            if (
+                pos.x + charWidth > x + 5 && pos.x < x + w - 5 && // horizontal overlap
+                pos.y - 2 <= y + h && pos.y - 2 >= y + h - 17 // vertical tolerance (standing ON)
+            ) {
+                return y + h;
+            }
+        }
+        // Check ground
+        if (pos.y <= groundHeight + 2 && pos.y >= groundHeight - 20) {
+            return groundHeight;
+        }
+        return null;
+    }
+
+    function getCeilingCollision() {
+        // Check if the top of the character is bumping into the bottom of a platform
+        for(let i=0; i<platforms.length; i++) {
+            const [x, y, w, h] = platforms[i];
+            if (
+                pos.x + charWidth > x + 5 && pos.x < x + w - 5 &&
+                pos.y + charHeight > y && pos.y + charHeight < y + h + 16
+            ) {
+                return y;
+            }
+        }
+        return null;
+    }
 
     function updateCharPosition() {
         // Horizontal movement
         velocity.x = 0;
         if (move.left) velocity.x = -speed;
         else if (move.right) velocity.x = speed;
-
         // Vertical movement (jump and gravity)
         if (move.jump && onGround) {
             velocity.y = jumpStrength;
@@ -171,23 +284,41 @@
         }
         velocity.y -= gravity;
 
+        // Save previous position for collision correction
+        let prevY = pos.y;
+
         pos.x += velocity.x;
         pos.y += velocity.y;
+
+        // --- Collision with ground/platforms (vertical, landing) ---
+        let standingY = getStandingPlatform();
+        if (standingY !== null && velocity.y <= 0 && pos.y <= standingY) {
+            pos.y = standingY;
+            velocity.y = 0;
+            onGround = true;
+        } else {
+            onGround = false;
+        }
+        // --- Ceiling collision (hitting head) ---
+        let bumpY = getCeilingCollision();
+        if (bumpY !== null && velocity.y > 0 && pos.y + charHeight > bumpY) {
+            pos.y = bumpY - charHeight;
+            velocity.y = -2;
+        }
 
         // Boundaries
         const rightBound = window.innerWidth - charWidth;
         if (pos.x < 0) pos.x = 0;
         if (pos.x > rightBound) pos.x = rightBound;
 
-        // Ground collision
-        if (pos.y < floor) {
-            pos.y = floor;
+        // Don't let fall below the ground
+        if (pos.y < groundHeight) {
+            pos.y = groundHeight;
             velocity.y = 0;
             onGround = true;
         }
-
-        // Ceiling
-        const ceiling = window.innerHeight - 80; // character can't go above window (with margin)
+        // Don't let go above screen
+        const ceiling = window.innerHeight - 80;
         if (pos.y > ceiling) pos.y = ceiling;
 
         // Apply position
@@ -205,30 +336,50 @@
     window.addEventListener('keydown', function(e) {
         if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
         switch(e.key.toLowerCase()) {
-            case "a": move.left = true; break;
-            case "d": move.right = true; break;
-            case "w": move.up = true; break; // (optional, not needed for jump, but could be used)
-            case "s": move.down = true; break;
+            case "a":
+                move.left = true;
+                lastDirection = "left";
+                char.classList.add('flipped');
+                break;
+            case "d":
+                move.right = true;
+                lastDirection = "right";
+                char.classList.remove('flipped');
+                break;
             case " ": move.jump = true; break;
         }
     });
     window.addEventListener('keyup', function(e) {
         switch(e.key.toLowerCase()) {
-            case "a": move.left = false; break;
-            case "d": move.right = false; break;
-            case "w": move.up = false; break;
-            case "s": move.down = false; break;
+            case "a":
+                move.left = false;
+                if (move.right) {
+                    lastDirection = "right";
+                    char.classList.remove('flipped');
+                }
+                break;
+            case "d":
+                move.right = false;
+                if (move.left) {
+                    lastDirection = "left";
+                    char.classList.add('flipped');
+                }
+                break;
             case " ": move.jump = false; break;
         }
     });
 
-    // --- Responsive resize ---
+    // --- Responsive resize (and platform reposition on resize) ---
     window.addEventListener('resize', ()=>{
-        // Keep character within bounds after resize
+        // Move last platform to near the right edge
+        platforms[platforms.length-1][0] = window.innerWidth-300;
+        redrawAll();
+        // Keep character within bounds
         const rightBound = window.innerWidth - charWidth;
         if(pos.x > rightBound) pos.x = rightBound;
         char.style.left = pos.x + "px";
     });
+
     </script>
 </body>
 </html>
