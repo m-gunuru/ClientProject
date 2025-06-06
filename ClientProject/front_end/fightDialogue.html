@@ -229,7 +229,9 @@
   </style>
 </head>
 <body>
-   <audio id="battleMusic" src="Pokemon%20XY%20Legendary%20Battle%20Remix.mp3" preload="auto"></audio>
+<audio id="battleMusic" preload="auto" loop>
+  <source src="Pokemon XY Legendary Battle Remix.mp3" type="audio/mpeg">
+</audio>
 
   <!-- Music settings button and panel -->
   <button id="musicSettingsBtn">Music Settings</button>
@@ -317,20 +319,45 @@
 
 
   <script>
-     let musicStarted = false;
-    const battleMusic = document.getElementById('battleMusic');
-    const musicSettingsBtn = document.getElementById('musicSettingsBtn');
-    const musicSettingsPanel = document.getElementById('musicSettingsPanel');
-    const musicVolume = document.getElementById('musicVolume');
+    let musicStarted = false;
+const battleMusic = document.getElementById('battleMusic');
+const musicSettingsBtn = document.getElementById('musicSettingsBtn');
+const musicSettingsPanel = document.getElementById('musicSettingsPanel');
+const musicVolume = document.getElementById('musicVolume');
 
-    // Show/hide music settings panel
-    musicSettingsBtn.onclick = function() {
-      musicSettingsPanel.style.display = musicSettingsPanel.style.display === "none" ? "block" : "none";
-    };
-    // Adjust volume live
-    musicVolume.oninput = function() {
-      battleMusic.volume = this.value;
-    };
+function startMusicIfNeeded() {
+  if (!musicStarted) {
+    battleMusic.volume = musicVolume.value;
+    battleMusic.play().catch(() => {}); // prevent uncaught promise if autoplay blocked
+    musicStarted = true;
+  }
+}
+
+// Start music on first user interaction
+document.body.addEventListener('click', startMusicIfNeeded, { once: true });
+
+// Show/hide music settings panel
+musicSettingsBtn.onclick = function() {
+  musicSettingsPanel.style.display = musicSettingsPanel.style.display === "none" ? "block" : "none";
+};
+
+// Adjust volume live
+musicVolume.oninput = function() {
+  battleMusic.volume = this.value;
+};
+
+// Start music on first user interaction
+document.body.addEventListener('click', startMusicIfNeeded, { once: true });
+
+// Show/hide music settings panel
+musicSettingsBtn.onclick = function() {
+  musicSettingsPanel.style.display = musicSettingsPanel.style.display === "none" ? "block" : "none";
+};
+// Adjust volume live
+musicVolume.oninput = function() {
+  battleMusic.volume = this.value;
+};
+
     const dialogues = [
       { speaker: "Ham", text: "Ready to battle? Show me your wits!" },
       { speaker: "Pebble", text: "Bring it on!" },
