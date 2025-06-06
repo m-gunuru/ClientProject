@@ -1,408 +1,576 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Nonlinear Parkour Game</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            background: url("https://raw.githubusercontent.com/m-gunuru/ClientProject/refs/heads/Test/ClientProject/front_end/image0.png") center center / cover no-repeat;
-            font-family: "Press Start 2P", monospace;
-            overflow: hidden;
-        }
-        #game-area {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-        }
-        .character-img {
-            position: absolute;
-            width: 120px;
-            height: auto;
-            z-index: 2;
-            user-select: none;
-            pointer-events: none;
-            transition: filter 0.2s;
-            display: none;
-        }
-        .character-img.flipped {
-            transform: scaleX(-1);
-        }.platform {
-    position: absolute;
-    border-radius: 8px;
-    z-index: 1;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center center;
-    border: none;
-    overflow: visible; /* So bigger image can spill out */
-}
-.platform.img {
-    background-image: url('https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/2025_06_06_0u7_Kleki.png');
-    transform: scale(1.15); /* Make image 15% bigger */
-    pointer-events: none; /* So mouse events don't get weird */
-}
-.platform.teleport {
-    background-image: url('https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/2025_06_06_0u8_Kleki.png') !important;
-    transform: scale(1.15);
-    pointer-events: none;
-}
-        #settingsBtn {
-            background: #3a4fa0;
-            color: white;
-            border: 2px solid #fff;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-family: "Press Start 2P", monospace;
-            padding: 12px 34px;
-            text-shadow: 3px 5px 1px #00000094;
-            transition: background 0.2s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            position:fixed;
-            top:20px;
-            right:20px;
-            z-index:1000;
-            min-width: 100px;
-            cursor: pointer;
-        }
-        #settingsBtn:hover { background: #1d2558; }
-        #settingsModal {
-            display:none;
-            position:fixed;
-            top:50%;
-            left:50%;
-            transform:translate(-50%,-50%);
-            background:#3a4fa0;
-            border-radius:10px;
-            box-shadow:0 2px 8px rgba(0,0,0,0.3);
-            z-index:2000;
-            padding: 36px 40px 36px 40px;
-            color:#fff;
-            font-family: "Press Start 2P", monospace;
-            min-width: 300px;
-        }
-        #settingsModal h2 { margin-top:0; }
-        #settingsModal input[type="range"]{ width: 160px;}
-        #settingsModal .button {
-            background: #1d2558;
-            color: white;
-            border: 2px solid #fff;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-family: "Press Start 2P", monospace;
-            padding: 8px 20px;
-            margin: 8px 6px 0 0;
-            cursor:pointer;
-        }
-        #settingsModal .button:hover { background: #3a4fa0; }
-        @media (max-width: 600px) {
-            .character-img { width: 80px; }
-            #settingsModal { min-width: 180px; padding: 18px 8vw 18px 8vw; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Parkour Freeroam</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: "Press Start 2P", monospace;
+      background: #000;
+    }
+    #background {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    #game-area {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 2;
+    }
+    .character-img {
+      position: absolute;
+      width: 120px;
+      height: auto;
+      z-index: 10;
+      user-select: none;
+      pointer-events: none;
+      transition: filter 0.2s;
+      display: none;
+    }
+    .character-img.flipped { transform: scaleX(-1); }
+    .platform {
+      position: absolute;
+      border-radius: 8px;
+      z-index: 5;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+      border: none;
+      overflow: visible;
+    }
+    .platform.img {
+      background-image: url('https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/2025_06_06_0u7_Kleki.png');
+      transform: scale(1.15);
+      pointer-events: none;
+    }
+    .platform.teleport {
+      background-image: url('https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/2025_06_06_0u8_Kleki.png') !important;
+      transform: scale(1.15);
+      pointer-events: none;
+    }
+    .heart-collectible {
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      font-size: 2rem;
+      z-index: 15;
+      text-align: center;
+      pointer-events: none;
+      user-select: none;
+      transition: opacity 0.2s;
+    }
+    .life-meter {
+      position: fixed;
+      top: 24px;
+      left: 32px;
+      z-index: 3001;
+      display: flex;
+      gap: 8px;
+      background: rgba(0,0,0,0.35);
+      border-radius: 13px;
+      padding: 6px 18px;
+      box-shadow: 0 2px 8px #0008;
+      font-size: 2rem;
+      align-items: center;
+      letter-spacing: 3px;
+    }
+    .life-heart {
+      font-size: 2rem;
+      margin-right: 2px;
+      filter: none;
+      opacity: 1;
+      transition: filter 0.2s, opacity 0.2s;
+      user-select: none;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .life-heart.empty {
+      filter: grayscale(1) brightness(0.6);
+      opacity:0.4;
+    }
+    #death-transition {
+      position: fixed;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      z-index: 9001;
+      pointer-events: none;
+      background: #000;
+      opacity: 0;
+      transition: opacity 0.8s;
+    }
+    #death-transition.flash {
+      background: #fff;
+      transition: opacity 0.18s;
+    }
+    .dialogue-box {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 85vw;
+      max-width: 1000px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 24px 32px 60px;
+      border: 2.5px solid #fff;
+      border-radius: 18px;
+      box-shadow: 0 -4px 16px #000a;
+      z-index: 1002;
+      font-family: 'Press Start 2P', monospace;
+      transition: opacity 0.4s;
+    }
+    .dialogue-box.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .speaker-name {
+      font-size: 1rem;
+      color: #ffeb3b;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px #000;
+      letter-spacing: 2px;
+    }
+    .dialogue-text {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #fff;
+      text-shadow: 1px 1px 3px #000;
+      min-height: 2em;
+    }
+    @media (max-width: 600px) {
+      .character-img { width: 80px; }
+      .life-meter { font-size: 1.2rem; padding: 4px 8px; }
+      .life-heart { font-size: 1.2rem; }
+    }
+  </style>
 </head>
 <body>
-    <audio id="bg-music" preload="auto" loop>
-      <source src="Pokemon BW2 Iris Battle Remix.mp3" type="audio/mpeg">
-    </audio>
-    <div id="game-area">
-        <!-- Animated Character GIF -->
-        <img 
-            id="character-gif"
-            class="character-img"
-            src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/output-onlinegiftools.gif" 
-            alt="Character Animated"
-        />
-        <!-- Static Character PNG (for pausing) -->
-        <img 
-            id="character-png"
-            class="character-img"
-            src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/2025_06_06_0tl_Kleki.png" 
-            alt="Character Static"
-        />
-        <!-- Platforms will be injected here -->
+  <div id="background"></div>
+  <audio id="bg-music" preload="auto" loop>
+    <source src="Pokemon BW2 Iris Battle Remix.mp3" type="audio/mpeg">
+  </audio>
+  <div id="game-area">
+    <img 
+      id="character-gif"
+      class="character-img"
+      src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/output-onlinegiftools.gif" 
+      alt="Character Animated"
+    />
+    <img 
+      id="character-png"
+      class="character-img"
+      src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/2025_06_06_0tl_Kleki.png" 
+      alt="Character Static"
+    />
+  </div>
+  <div class="life-meter" id="life-meter"></div>
+  <div id="death-transition"></div>
+  <div class="dialogue-box" id="pebbles-dialogue">
+    <div class="speaker-name">Pebbles</div>
+    <div class="dialogue-text">
+      Help me get to the end of this parkour so I can prove my knowledge to Ham the Hammer!
     </div>
-    <!-- Settings Button -->
-    <button id="settingsBtn">Settings</button>
-    <!-- Settings Modal -->
-    <div id="settingsModal">
-        <h2>Settings</h2>
-        <label for="volumeSlider">Volume:</label>
-        <input type="range" id="volumeSlider" min="0" max="100" step="1"><span id="volumeValue"></span>%
-        <br><br>
-        <button id="saveSettingsBtn" class="button">Save</button>
-        <button id="closeSettingsBtn" class="button">Close</button>
-    </div>
-    <script>
-    // --- Music & Settings Logic ---
-    window.onload = function() {
-        let musicStarted = false;
-        function tryPlayMusic() {
-            if (!musicStarted) {
-                document.getElementById('bg-music').play().catch(()=>{});
-                musicStarted = true;
-            }
-        }
-        window.addEventListener('keydown', tryPlayMusic, { once: true });
-        window.addEventListener('mousedown', tryPlayMusic, { once: true });
-
-        function loadSettings() {
-            const settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
-            document.getElementById('volumeSlider').value = settings.volume;
-            document.getElementById('volumeValue').textContent = settings.volume;
-            document.getElementById('bg-music').volume = settings.volume / 100;
-            return settings;
-        }
-        function saveSettings() {
-            const volume = parseInt(document.getElementById('volumeSlider').value, 10);
-            localStorage.setItem('gameSettings', JSON.stringify({ volume }));
-            alert('Settings saved!');
-        }
-        const modal = document.getElementById('settingsModal');
-        document.getElementById('settingsBtn').onclick = function() {
-            modal.style.display = 'block';
-            loadSettings();
-        };
-        document.getElementById('closeSettingsBtn').onclick = function() {
-            modal.style.display = 'none';
-        };
-        document.getElementById('saveSettingsBtn').onclick = function() {
-            saveSettings();
-            modal.style.display = 'none';
-        };
-        document.getElementById('volumeSlider').oninput = function() {
-            document.getElementById('volumeValue').textContent = this.value;
-            document.getElementById('bg-music').volume = this.value / 100;
-        };
-        loadSettings();
-    };
-
-    // --- Game & Platform Logic ---
-    const charGif = document.getElementById('character-gif');
-    const charPng = document.getElementById('character-png');
-    const charWidth = 120;
-    const charHeight = 120;
-    const gameArea = document.getElementById('game-area');
-
-    // --- GROUND HEIGHT: Adjust here ---
-    const groundHeight = 100; // pixels from bottom
-
-    // Platform format: [x, y, width, height, isTeleport]
-    const platforms = [
-        [130, 200, 120, 25, false],         // Start (reachable from ground)
-        [320, 350, 120, 25, false],         // up right (higher)
-        [600, 380, 120, 25, false],         // mid right (higher)
-        [800, 420, 120, 25, false],         // high right (higher)
-        [950, 570, 120, 25, false],         // high up (higher)
-        [1200, 350, 120, 25, true]          // blue teleport pad (higher)
-    ];
-    let startPlatformIdx = 0;
-
-    // For moving platforms (per-platform speed, amplitude, phase)
-    const platformOffsets = new Array(platforms.length).fill(0);
-    const platformSpeeds = [0, 1.2, 0.7, 1.4, 0.9, 1.1];
-    const platformAmplitudes = [0, 40, 25, 55, 30, 50];
-    const platformPhases = [0, 0, Math.PI/3, Math.PI/5, Math.PI/2, Math.PI];
-
-    const HITBOX_SHRINK = 20; // How much to shrink (px)
-function drawPlatforms() {
-    Array.from(document.getElementsByClassName('platform')).forEach(e=>e.remove());
-    for (let i=0; i<platforms.length; i++) {
-        const [x, y, w, h, isTeleport] = platforms[i];
-        let pf = document.createElement('div');
-        pf.className = 'platform img' + (isTeleport ? ' teleport' : '');
-        pf.style.left = (x + HITBOX_SHRINK/2) + 'px'; // Center the hitbox under the image
-        pf.style.bottom = y+'px';
-        pf.style.width = (w - HITBOX_SHRINK) + 'px'; // Shrink hitbox width
-        pf.style.height = h+'px';
-        pf.dataset.idx = i;
-        gameArea.appendChild(pf);
+  </div>
+<script>
+window.onload = function() {
+  let musicStarted = false;
+  function tryPlayMusic() {
+    if (!musicStarted) {
+      document.getElementById('bg-music').play().catch(()=>{});
+      musicStarted = true;
     }
+  }
+  window.addEventListener('keydown', tryPlayMusic, { once: true });
+  window.addEventListener('mousedown', tryPlayMusic, { once: true });
+};
+
+// --- Platform layout (spaced but doable) ---
+const platforms = [
+  [130, 210, 120, 25, false],    // 0 ground
+  [390, 320, 120, 25, false],    // 1
+  [700, 410, 120, 25, false],    // 2
+  [1040, 340, 120, 25, false],   // 3 (heart)
+  [1400, 470, 120, 25, false],   // 4
+  [1780, 370, 120, 25, false],   // 5 (heart)
+  [2180, 410, 120, 25, true]     // 6 teleport/end
+];
+const heartClouds = [3, 5]; // Only two collectible hearts
+
+let heartsOnClouds = {};
+function spawnHearts() {
+  heartsOnClouds = {};
+  for (const idx of heartClouds) heartsOnClouds[idx] = true;
 }
-    drawPlatforms();
+let platformDivs = [];
 
-    function updatePlatforms() {
-        const t = performance.now() / 1000; // seconds
-        for (let i = 0; i < platforms.length; i++) {
-            if (i === 0) continue; // static
-            platformOffsets[i] = Math.sin(t * platformSpeeds[i] + platformPhases[i]) * platformAmplitudes[i];
-            const platformEl = document.querySelector('.platform[data-idx="'+i+'"]');
-            if (platformEl) {
-                platformEl.style.bottom = (platforms[i][1] + platformOffsets[i]) + 'px';
-            }
-        }
+const platformOffsets = new Array(platforms.length).fill(0);
+const platformAmplitudes = [0, 80, 120, 60, 100, 70, 50];
+const platformSpeeds = [0, 0.8, 1.1, 1.4, 0.9, 1.2, 1.1];
+const platformPhases = [0, 0.2, 1.1, 0.8, 0.5, 1.4, 0.7];
+
+const charGif = document.getElementById('character-gif');
+const charPng = document.getElementById('character-png');
+const charWidth = 120;
+const charHeight = 120;
+const gameArea = document.getElementById('game-area');
+const backgroundDiv = document.getElementById('background');
+const BG_IMG_URL = "https://raw.githubusercontent.com/m-gunuru/ClientProject/refs/heads/Test/ClientProject/front_end/image0.png";
+const BG_WIDTH = 1280;
+const BG_HEIGHT = 720;
+const groundHeight = 100;
+const HITBOX_SHRINK = 20;
+
+const maxLives = 3;
+let lives = 3;
+function updateLifeMeter() {
+  const meter = document.getElementById('life-meter');
+  meter.innerHTML = '';
+  for (let i = 0; i < maxLives; i++) {
+    let span = document.createElement('span');
+    span.className = 'life-heart' + (i >= lives ? ' empty' : '');
+    span.textContent = '❤️';
+    meter.appendChild(span);
+  }
+}
+
+const deathTransition = document.getElementById('death-transition');
+function playDeathTransition(cb) {
+  deathTransition.classList.remove("flash");
+  deathTransition.style.opacity = 0;
+  deathTransition.style.background = "#000";
+  deathTransition.style.transition = "opacity 0.8s";
+  setTimeout(() => {
+    deathTransition.style.opacity = 1;
+    setTimeout(() => {
+      deathTransition.style.background = "#fff";
+      deathTransition.style.transition = "opacity 0.18s";
+      deathTransition.classList.add("flash");
+      setTimeout(() => {
+        deathTransition.style.opacity = 0;
+        deathTransition.classList.remove("flash");
+        setTimeout(() => {
+          deathTransition.style.background = "#000";
+          cb && cb();
+        }, 200);
+      }, 180);
+    }, 800);
+  }, 40);
+}
+
+function drawPlatforms(cameraX) {
+  for (const el of platformDivs) el.remove();
+  platformDivs = [];
+  document.querySelectorAll('.heart-collectible').forEach(e=>e.remove());
+  for (let i = 0; i < platforms.length; i++) {
+    const [x, y, w, h, isTeleport] = platforms[i];
+    let pf = document.createElement('div');
+    pf.className = 'platform img' + (isTeleport ? ' teleport' : '');
+    pf.style.left = (x + HITBOX_SHRINK/2 - cameraX) + 'px';
+    pf.style.bottom = (y + (platformOffsets[i]||0))+'px';
+    pf.style.width = (w - HITBOX_SHRINK) + 'px';
+    pf.style.height = h+'px';
+    pf.dataset.idx = i;
+    gameArea.appendChild(pf);
+    platformDivs.push(pf);
+
+    // Draw floating heart if there is one on this cloud
+    if (heartsOnClouds[i]) {
+      let heart = document.createElement('span');
+      heart.className = "heart-collectible";
+      heart.textContent = '❤️';
+      heart.style.left = (x + w/2 - 18 - cameraX) + "px";
+      heart.style.bottom = (y + (platformOffsets[i]||0) + h + 34) + "px";
+      heart.style.opacity = 1;
+      heart.dataset.platform = i;
+      gameArea.appendChild(heart);
     }
+  }
+}
 
-    // --- Character Movement Logic ---
-    let pos = { x: platforms[startPlatformIdx][0]+10, y: platforms[startPlatformIdx][1]+platforms[startPlatformIdx][3] };
-    let velocity = { x: 0, y: 0 };
-    let move = { left: false, right: false, jump: false };
-    let onGround = false;
-    let lastDirection = "right";
-    const speed = 5;
-    const jumpStrength = 17;
-    const gravity = 0.9;
+let cameraX = 0;
+const VIEWPORT_W = () => window.innerWidth;
+const WORLD_WIDTH = platforms[platforms.length-1][0] + 400;
 
-    let prevStandingPlatform = null;
+let pos = { x: platforms[0][0]+10, y: platforms[0][1]+platforms[0][3] };
+let velocity = { x: 0, y: 0 };
+let move = { left: false, right: false, jump: false };
+let onGround = false;
+let lastDirection = "right";
+const speed = 5;
+const jumpStrength = 17;
+const gravity = 0.9;
+let prevStandingPlatform = 0; // index of previous platform (0 = ground)
+let wasOnGround = true; // for tracking transitions
+let justLandedLossCooldown = false; // prevents double life loss on same frame
 
-    function getStandingPlatform() {
-        for(let i=0; i<platforms.length; i++) {
-            const [x, y, w, h, isTeleport] = platforms[i];
-            const offsetY = (platformOffsets[i] || 0);
-            // Make the landing band wider (more forgiving)
-            if (
-                pos.x + charWidth > x + 5 && pos.x < x + w - 5 &&
-                pos.y - 2 <= y + h + offsetY && pos.y - 2 >= y + h + offsetY - 30
-            ) {
-                // If it's a cloud (not teleport), sink in by 8px
-                const sink = isTeleport ? 0 : 8;
-                return [i, y + h + offsetY - sink];
-            }
-        }
-        if (pos.y <= groundHeight + 2 && pos.y >= groundHeight - 20) {
-            return ['ground', groundHeight];
-        }
-        return null;
+function checkHeartCollect() {
+  document.querySelectorAll('.heart-collectible').forEach(span => {
+    const idx = Number(span.dataset.platform);
+    if (!heartsOnClouds[idx]) return;
+    const plat = platforms[idx];
+    const hx = plat[0] + plat[2]/2 - 18;
+    const hy = plat[1] + (platformOffsets[idx]||0) + plat[3] + 34;
+    if (
+      pos.x + charWidth > hx &&
+      pos.x < hx + 36 &&
+      pos.y > hy - 16 &&
+      pos.y < hy + 50
+    ) {
+      heartsOnClouds[idx] = false;
+      span.style.opacity = 0;
+      if (lives < maxLives) lives++;
+      updateLifeMeter();
     }
+  });
+}
 
-    function getLowestPlatformY() {
-        let minY = Infinity;
-        for (let p of platforms) if (p[1] < minY) minY = p[1];
-        return minY;
+function getStandingPlatform() {
+  for(let i=0; i<platforms.length; i++) {
+    const [x, y, w, h, isTeleport] = platforms[i];
+    const offsetY = (platformOffsets[i] || 0);
+    if (
+      pos.x + charWidth > x + 5 && pos.x < x + w - 5 &&
+      pos.y - 2 <= y + h + offsetY && pos.y - 2 >= y + h + offsetY - 30
+    ) {
+      const sink = isTeleport ? 0 : 8;
+      return [i, y + h + offsetY - sink];
     }
+  }
+  if (pos.y <= groundHeight + 2 && pos.y >= groundHeight - 20) {
+    return [0, groundHeight];
+  }
+  return null;
+}
 
-    function resetToStart() {
-        pos.x = platforms[startPlatformIdx][0]+10;
-        pos.y = platforms[startPlatformIdx][1]+platforms[startPlatformIdx][3];
-        velocity.x = 0;
-        velocity.y = 0;
+function resetToStart() {
+  pos.x = platforms[0][0]+10;
+  pos.y = platforms[0][1]+platforms[0][3];
+  velocity.x = 0;
+  velocity.y = 0;
+  prevStandingPlatform = 0;
+  wasOnGround = true;
+}
+
+function updatePlatforms() {
+  const t = performance.now() / 1000;
+  for (let i = 0; i < platforms.length; i++) {
+    if (i === 0) continue;
+    platformOffsets[i] = Math.sin(t * platformSpeeds[i] + platformPhases[i]) * platformAmplitudes[i];
+  }
+}
+
+// --- Robust textbox hide logic, always rebinding after death/respawn
+const pebblesDialogue = document.getElementById('pebbles-dialogue');
+let dialogueHidden = false;
+function rebindDialogueHide() {
+  dialogueHidden = false;
+  function hideDialogueOnMove(e) {
+    if (dialogueHidden) return;
+    const k = e.key.toLowerCase();
+    if (k === "a" || k === "d" || k === " ") {
+      pebblesDialogue.classList.add('hide');
+      dialogueHidden = true;
+      window.removeEventListener('keydown', hideDialogueOnMove);
     }
+  }
+  window.addEventListener('keydown', hideDialogueOnMove);
+}
+rebindDialogueHide();
 
-    function updateCharPosition() {
-        // Horizontal movement
-        velocity.x = 0;
-        if (move.left) velocity.x = -speed;
-        else if (move.right) velocity.x = speed;
-        // Vertical movement (jump and gravity)
-        if (move.jump && onGround) {
-            velocity.y = jumpStrength;
-            onGround = false;
-        }
-        velocity.y -= gravity;
-
-        pos.x += velocity.x;
-        pos.y += velocity.y;
-
-        // --- Collision with ground/platforms (vertical, landing only, no head collision) ---
-        let standing = getStandingPlatform();
-        // If standing on a moving platform, move character with it
-        if (typeof standing?.[0] === "number" && standing[0] !== 0) {
-            const deltaY = (platformOffsets[standing[0]] || 0) - (platformOffsets[prevStandingPlatform] || 0);
-            if (onGround) pos.y += deltaY;
-        }
-        prevStandingPlatform = standing ? standing[0] : null;
-        if (standing && velocity.y <= 0 && pos.y <= standing[1]) {
-            pos.y = standing[1];
-            velocity.y = 0;
-            onGround = true;
-
-            // Teleport logic
-            if (typeof standing[0] === "number" && platforms[standing[0]][4]) {
-                window.location.href = "fightDialogue.html";
-            }
-        } else {
-            onGround = false;
-        }
-
-        // Boundaries
-        const rightBound = window.innerWidth - charWidth;
-        if (pos.x < 0) pos.x = 0;
-        if (pos.x > rightBound) pos.x = rightBound;
-
-        // Fall reset
-        let resetY = Math.min(groundHeight, getLowestPlatformY() - 80);
-        if (pos.y < resetY) {
-            resetToStart();
-        }
-
-        // Top boundary
-        const ceiling = window.innerHeight - 80;
-        if (pos.y > ceiling) pos.y = ceiling;
-
-        // Apply position
-        charGif.style.left = charPng.style.left = pos.x + 'px';
-        charGif.style.bottom = charPng.style.bottom = pos.y + 'px';
-    }
-
-    // --- GIF Pause/Play Logic (show PNG if not moving left/right) ---
-    function updateCharacterFrame() {
-        if (move.left || move.right) {
-            charGif.style.display = 'block';
-            charPng.style.display = 'none';
-        } else {
-            charGif.style.display = 'none';
-            charPng.style.display = 'block';
-        }
-        // Apply flipping
-        if (lastDirection === "left") {
-            charGif.classList.add('flipped');
-            charPng.classList.add('flipped');
-        } else {
-            charGif.classList.remove('flipped');
-            charPng.classList.remove('flipped');
-        }
-    }
-
-    function gameLoop() {
-        updatePlatforms();
-        updateCharPosition();
-        updateCharacterFrame();
-        requestAnimationFrame(gameLoop);
-    }
-    gameLoop();
-
-    // --- Keyboard Controls ---
-    window.addEventListener('keydown', function(e) {
-        if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
-        switch(e.key.toLowerCase()) {
-            case "a":
-                move.left = true;
-                lastDirection = "left";
-                break;
-            case "d":
-                move.right = true;
-                lastDirection = "right";
-                break;
-            case " ": move.jump = true; break;
-        }
+let gameFrozen = false;
+function updateCharPosition() {
+  if (gameFrozen) return;
+  velocity.x = 0;
+  if (move.left) velocity.x = -speed;
+  else if (move.right) velocity.x = speed;
+  if (move.jump && onGround) {
+    velocity.y = jumpStrength;
+    onGround = false;
+  }
+  velocity.y -= gravity;
+  pos.x += velocity.x;
+  pos.y += velocity.y;
+// Failsafe: If player falls way below the ground, treat as fatal fall
+if (pos.y < groundHeight - 120) {
+  if (lives > 0) {
+    lives--;
+    updateLifeMeter();
+  }
+  if (lives <= 0) {
+    gameFrozen = true;
+    playDeathTransition(()=>{
+      lives = maxLives;
+      updateLifeMeter();
+      resetToStart();
+      spawnHearts();
+      pebblesDialogue.classList.remove('hide');
+      rebindDialogueHide();
+      gameFrozen = false;
     });
-    window.addEventListener('keyup', function(e) {
-        switch(e.key.toLowerCase()) {
-            case "a":
-                move.left = false;
-                if (move.right) {
-                    lastDirection = "right";
-                }
-                break;
-            case "d":
-                move.right = false;
-                if (move.left) {
-                    lastDirection = "left";
-                }
-                break;
-            case " ": move.jump = false; break;
-        }
-    });
+  } else {
+    resetToStart();
+  }
+  // Also set to grounded state so you don't chain-lose lives
+  wasOnGround = true;
+  prevStandingPlatform = 0;
+  return;
+}
+  // Find which platform we are standing on (if any)
+  let standing = getStandingPlatform();
+  let currentPlatformIdx = (standing && typeof standing[0] === "number") ? standing[0] : null;
+  let touchingGround = (currentPlatformIdx === 0);
 
-    // --- Responsive resize ---
-    window.addEventListener('resize', ()=>{
-        const rightBound = window.innerWidth - charWidth;
-        if(pos.x > rightBound) pos.x = rightBound;
-        charGif.style.left = charPng.style.left = pos.x + "px";
-    });
-    </script>
+  // Only lose a life if landing on ground from higher elevation (not from ground or first cloud)
+  if (
+    touchingGround &&
+    !wasOnGround &&
+    prevStandingPlatform !== 0 &&
+    prevStandingPlatform !== 1
+  ) {
+    if (lives > 0) {
+      lives--;
+      updateLifeMeter();
+    }
+    // Optional: death/respawn logic if lives==0...
+    if (lives <= 0) {
+      gameFrozen = true;
+      playDeathTransition(()=>{
+        lives = maxLives;
+        updateLifeMeter();
+        resetToStart();
+        spawnHearts();
+        pebblesDialogue.classList.remove('hide');
+        rebindDialogueHide();
+        gameFrozen = false;
+      });
+      wasOnGround = true;
+      prevStandingPlatform = 0;
+      return;
+    }
+  }
+
+  // Track for next frame
+  wasOnGround = touchingGround;
+  prevStandingPlatform = touchingGround ? 0 : (currentPlatformIdx !== null ? currentPlatformIdx : prevStandingPlatform);
+
+  // Platform moving logic
+  if (currentPlatformIdx !== null && currentPlatformIdx !== 0 && prevStandingPlatform !== null && prevStandingPlatform !== 0) {
+    const deltaY = (platformOffsets[currentPlatformIdx]||0) - (platformOffsets[prevStandingPlatform]||0);
+    if (onGround) pos.y += deltaY;
+  }
+
+  // On landing (from above or side)
+  if (standing && velocity.y <= 0 && pos.y <= standing[1]) {
+    pos.y = standing[1];
+    velocity.y = 0;
+    onGround = true;
+    // Teleport logic
+    if (currentPlatformIdx !== null && platforms[currentPlatformIdx][4]) window.location.href="fightDialogue.html";
+  } else {
+    onGround = false;
+  }
+
+  // Boundaries
+  if (pos.x<0) pos.x=0;
+  if (pos.x>WORLD_WIDTH-charWidth) pos.x=WORLD_WIDTH-charWidth;
+
+  // Collect hearts
+  checkHeartCollect();
+
+  // Top boundary
+  const ceiling = window.innerHeight - 80;
+  if (pos.y > ceiling) pos.y = ceiling;
+}
+
+function updateCharacterFrame() {
+  if (gameFrozen) return;
+  if (move.left || move.right) {
+    charGif.style.display = 'block';
+    charPng.style.display = 'none';
+  } else {
+    charGif.style.display = 'none';
+    charPng.style.display = 'block';
+  }
+  if (lastDirection === "left") {
+    charGif.classList.add('flipped');
+    charPng.classList.add('flipped');
+  } else {
+    charGif.classList.remove('flipped');
+    charPng.classList.remove('flipped');
+  }
+}
+
+function updateCamera() {
+  cameraX = pos.x - VIEWPORT_W()/2 + charWidth/2;
+  cameraX = Math.max(0, Math.min(cameraX, WORLD_WIDTH - VIEWPORT_W()));
+}
+
+function updateBackground() {
+  let pxW = BG_WIDTH, pxH = BG_HEIGHT;
+  let bgHtml = "";
+  let leftmost = -cameraX % pxW;
+  let repeats = Math.ceil(window.innerWidth / pxW) + 2;
+  for (let i = 0; i < repeats; ++i) {
+    bgHtml += `<img src="${BG_IMG_URL}" style="position:absolute;left:${leftmost + i*pxW}px;top:0;width:${pxW}px;height:${window.innerHeight}px;z-index:0;"/>`;
+  }
+  backgroundDiv.innerHTML = bgHtml;
+}
+
+function updateCharacterPositionOnScreen() {
+  charGif.style.left = charPng.style.left = (pos.x - cameraX) + 'px';
+  charGif.style.bottom = charPng.style.bottom = pos.y + 'px';
+}
+
+function gameLoop() {
+  updatePlatforms();
+  updateCharPosition();
+  updateCamera();
+  updateBackground();
+  drawPlatforms(cameraX);
+  updateLifeMeter();
+  updateCharacterFrame();
+  updateCharacterPositionOnScreen();
+  requestAnimationFrame(gameLoop);
+}
+
+// Keyboard Controls
+window.addEventListener('keydown', function(e) {
+  if (gameFrozen) return;
+  if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
+  switch(e.key.toLowerCase()) {
+    case "a": move.left = true; lastDirection = "left"; break;
+    case "d": move.right = true; lastDirection = "right"; break;
+    case " ": move.jump = true; break;
+  }
+});
+window.addEventListener('keyup', function(e) {
+  if (gameFrozen) return;
+  switch(e.key.toLowerCase()) {
+    case "a": move.left = false; if (move.right) lastDirection = "right"; break;
+    case "d": move.right = false; if (move.left) lastDirection = "left"; break;
+    case " ": move.jump = false; break;
+  }
+});
+
+window.addEventListener('resize', ()=>{
+  drawPlatforms(cameraX);
+  updateBackground();
+  updateCharacterPositionOnScreen();
+});
+
+// Game start
+spawnHearts();
+updateLifeMeter();
+gameLoop();
+</script>
 </body>
 </html>
