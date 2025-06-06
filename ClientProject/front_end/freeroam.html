@@ -30,26 +30,26 @@
         }
         .character-img.flipped {
             transform: scaleX(-1);
-        }
-        .platform {
-            position: absolute;
-            background: #c8a963;
-            border: 3px solid #886d3a;
-            border-radius: 8px;
-            z-index: 1;
-            box-shadow: 0 4px 12px #000a;
-        }
-        .teleport {
-            background: #3187ff !important;
-            border: 3px solid #1e3a5c !important;
-            box-shadow: 0 4px 18px #3187ffcc;
-            transition: box-shadow 0.2s;
-            animation: glow 1.5s infinite alternate;
-        }
-        @keyframes glow {
-            0% { box-shadow: 0 4px 18px #3187ff88; }
-            100% { box-shadow: 0 4px 32px #3187ffcc; }
-        }
+        }.platform {
+    position: absolute;
+    border-radius: 8px;
+    z-index: 1;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    border: none;
+    overflow: visible; /* So bigger image can spill out */
+}
+.platform.img {
+    background-image: url('https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/2025_06_06_0u7_Kleki.png');
+    transform: scale(1.15); /* Make image 15% bigger */
+    pointer-events: none; /* So mouse events don't get weird */
+}
+.platform.teleport {
+    background-image: url('https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/2025_06_06_0u8_Kleki.png') !important;
+    transform: scale(1.15);
+    pointer-events: none;
+}
         #settingsBtn {
             background: #3a4fa0;
             color: white;
@@ -191,7 +191,6 @@
     const groundHeight = 100; // pixels from bottom
 
     // Platform format: [x, y, width, height, isTeleport]
-    // Nonlinear parkour!
     const platforms = [
         [130, 200, 120, 25, false],         // Start (reachable from ground)
         [320, 350, 120, 25, false],         // up right (higher)
@@ -200,41 +199,38 @@
         [950, 570, 120, 25, false],         // high up (higher)
         [1200, 350, 120, 25, true]          // blue teleport pad (higher)
     ];
-    let startPlatformIdx = 0; // The index in platforms[] for the starting platform
+    let startPlatformIdx = 0;
 
-    // For moving platforms
+    // For moving platforms (per-platform speed, amplitude, phase)
     const platformOffsets = new Array(platforms.length).fill(0);
-    const platformDirections = new Array(platforms.length).fill(1);
-    const platformSpeed = 1; // px per frame
-    const platformAmplitude = 40; // max up/down distance
+    const platformSpeeds = [0, 1.2, 0.7, 1.4, 0.9, 1.1];
+    const platformAmplitudes = [0, 40, 25, 55, 30, 50];
+    const platformPhases = [0, 0, Math.PI/3, Math.PI/5, Math.PI/2, Math.PI];
 
-    function drawPlatforms() {
-        Array.from(document.getElementsByClassName('platform')).forEach(e=>e.remove());
-        for (let i=0; i<platforms.length; i++) {
-            const [x, y, w, h, isTeleport] = platforms[i];
-            let pf = document.createElement('div');
-            pf.className = 'platform' + (isTeleport ? ' teleport' : '');
-            pf.style.left = x+'px';
-            pf.style.bottom = y+'px';
-            pf.style.width = w+'px';
-            pf.style.height = h+'px';
-            pf.dataset.idx = i;
-            gameArea.appendChild(pf);
-        }
+    const HITBOX_SHRINK = 20; // How much to shrink (px)
+function drawPlatforms() {
+    Array.from(document.getElementsByClassName('platform')).forEach(e=>e.remove());
+    for (let i=0; i<platforms.length; i++) {
+        const [x, y, w, h, isTeleport] = platforms[i];
+        let pf = document.createElement('div');
+        pf.className = 'platform img' + (isTeleport ? ' teleport' : '');
+        pf.style.left = (x + HITBOX_SHRINK/2) + 'px'; // Center the hitbox under the image
+        pf.style.bottom = y+'px';
+        pf.style.width = (w - HITBOX_SHRINK) + 'px'; // Shrink hitbox width
+        pf.style.height = h+'px';
+        pf.dataset.idx = i;
+        gameArea.appendChild(pf);
     }
+}
     drawPlatforms();
 
     function updatePlatforms() {
+        const t = performance.now() / 1000; // seconds
         for (let i = 0; i < platforms.length; i++) {
-            // Skip the first platform (leave it static)
-            if (i === 0) continue;
-            platformOffsets[i] += platformSpeed * platformDirections[i];
-            if (platformOffsets[i] > platformAmplitude || platformOffsets[i] < -platformAmplitude) {
-                platformDirections[i] *= -1;
-            }
+            if (i === 0) continue; // static
+            platformOffsets[i] = Math.sin(t * platformSpeeds[i] + platformPhases[i]) * platformAmplitudes[i];
             const platformEl = document.querySelector('.platform[data-idx="'+i+'"]');
             if (platformEl) {
-                // Animate platform up and down
                 platformEl.style.bottom = (platforms[i][1] + platformOffsets[i]) + 'px';
             }
         }
@@ -254,13 +250,16 @@
 
     function getStandingPlatform() {
         for(let i=0; i<platforms.length; i++) {
-            const [x, y, w, h] = platforms[i];
+            const [x, y, w, h, isTeleport] = platforms[i];
             const offsetY = (platformOffsets[i] || 0);
+            // Make the landing band wider (more forgiving)
             if (
                 pos.x + charWidth > x + 5 && pos.x < x + w - 5 &&
-                pos.y - 2 <= y + h + offsetY && pos.y - 2 >= y + h + offsetY - 17
+                pos.y - 2 <= y + h + offsetY && pos.y - 2 >= y + h + offsetY - 30
             ) {
-                return [i, y + h + offsetY];
+                // If it's a cloud (not teleport), sink in by 8px
+                const sink = isTeleport ? 0 : 8;
+                return [i, y + h + offsetY - sink];
             }
         }
         if (pos.y <= groundHeight + 2 && pos.y >= groundHeight - 20) {
@@ -340,7 +339,6 @@
 
     // --- GIF Pause/Play Logic (show PNG if not moving left/right) ---
     function updateCharacterFrame() {
-        // If moving left/right, show GIF, hide PNG; otherwise, show PNG, hide GIF
         if (move.left || move.right) {
             charGif.style.display = 'block';
             charPng.style.display = 'none';
@@ -401,11 +399,9 @@
 
     // --- Responsive resize ---
     window.addEventListener('resize', ()=>{
-        // Keep character within bounds
         const rightBound = window.innerWidth - charWidth;
         if(pos.x > rightBound) pos.x = rightBound;
         charGif.style.left = charPng.style.left = pos.x + "px";
-        // (for more advanced games: platforms could be reflowed here)
     });
     </script>
 </body>
