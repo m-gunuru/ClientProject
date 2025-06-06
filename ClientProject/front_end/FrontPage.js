@@ -47,7 +47,6 @@ async function checkUser() {
     const user = userCredential.user;
 
     if (user.emailVerified) {
-      alert("Login Successful! Loading you into the game...");
       window.location.href = "Dialogue.html";
     } else {
       alert("Verify your email before logging in.");
