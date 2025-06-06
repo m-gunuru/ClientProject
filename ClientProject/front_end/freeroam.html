@@ -116,11 +116,11 @@
             src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/output-onlinegiftools.gif" 
             alt="Character Animated"
         />
-        <!-- Static Character PNG (first frame of the GIF, for pausing) -->
+        <!-- Static Character PNG (for pausing) -->
         <img 
             id="character-png"
             class="character-img"
-            src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/output-onlinegiftools.png" 
+            src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/2025_06_06_0tl_Kleki.png" 
             alt="Character Static"
         />
         <!-- Platforms will be injected here -->
@@ -188,21 +188,25 @@
     const gameArea = document.getElementById('game-area');
 
     // --- GROUND HEIGHT: Adjust here ---
-    const groundHeight = 100; // <-- Adjust ground height here (pixels from bottom)
-    // -------------------------------
+    const groundHeight = 100; // pixels from bottom
 
     // Platform format: [x, y, width, height, isTeleport]
     // Nonlinear parkour!
     const platforms = [
-        [130, 200, 120, 25, false],         // Start
-        [320, 350, 120, 25, false],         // up right
-        [200, 500, 120, 25, false],         // up left
-        [600, 280, 120, 25, false],         // mid right
-        [800, 420, 120, 25, false],         // high right
-        [950, 570, 120, 25, false],         // high up
-        [1200, 350, 120, 25, true]          // blue teleport pad (true)
+        [130, 200, 120, 25, false],         // Start (reachable from ground)
+        [320, 350, 120, 25, false],         // up right (higher)
+        [600, 380, 120, 25, false],         // mid right (higher)
+        [800, 420, 120, 25, false],         // high right (higher)
+        [950, 570, 120, 25, false],         // high up (higher)
+        [1200, 350, 120, 25, true]          // blue teleport pad (higher)
     ];
     let startPlatformIdx = 0; // The index in platforms[] for the starting platform
+
+    // For moving platforms
+    const platformOffsets = new Array(platforms.length).fill(0);
+    const platformDirections = new Array(platforms.length).fill(1);
+    const platformSpeed = 1; // px per frame
+    const platformAmplitude = 40; // max up/down distance
 
     function drawPlatforms() {
         Array.from(document.getElementsByClassName('platform')).forEach(e=>e.remove());
@@ -214,10 +218,27 @@
             pf.style.bottom = y+'px';
             pf.style.width = w+'px';
             pf.style.height = h+'px';
+            pf.dataset.idx = i;
             gameArea.appendChild(pf);
         }
     }
     drawPlatforms();
+
+    function updatePlatforms() {
+        for (let i = 0; i < platforms.length; i++) {
+            // Skip the first platform (leave it static)
+            if (i === 0) continue;
+            platformOffsets[i] += platformSpeed * platformDirections[i];
+            if (platformOffsets[i] > platformAmplitude || platformOffsets[i] < -platformAmplitude) {
+                platformDirections[i] *= -1;
+            }
+            const platformEl = document.querySelector('.platform[data-idx="'+i+'"]');
+            if (platformEl) {
+                // Animate platform up and down
+                platformEl.style.bottom = (platforms[i][1] + platformOffsets[i]) + 'px';
+            }
+        }
+    }
 
     // --- Character Movement Logic ---
     let pos = { x: platforms[startPlatformIdx][0]+10, y: platforms[startPlatformIdx][1]+platforms[startPlatformIdx][3] };
@@ -229,14 +250,17 @@
     const jumpStrength = 17;
     const gravity = 0.9;
 
+    let prevStandingPlatform = null;
+
     function getStandingPlatform() {
         for(let i=0; i<platforms.length; i++) {
             const [x, y, w, h] = platforms[i];
+            const offsetY = (platformOffsets[i] || 0);
             if (
                 pos.x + charWidth > x + 5 && pos.x < x + w - 5 &&
-                pos.y - 2 <= y + h && pos.y - 2 >= y + h - 17
+                pos.y - 2 <= y + h + offsetY && pos.y - 2 >= y + h + offsetY - 17
             ) {
-                return [i, y + h];
+                return [i, y + h + offsetY];
             }
         }
         if (pos.y <= groundHeight + 2 && pos.y >= groundHeight - 20) {
@@ -275,6 +299,12 @@
 
         // --- Collision with ground/platforms (vertical, landing only, no head collision) ---
         let standing = getStandingPlatform();
+        // If standing on a moving platform, move character with it
+        if (typeof standing?.[0] === "number" && standing[0] !== 0) {
+            const deltaY = (platformOffsets[standing[0]] || 0) - (platformOffsets[prevStandingPlatform] || 0);
+            if (onGround) pos.y += deltaY;
+        }
+        prevStandingPlatform = standing ? standing[0] : null;
         if (standing && velocity.y <= 0 && pos.y <= standing[1]) {
             pos.y = standing[1];
             velocity.y = 0;
@@ -329,6 +359,7 @@
     }
 
     function gameLoop() {
+        updatePlatforms();
         updateCharPosition();
         updateCharacterFrame();
         requestAnimationFrame(gameLoop);
