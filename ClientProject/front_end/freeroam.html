@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Parkour Character Game</title>
+    <title>Nonlinear Parkour Game</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
     <style>
         html, body {
@@ -18,7 +18,7 @@
             width: 100vw;
             height: 100vh;
         }
-        #character {
+        .character-img {
             position: absolute;
             width: 120px;
             height: auto;
@@ -26,8 +26,9 @@
             user-select: none;
             pointer-events: none;
             transition: filter 0.2s;
+            display: none;
         }
-        #character.flipped {
+        .character-img.flipped {
             transform: scaleX(-1);
         }
         .platform {
@@ -38,13 +39,16 @@
             z-index: 1;
             box-shadow: 0 4px 12px #000a;
         }
-        #ground {
-            position: absolute;
-            left: 0;
-            width: 100vw;
-            background: #835c34;
-            border-top: 5px solid #fff5e0;
-            z-index: 1;
+        .teleport {
+            background: #3187ff !important;
+            border: 3px solid #1e3a5c !important;
+            box-shadow: 0 4px 18px #3187ffcc;
+            transition: box-shadow 0.2s;
+            animation: glow 1.5s infinite alternate;
+        }
+        @keyframes glow {
+            0% { box-shadow: 0 4px 18px #3187ff88; }
+            100% { box-shadow: 0 4px 32px #3187ffcc; }
         }
         #settingsBtn {
             background: #3a4fa0;
@@ -95,7 +99,7 @@
         }
         #settingsModal .button:hover { background: #3a4fa0; }
         @media (max-width: 600px) {
-            #character { width: 80px; }
+            .character-img { width: 80px; }
             #settingsModal { min-width: 180px; padding: 18px 8vw 18px 8vw; }
         }
     </style>
@@ -105,13 +109,21 @@
       <source src="Pokemon BW2 Iris Battle Remix.mp3" type="audio/mpeg">
     </audio>
     <div id="game-area">
-        <!-- Character -->
+        <!-- Animated Character GIF -->
         <img 
-            id="character" 
+            id="character-gif"
+            class="character-img"
             src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/output-onlinegiftools.gif" 
-            alt="Character" 
+            alt="Character Animated"
         />
-        <!-- Ground and platforms will be injected here -->
+        <!-- Static Character PNG (first frame of the GIF, for pausing) -->
+        <img 
+            id="character-png"
+            class="character-img"
+            src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/output-onlinegiftools.png" 
+            alt="Character Static"
+        />
+        <!-- Platforms will be injected here -->
     </div>
     <!-- Settings Button -->
     <button id="settingsBtn">Settings</button>
@@ -127,7 +139,6 @@
     <script>
     // --- Music & Settings Logic ---
     window.onload = function() {
-        // Play music on first user interaction (browser policy)
         let musicStarted = false;
         function tryPlayMusic() {
             if (!musicStarted) {
@@ -170,44 +181,35 @@
     };
 
     // --- Game & Platform Logic ---
-    const char = document.getElementById('character');
+    const charGif = document.getElementById('character-gif');
+    const charPng = document.getElementById('character-png');
     const charWidth = 120;
-    const charHeight = 120; // Approximate height for collision
+    const charHeight = 120;
     const gameArea = document.getElementById('game-area');
 
-    // --- Ground and Platforms ---
-    const groundHeight = 180; // px from bottom
-    // Platform format: [x, y, width, height] (y from bottom)
+    // --- GROUND HEIGHT: Adjust here ---
+    const groundHeight = 100; // <-- Adjust ground height here (pixels from bottom)
+    // -------------------------------
+
+    // Platform format: [x, y, width, height, isTeleport]
+    // Nonlinear parkour!
     const platforms = [
-        [350, 340, 130, 25],
-        [600, 250, 110, 25],
-        [900, 210, 110, 25],
-        [1200, 370, 140, 25],
-        [190, 420, 100, 25],
-        [800, 520, 100, 25],
-        [window.innerWidth-300, 320, 160, 25]
+        [130, 200, 120, 25, false],         // Start
+        [320, 350, 120, 25, false],         // up right
+        [200, 500, 120, 25, false],         // up left
+        [600, 280, 120, 25, false],         // mid right
+        [800, 420, 120, 25, false],         // high right
+        [950, 570, 120, 25, false],         // high up
+        [1200, 350, 120, 25, true]          // blue teleport pad (true)
     ];
+    let startPlatformIdx = 0; // The index in platforms[] for the starting platform
 
-    // Draw ground
-    function drawGround() {
-        let ground = document.getElementById('ground');
-        if (!ground) {
-            ground = document.createElement('div');
-            ground.id = "ground";
-            gameArea.appendChild(ground);
-        }
-        ground.style.bottom = '0px';
-        ground.style.height = groundHeight+'px';
-    }
-
-    // Draw platforms
     function drawPlatforms() {
-        // Remove old platforms
         Array.from(document.getElementsByClassName('platform')).forEach(e=>e.remove());
         for (let i=0; i<platforms.length; i++) {
-            const [x, y, w, h] = platforms[i];
+            const [x, y, w, h, isTeleport] = platforms[i];
             let pf = document.createElement('div');
-            pf.className = 'platform';
+            pf.className = 'platform' + (isTeleport ? ' teleport' : '');
             pf.style.left = x+'px';
             pf.style.bottom = y+'px';
             pf.style.width = w+'px';
@@ -215,15 +217,10 @@
             gameArea.appendChild(pf);
         }
     }
-
-    function redrawAll() {
-        drawGround();
-        drawPlatforms();
-    }
-    redrawAll();
+    drawPlatforms();
 
     // --- Character Movement Logic ---
-    let pos = { x: 200, y: groundHeight }; // Start on the ground, shifted from left edge
+    let pos = { x: platforms[startPlatformIdx][0]+10, y: platforms[startPlatformIdx][1]+platforms[startPlatformIdx][3] };
     let velocity = { x: 0, y: 0 };
     let move = { left: false, right: false, jump: false };
     let onGround = false;
@@ -232,44 +229,33 @@
     const jumpStrength = 17;
     const gravity = 0.9;
 
-    function rectsIntersect(ax, ay, aw, ah, bx, by, bw, bh) {
-        return (ax < bx + bw &&
-                ax + aw > bx &&
-                ay < by + bh &&
-                ay + ah > by);
-    }
-
     function getStandingPlatform() {
-        // Returns the y of the platform the character is standing on, or null
-        // We'll use a small vertical tolerance for collision
-        for(let i=0; i<platforms.length; i++) {
-            const [x, y, w, h] = platforms[i];
-            if (
-                pos.x + charWidth > x + 5 && pos.x < x + w - 5 && // horizontal overlap
-                pos.y - 2 <= y + h && pos.y - 2 >= y + h - 17 // vertical tolerance (standing ON)
-            ) {
-                return y + h;
-            }
-        }
-        // Check ground
-        if (pos.y <= groundHeight + 2 && pos.y >= groundHeight - 20) {
-            return groundHeight;
-        }
-        return null;
-    }
-
-    function getCeilingCollision() {
-        // Check if the top of the character is bumping into the bottom of a platform
         for(let i=0; i<platforms.length; i++) {
             const [x, y, w, h] = platforms[i];
             if (
                 pos.x + charWidth > x + 5 && pos.x < x + w - 5 &&
-                pos.y + charHeight > y && pos.y + charHeight < y + h + 16
+                pos.y - 2 <= y + h && pos.y - 2 >= y + h - 17
             ) {
-                return y;
+                return [i, y + h];
             }
         }
+        if (pos.y <= groundHeight + 2 && pos.y >= groundHeight - 20) {
+            return ['ground', groundHeight];
+        }
         return null;
+    }
+
+    function getLowestPlatformY() {
+        let minY = Infinity;
+        for (let p of platforms) if (p[1] < minY) minY = p[1];
+        return minY;
+    }
+
+    function resetToStart() {
+        pos.x = platforms[startPlatformIdx][0]+10;
+        pos.y = platforms[startPlatformIdx][1]+platforms[startPlatformIdx][3];
+        velocity.x = 0;
+        velocity.y = 0;
     }
 
     function updateCharPosition() {
@@ -284,26 +270,22 @@
         }
         velocity.y -= gravity;
 
-        // Save previous position for collision correction
-        let prevY = pos.y;
-
         pos.x += velocity.x;
         pos.y += velocity.y;
 
-        // --- Collision with ground/platforms (vertical, landing) ---
-        let standingY = getStandingPlatform();
-        if (standingY !== null && velocity.y <= 0 && pos.y <= standingY) {
-            pos.y = standingY;
+        // --- Collision with ground/platforms (vertical, landing only, no head collision) ---
+        let standing = getStandingPlatform();
+        if (standing && velocity.y <= 0 && pos.y <= standing[1]) {
+            pos.y = standing[1];
             velocity.y = 0;
             onGround = true;
+
+            // Teleport logic
+            if (typeof standing[0] === "number" && platforms[standing[0]][4]) {
+                window.location.href = "fightDialogue.html";
+            }
         } else {
             onGround = false;
-        }
-        // --- Ceiling collision (hitting head) ---
-        let bumpY = getCeilingCollision();
-        if (bumpY !== null && velocity.y > 0 && pos.y + charHeight > bumpY) {
-            pos.y = bumpY - charHeight;
-            velocity.y = -2;
         }
 
         // Boundaries
@@ -311,23 +293,44 @@
         if (pos.x < 0) pos.x = 0;
         if (pos.x > rightBound) pos.x = rightBound;
 
-        // Don't let fall below the ground
-        if (pos.y < groundHeight) {
-            pos.y = groundHeight;
-            velocity.y = 0;
-            onGround = true;
+        // Fall reset
+        let resetY = Math.min(groundHeight, getLowestPlatformY() - 80);
+        if (pos.y < resetY) {
+            resetToStart();
         }
-        // Don't let go above screen
+
+        // Top boundary
         const ceiling = window.innerHeight - 80;
         if (pos.y > ceiling) pos.y = ceiling;
 
         // Apply position
-        char.style.left = pos.x + 'px';
-        char.style.bottom = pos.y + 'px';
+        charGif.style.left = charPng.style.left = pos.x + 'px';
+        charGif.style.bottom = charPng.style.bottom = pos.y + 'px';
+    }
+
+    // --- GIF Pause/Play Logic (show PNG if not moving left/right) ---
+    function updateCharacterFrame() {
+        // If moving left/right, show GIF, hide PNG; otherwise, show PNG, hide GIF
+        if (move.left || move.right) {
+            charGif.style.display = 'block';
+            charPng.style.display = 'none';
+        } else {
+            charGif.style.display = 'none';
+            charPng.style.display = 'block';
+        }
+        // Apply flipping
+        if (lastDirection === "left") {
+            charGif.classList.add('flipped');
+            charPng.classList.add('flipped');
+        } else {
+            charGif.classList.remove('flipped');
+            charPng.classList.remove('flipped');
+        }
     }
 
     function gameLoop() {
         updateCharPosition();
+        updateCharacterFrame();
         requestAnimationFrame(gameLoop);
     }
     gameLoop();
@@ -339,12 +342,10 @@
             case "a":
                 move.left = true;
                 lastDirection = "left";
-                char.classList.add('flipped');
                 break;
             case "d":
                 move.right = true;
                 lastDirection = "right";
-                char.classList.remove('flipped');
                 break;
             case " ": move.jump = true; break;
         }
@@ -355,31 +356,26 @@
                 move.left = false;
                 if (move.right) {
                     lastDirection = "right";
-                    char.classList.remove('flipped');
                 }
                 break;
             case "d":
                 move.right = false;
                 if (move.left) {
                     lastDirection = "left";
-                    char.classList.add('flipped');
                 }
                 break;
             case " ": move.jump = false; break;
         }
     });
 
-    // --- Responsive resize (and platform reposition on resize) ---
+    // --- Responsive resize ---
     window.addEventListener('resize', ()=>{
-        // Move last platform to near the right edge
-        platforms[platforms.length-1][0] = window.innerWidth-300;
-        redrawAll();
         // Keep character within bounds
         const rightBound = window.innerWidth - charWidth;
         if(pos.x > rightBound) pos.x = rightBound;
-        char.style.left = pos.x + "px";
+        charGif.style.left = charPng.style.left = pos.x + "px";
+        // (for more advanced games: platforms could be reflowed here)
     });
-
     </script>
 </body>
 </html>
