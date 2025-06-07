@@ -146,6 +146,33 @@
       text-shadow: 1px 1px 3px #000;
       min-height: 2em;
     }
+    /* --- Settings styles --- */
+    #settings-btn {
+      position:fixed;
+      top:24px;
+      right:32px;
+      z-index:3002;
+      cursor:pointer;
+      background:#222;
+      border-radius:10px;
+      padding:8px 16px;
+      font-size:16px;
+      color:#fff;
+    }
+    #settings-panel {
+      display:none;
+      position:fixed;
+      top:70px;
+      right:32px;
+      background:#222;
+      padding:16px 28px;
+      z-index:3003;
+      border-radius:16px;
+      box-shadow:0 2px 10px #0008;
+    }
+    #settings-panel label {
+      color: #fff;
+    }
     @media (max-width: 600px) {
       .character-img { width: 80px; }
       .life-meter { font-size: 1.2rem; padding: 4px 8px; }
@@ -179,6 +206,11 @@
     <div class="dialogue-text">
       Help me get to the end of this parkour so I can prove my knowledge to Ham the Hammer!
     </div>
+  </div>
+  <!-- Settings Button & Panel -->
+  <div id="settings-btn">⚙️ Settings</div>
+  <div id="settings-panel">
+    <label>Volume: <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1"></label>
   </div>
 <script>
 window.onload = function() {
@@ -322,8 +354,8 @@ function checkHeartCollect() {
     if (
       pos.x + charWidth > hx &&
       pos.x < hx + 36 &&
-      pos.y > hy - 16 &&
-      pos.y < hy + 50
+      pos.y > hy - 36 &&   // expanded from -16 for standing collection
+      pos.y < hy + 60      // expanded from +50 for standing collection
     ) {
       heartsOnClouds[idx] = false;
       span.style.opacity = 0;
@@ -376,7 +408,7 @@ function rebindDialogueHide() {
   function hideDialogueOnMove(e) {
     if (dialogueHidden) return;
     const k = e.key.toLowerCase();
-    if (k === "a" || k === "d" || k === " ") {
+    if (k === "a" || k === "d" || k === " " || k === "w") {
       pebblesDialogue.classList.add('hide');
       dialogueHidden = true;
       window.removeEventListener('keydown', hideDialogueOnMove);
@@ -399,31 +431,32 @@ function updateCharPosition() {
   velocity.y -= gravity;
   pos.x += velocity.x;
   pos.y += velocity.y;
-// Failsafe: If player falls way below the ground, treat as fatal fall
-if (pos.y < groundHeight - 120) {
-  if (lives > 0) {
-    lives--;
-    updateLifeMeter();
-  }
-  if (lives <= 0) {
-    gameFrozen = true;
-    playDeathTransition(()=>{
-      lives = maxLives;
+
+  // Failsafe: If player falls way below the ground, treat as fatal fall
+  if (pos.y < groundHeight - 120) {
+    if (lives > 0) {
+      lives--;
       updateLifeMeter();
+    }
+    if (lives <= 0) {
+      gameFrozen = true;
+      playDeathTransition(()=>{
+        lives = maxLives;
+        updateLifeMeter();
+        resetToStart();
+        spawnHearts();
+        pebblesDialogue.classList.remove('hide');
+        rebindDialogueHide();
+        gameFrozen = false;
+      });
+    } else {
       resetToStart();
-      spawnHearts();
-      pebblesDialogue.classList.remove('hide');
-      rebindDialogueHide();
-      gameFrozen = false;
-    });
-  } else {
-    resetToStart();
+    }
+    // Also set to grounded state so you don't chain-lose lives
+    wasOnGround = true;
+    prevStandingPlatform = 0;
+    return;
   }
-  // Also set to grounded state so you don't chain-lose lives
-  wasOnGround = true;
-  prevStandingPlatform = 0;
-  return;
-}
   // Find which platform we are standing on (if any)
   let standing = getStandingPlatform();
   let currentPlatformIdx = (standing && typeof standing[0] === "number") ? standing[0] : null;
@@ -468,13 +501,19 @@ if (pos.y < groundHeight - 120) {
     if (onGround) pos.y += deltaY;
   }
 
+  // Teleport logic: standing on teleport (blue cloud) triggers instantly, not just on landing
+  if (currentPlatformIdx !== null && platforms[currentPlatformIdx][4]) {
+    // Clamp y before teleporting (just in case)
+    const ceiling = window.innerHeight - 80;
+    if (pos.y > ceiling) pos.y = ceiling;
+    window.location.href = "fightDialogue.html";
+  }
+
   // On landing (from above or side)
   if (standing && velocity.y <= 0 && pos.y <= standing[1]) {
     pos.y = standing[1];
     velocity.y = 0;
     onGround = true;
-    // Teleport logic
-    if (currentPlatformIdx !== null && platforms[currentPlatformIdx][4]) window.location.href="fightDialogue.html";
   } else {
     onGround = false;
   }
@@ -486,7 +525,7 @@ if (pos.y < groundHeight - 120) {
   // Collect hearts
   checkHeartCollect();
 
-  // Top boundary
+  // Top boundary (ceiling)
   const ceiling = window.innerHeight - 80;
   if (pos.y > ceiling) pos.y = ceiling;
 }
@@ -549,6 +588,7 @@ window.addEventListener('keydown', function(e) {
   switch(e.key.toLowerCase()) {
     case "a": move.left = true; lastDirection = "left"; break;
     case "d": move.right = true; lastDirection = "right"; break;
+    case "w":
     case " ": move.jump = true; break;
   }
 });
@@ -557,9 +597,19 @@ window.addEventListener('keyup', function(e) {
   switch(e.key.toLowerCase()) {
     case "a": move.left = false; if (move.right) lastDirection = "right"; break;
     case "d": move.right = false; if (move.left) lastDirection = "left"; break;
+    case "w":
     case " ": move.jump = false; break;
   }
 });
+
+// Settings button & volume slider logic
+document.getElementById('settings-btn').onclick = function() {
+  const panel = document.getElementById('settings-panel');
+  panel.style.display = (panel.style.display === 'none' ? 'block' : 'none');
+};
+document.getElementById('volume-slider').oninput = function(e) {
+  document.getElementById('bg-music').volume = parseFloat(e.target.value);
+};
 
 window.addEventListener('resize', ()=>{
   drawPlatforms(cameraX);
