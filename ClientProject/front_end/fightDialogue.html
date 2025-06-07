@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <style>
@@ -13,19 +14,20 @@
       color: white;
       overflow: hidden;
     }
-      #musicSettingsBtn {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 20;
-      background: #111;
-      color: #fff;
-      border: 2px solid #fff;
-      border-radius: 6px;
-      padding: 5px 12px;
-      font-family: 'Press Start 2P', monospace;
-      cursor: pointer;
-    }
+  #musicSettingsBtn {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    background: #111;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-family: 'Press Start 2P', monospace;
+    cursor: pointer;
+  }
     #musicSettingsPanel {
       display: none;
       position: fixed;
@@ -360,7 +362,7 @@ musicVolume.oninput = function() {
 
     const dialogues = [
       { speaker: "Ham", text: "Ready to battle? Show me your wits!" },
-      { speaker: "Pebble", text: "Bring it on!" },
+      { speaker: "Pebbles", text: "Bring it on!" },
       { speaker: "Ham", text: "Let's see if you can handle 'construct'!" },
       { speaker: "Ham", text: "", popup: "construct" }
     ];
@@ -375,11 +377,11 @@ musicVolume.oninput = function() {
     let fightMenuReady = false;
 
     const hamTaunts = [
-      "Ha! Not so fast, Pebble!",
+      "Ha! Not so fast, Pebbles!",
       "You'll have to do better than that!",
       "Is that all you've got?",
       "Missed me! Try again if you dare!",
-      "You're losing your edge, Pebble!"
+      "You're losing your edge, Pebbles!"
     ];
     function getRandomHamTaunt() {
       return hamTaunts[Math.floor(Math.random() * hamTaunts.length)];
@@ -402,11 +404,11 @@ musicVolume.oninput = function() {
 
   // All possible taunts and heal grumble
   const taunts = [
-    "Ha! Not so fast, Pebble!",
+    "Ha! Not so fast, Pebbles!",
     "You'll have to do better than that!",
     "Is that all you've got?",
     "Missed me! Try again if you dare!",
-    "You're losing your edge, Pebble!",
+    "You're losing your edge, Pebbles!",
     "You regained a life... (grumble)"
   ];
 
@@ -439,7 +441,7 @@ musicVolume.oninput = function() {
 
     function handleHeal() {
   if (pebbleLives >= 3) {
-    alert("Pebble is already at full health!");
+    alert("Pebbles is already at full health!");
     return;
   }
   hideFightMenu(); // Hide the fight menu when heal is clicked
@@ -613,7 +615,7 @@ musicVolume.oninput = function() {
   if (currentIndex < dialogues.length) {
     const current = dialogues[currentIndex];
     speaker.textContent = current.speaker || "";
-    if (current.speaker === "Pebble") {
+    if (current.speaker === "Pebbles") {
       pebbleImg.classList.add("active");
       hamImg.classList.remove("active");
     } else if (current.speaker === "Ham") {
