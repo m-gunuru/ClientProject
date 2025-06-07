@@ -2,10 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
-        rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
     <style>
         html, body {
             height: 100%;
@@ -290,10 +287,13 @@
     <button id="settingsBtn" class="button" style="position:fixed; top:20px; right:20px; z-index:1000; min-width: 100px;">
       Settings
     </button>
-    <div id="settingsModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#3a4fa0; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.3); padding:24px; z-index:20000; color:white;">
+    <div id="settingsModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#3a4fa0; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.3); padding:24px; z-index:20000; color:white; min-width:320px;">
       <h2>Settings</h2>
-      <label for="volumeSlider">Volume:</label>
+      <label for="volumeSlider">BG Music:</label>
       <input type="range" id="volumeSlider" min="0" max="100" step="1"><span id="volumeValue"></span>%
+      <br><br>
+      <label for="voiceSlider">Char VA:</label>
+      <input type="range" id="voiceSlider" min="0" max="100" step="1"><span id="voiceValue"></span>%
       <br><br>
       <button id="saveSettingsBtn" class="button">Save</button>
       <button id="closeSettingsBtn" class="button">Close</button>
@@ -306,32 +306,46 @@
 
         const pebbleVoice = document.getElementById('pebble-voice');
         const hamVoice = document.getElementById('ham-voice');
-        pebbleVoice.volume = 1;
-        hamVoice.volume = 1;
+        const music = document.getElementById('bg-music');
 
-        function startGame() {
-            document.getElementById('start-overlay').classList.add('fade-out');
-            document.querySelector('.dialogue-container').style.filter = "none";
-            const music = document.getElementById('bg-music');
-            // Load volume from settings or use 100 as default
-            let settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
-            let volume = (typeof settings.volume === "number") ? settings.volume : 100;
-            music.volume = volume / 100;
-            music.play().catch(e => {});
-            // unlock voices for browser autoplay policy
-            pebbleVoice.play().then(() => {
-                pebbleVoice.pause(); pebbleVoice.currentTime = 0;
-                // Play Pebble's voice at start
-                pebbleVoice.currentTime = 0;
-                pebbleVoice.play();
-            });
-            hamVoice.play().then(() => {hamVoice.pause(); hamVoice.currentTime = 0;});
-            if (!gameStarted) {
-                updateDialogue(currentIndex);
-                gameStarted = true;
+        function getSettings() {
+            let settings = JSON.parse(localStorage.getItem('gameSettings'));
+            if (!settings) {
+                settings = { volume: 100, voice: 100 };
+                localStorage.setItem('gameSettings', JSON.stringify(settings));
             }
+            if (typeof settings.volume !== "number") settings.volume = 100;
+            if (typeof settings.voice !== "number") settings.voice = 100;
+            return settings;
         }
 
+        function setAudioVolumesFromSettings() {
+            const settings = getSettings();
+            music.volume = settings.volume / 100;
+            pebbleVoice.volume = hamVoice.volume = settings.voice / 100;
+        }
+
+        function setVoiceVolumesFromSettings() {
+            const settings = getSettings();
+            pebbleVoice.volume = hamVoice.volume = settings.voice / 100;
+        }
+
+        function startGame() {
+    document.getElementById('start-overlay').classList.add('fade-out');
+    document.querySelector('.dialogue-container').style.filter = "none";
+    setAudioVolumesFromSettings();
+    music.play().catch(()=>{});
+    // Only play Pebble's voice if the first speaker is Pebble
+    if (dialogues[currentIndex].speaker === "Pebble") {
+        pebbleVoice.currentTime = 0;
+        pebbleVoice.pause();
+        pebbleVoice.play().catch(()=>{});
+    }
+    if (!gameStarted) {
+        updateDialogue(currentIndex);
+        gameStarted = true;
+    }
+}
         window.addEventListener("DOMContentLoaded", function() {
             document.querySelector('.dialogue-container').style.filter = "blur(1.8px)";
             document.getElementById('start-btn').onclick = startGame;
@@ -391,7 +405,6 @@
         const nextBtn = document.getElementById("nextBtn");
 
         function typeTextWithHighlight(text, i = 0) {
-            // --- NO voice playing here ---
             const html = text.replace(/\*([^*]+)\*/g, '<span class="highlight">$1</span>');
             const temp = document.createElement('div');
             temp.innerHTML = html;
@@ -491,6 +504,7 @@
         }
 
         function playVoiceForCurrentDialogue() {
+            setVoiceVolumesFromSettings();
             pebbleVoice.pause(); pebbleVoice.currentTime = 0;
             hamVoice.pause(); hamVoice.currentTime = 0;
             const current = dialogues[currentIndex];
@@ -579,15 +593,19 @@
 
         window.onload = function() {
             function loadSettings() {
-                const settings = JSON.parse(localStorage.getItem('gameSettings')) || { volume: 100 };
+                const settings = getSettings();
                 document.getElementById('volumeSlider').value = settings.volume;
                 document.getElementById('volumeValue').textContent = settings.volume;
-                document.getElementById('bg-music').volume = settings.volume / 100;
+                document.getElementById('voiceSlider').value = settings.voice;
+                document.getElementById('voiceValue').textContent = settings.voice;
+                music.volume = settings.volume / 100;
+                pebbleVoice.volume = hamVoice.volume = settings.voice / 100;
                 return settings;
             }
             function saveSettings() {
                 const volume = parseInt(document.getElementById('volumeSlider').value, 10);
-                localStorage.setItem('gameSettings', JSON.stringify({ volume }));
+                const voice = parseInt(document.getElementById('voiceSlider').value, 10);
+                localStorage.setItem('gameSettings', JSON.stringify({ volume, voice }));
                 alert('Settings saved!');
             }
             const modal = document.getElementById('settingsModal');
@@ -604,7 +622,19 @@
             };
             document.getElementById('volumeSlider').oninput = function() {
                 document.getElementById('volumeValue').textContent = this.value;
-                document.getElementById('bg-music').volume = this.value / 100;
+                music.volume = this.value / 100;
+                localStorage.setItem('gameSettings', JSON.stringify({
+                    volume: parseInt(this.value, 10),
+                    voice: parseInt(document.getElementById('voiceSlider').value, 10)
+                }));
+            };
+            document.getElementById('voiceSlider').oninput = function() {
+                document.getElementById('voiceValue').textContent = this.value;
+                pebbleVoice.volume = hamVoice.volume = this.value / 100;
+                localStorage.setItem('gameSettings', JSON.stringify({
+                    volume: parseInt(document.getElementById('volumeSlider').value, 10),
+                    voice: parseInt(this.value, 10)
+                }));
             };
             loadSettings();
         };
