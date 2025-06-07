@@ -5,199 +5,45 @@
   <title>Parkour Freeroam</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      font-family: "Press Start 2P", monospace;
-      background: #000;
-    }
-    #background {
-      position: absolute;
-      left: 0; top: 0;
-      width: 100vw; height: 100vh;
-      z-index: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    #game-area {
-      position: absolute;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      z-index: 2;
-    }
-    .character-img {
-      position: absolute;
-      width: 120px;
-      height: auto;
-      z-index: 10;
-      user-select: none;
-      pointer-events: none;
-      transition: filter 0.2s;
-      display: none;
-    }
+    html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family: "Press Start 2P", monospace; background: #000;}
+    #background { position: absolute; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; overflow: hidden;}
+    #game-area { position: absolute; width: 100vw; height: 100vh; overflow: hidden; z-index: 2;}
+    .character-img { position: absolute; width: 120px; height: auto; z-index: 10; user-select: none; pointer-events: none; transition: filter 0.2s; display: none;}
     .character-img.flipped { transform: scaleX(-1); }
-    .platform {
-      position: absolute;
-      border-radius: 8px;
-      z-index: 5;
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center center;
-      border: none;
-      overflow: visible;
-    }
-    .platform.img {
-      background-image: url('https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/2025_06_06_0u7_Kleki.png');
-      transform: scale(1.15);
-      pointer-events: none;
-    }
-    .platform.teleport {
-      background-image: url('https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/2025_06_06_0u8_Kleki.png') !important;
-      transform: scale(1.15);
-      pointer-events: none;
-    }
-    .heart-collectible {
-      position: absolute;
-      width: 36px;
-      height: 36px;
-      font-size: 2rem;
-      z-index: 15;
-      text-align: center;
-      pointer-events: none;
-      user-select: none;
-      transition: opacity 0.2s;
-    }
-    .life-meter {
-      position: fixed;
-      top: 24px;
-      left: 32px;
-      z-index: 3001;
-      display: flex;
-      gap: 8px;
-      background: rgba(0,0,0,0.35);
-      border-radius: 13px;
-      padding: 6px 18px;
-      box-shadow: 0 2px 8px #0008;
-      font-size: 2rem;
-      align-items: center;
-      letter-spacing: 3px;
-    }
-    .life-heart {
-      font-size: 2rem;
-      margin-right: 2px;
-      filter: none;
-      opacity: 1;
-      transition: filter 0.2s, opacity 0.2s;
-      user-select: none;
-      display: inline-block;
-      vertical-align: middle;
-    }
-    .life-heart.empty {
-      filter: grayscale(1) brightness(0.6);
-      opacity:0.4;
-    }
-    #death-transition {
-      position: fixed;
-      left: 0; top: 0; width: 100vw; height: 100vh;
-      z-index: 9001;
-      pointer-events: none;
-      background: #000;
-      opacity: 0;
-      transition: opacity 0.8s;
-    }
-    #death-transition.flash {
-      background: #fff;
-      transition: opacity 0.18s;
-    }
-    .dialogue-box {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 85vw;
-      max-width: 1000px;
-      background: rgba(0, 0, 0, 0.7);
-      padding: 24px 32px 60px;
-      border: 2.5px solid #fff;
-      border-radius: 18px;
-      box-shadow: 0 -4px 16px #000a;
-      z-index: 1002;
-      font-family: 'Press Start 2P', monospace;
-      transition: opacity 0.4s;
-    }
-    .dialogue-box.hide {
-      opacity: 0;
-      pointer-events: none;
-    }
-    .speaker-name {
-      font-size: 1rem;
-      color: #ffeb3b;
-      margin-bottom: 10px;
-      text-shadow: 2px 2px #000;
-      letter-spacing: 2px;
-    }
-    .dialogue-text {
-      font-size: 1.1rem;
-      line-height: 1.8;
-      color: #fff;
-      text-shadow: 1px 1px 3px #000;
-      min-height: 2em;
-    }
-    /* --- Settings styles --- */
-    #settings-btn {
-      position:fixed;
-      top:24px;
-      right:32px;
-      z-index:3002;
-      cursor:pointer;
-      background:#222;
-      border-radius:10px;
-      padding:8px 16px;
-      font-size:16px;
-      color:#fff;
-    }
-    #settings-panel {
-      display:none;
-      position:fixed;
-      top:70px;
-      right:32px;
-      background:#222;
-      padding:16px 28px;
-      z-index:3003;
-      border-radius:16px;
-      box-shadow:0 2px 10px #0008;
-    }
-    #settings-panel label {
-      color: #fff;
-    }
-    @media (max-width: 600px) {
-      .character-img { width: 80px; }
-      .life-meter { font-size: 1.2rem; padding: 4px 8px; }
-      .life-heart { font-size: 1.2rem; }
-    }
+    .platform { position: absolute; border-radius: 8px; z-index: 5; background-size: cover; background-repeat: no-repeat; background-position: center center; border: none; overflow: visible; transition: opacity 0.2s;}
+    .platform.img { background-image: url('https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/2025_06_06_0u7_Kleki.png'); transform: scale(1.15); pointer-events: none;}
+    .platform.teleport { background-image: url('https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/2025_06_06_0u8_Kleki.png') !important; transform: scale(1.15); pointer-events: none;}
+    .heart-collectible { position: absolute; width: 36px; height: 36px; font-size: 2rem; z-index: 15; text-align: center; pointer-events: none; user-select: none; transition: opacity 0.2s;}
+    .flying-heart { position: fixed; width: 36px; height: 36px; font-size: 2rem; z-index: 3002; pointer-events: none; user-select: none; transition: opacity 0.2s;}
+    .life-meter { position: fixed; top: 24px; left: 32px; z-index: 3001; display: flex; gap: 8px; background: rgba(0,0,0,0.35); border-radius: 13px; padding: 6px 18px; box-shadow: 0 2px 8px #0008; font-size: 2rem; align-items: center; letter-spacing: 3px;}
+    .life-heart { font-size: 2rem; margin-right: 2px; filter: none; opacity: 1; transition: filter 0.2s, opacity 0.2s; user-select: none; display: inline-block; vertical-align: middle;}
+    .life-heart.empty { filter: grayscale(1) brightness(0.6); opacity:0.4; }
+    #death-transition { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; z-index: 9001; pointer-events: none; background: #000; opacity: 0; transition: opacity 0.8s;}
+    #death-transition.flash { background: #fff; transition: opacity 0.18s; }
+    .dialogue-box { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 85vw; max-width: 1000px; background: rgba(0, 0, 0, 0.7); padding: 24px 32px 60px; border: 2.5px solid #fff; border-radius: 18px; box-shadow: 0 -4px 16px #000a; z-index: 1002; font-family: 'Press Start 2P', monospace; transition: opacity 0.4s;}
+    .dialogue-box.hide { opacity: 0; pointer-events: none; }
+    .speaker-name { font-size: 1rem; color: #ffeb3b; margin-bottom: 10px; text-shadow: 2px 2px #000; letter-spacing: 2px; }
+    .dialogue-text { font-size: 1.1rem; line-height: 1.8; color: #fff; text-shadow: 1px 1px 3px #000; min-height: 2em; }
+    #settings-btn { position:fixed; top:24px; right:32px; z-index:3002; cursor:pointer; background:#222; border-radius:10px; padding:8px 16px; font-size:16px; color:#fff;}
+    #settings-panel { display:none; position:fixed; top:70px; right:32px; background:#222; padding:16px 28px; z-index:3003; border-radius:16px; box-shadow:0 2px 10px #0008;}
+    #settings-panel label { color: #fff;}
+    #start-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999;}
+    #start-btn { background: #fff; color: #333; border: 2px solid #fff; border-radius: 12px; font-size: 1.2em; font-family: "Press Start 2P", monospace; padding: 18px 36px; cursor: pointer;}
+    #start-btn:hover { background: #eef; color: #222;}
+    @media (max-width: 600px) { .character-img { width: 80px; } .life-meter { font-size: 1.2rem; padding: 4px 8px; } .life-heart { font-size: 1.2rem; }}
   </style>
 </head>
 <body>
+  <div id="start-overlay"><button id="start-btn">Start Game</button></div>
   <div id="background"></div>
   <audio id="bg-music" preload="auto" loop>
     <source src="Pokemon BW2 Iris Battle Remix.mp3" type="audio/mpeg">
   </audio>
+  <audio id="jump-sound" src="https://themushroomkingdom.net/sounds/wav/smb/smb_jump-small.wav"></audio>
+  <audio id="death-sound" src="https://www.soundjay.com/buttons/sounds/button-4.mp3"></audio>
   <div id="game-area">
-    <img 
-      id="character-gif"
-      class="character-img"
-      src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/output-onlinegiftools.gif" 
-      alt="Character Animated"
-    />
-    <img 
-      id="character-png"
-      class="character-img"
-      src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/2025_06_06_0tl_Kleki.png" 
-      alt="Character Static"
-    />
+    <img id="character-gif" class="character-img" src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/output-onlinegiftools.gif" alt="Character Animated"/>
+    <img id="character-png" class="character-img" src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/2025_06_06_0tl_Kleki.png" alt="Character Static"/>
   </div>
   <div class="life-meter" id="life-meter"></div>
   <div id="death-transition"></div>
@@ -207,48 +53,64 @@
       Help me get to the end of this parkour so I can prove my knowledge to Ham the Hammer!
     </div>
   </div>
-  <!-- Settings Button & Panel -->
-  <div id="settings-btn">⚙️ Settings</div>
+  <div id="settings-btn">Settings</div>
   <div id="settings-panel">
-    <label>Volume: <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="1"></label>
+    <label>Music Volume: <input type="range" id="music-volume-slider" min="0" max="1" step="0.01" value="1"></label><br>
+    <label>SFX Volume: <input type="range" id="sfx-volume-slider" min="0" max="1" step="0.01" value="1"></label>
   </div>
 <script>
-window.onload = function() {
-  let musicStarted = false;
-  function tryPlayMusic() {
-    if (!musicStarted) {
-      document.getElementById('bg-music').play().catch(()=>{});
-      musicStarted = true;
-    }
-  }
-  window.addEventListener('keydown', tryPlayMusic, { once: true });
-  window.addEventListener('mousedown', tryPlayMusic, { once: true });
+let soundsEnabled = false;
+let musicVolume = 1;
+let sfxVolume = 1;
+const jumpSound = document.getElementById('jump-sound');
+const deathSound = document.getElementById('death-sound');
+const bgMusic = document.getElementById('bg-music');
+bgMusic.volume = musicVolume;
+jumpSound.volume = sfxVolume;
+deathSound.volume = sfxVolume;
+document.getElementById('start-btn').onclick = function() {
+  // Prime the sounds for browser autoplay policy
+  Promise.all([
+    jumpSound.play().then(() => jumpSound.pause()).catch(()=>{}),
+    deathSound.play().then(() => deathSound.pause()).catch(()=>{})
+  ]).finally(() => {
+    document.getElementById('start-overlay').style.display = 'none';
+    soundsEnabled = true;
+    bgMusic.currentTime = 0;
+    bgMusic.play().catch(()=>{});
+    spawnHearts();
+    updateLifeMeter();
+    gameLoop();
+  });
 };
-
-// --- Platform layout (spaced but doable) ---
-const platforms = [
-  [130, 210, 120, 25, false],    // 0 ground
-  [390, 320, 120, 25, false],    // 1
-  [700, 410, 120, 25, false],    // 2
-  [1040, 340, 120, 25, false],   // 3 (heart)
-  [1400, 470, 120, 25, false],   // 4
-  [1780, 370, 120, 25, false],   // 5 (heart)
-  [2180, 410, 120, 25, true]     // 6 teleport/end
-];
-const heartClouds = [3, 5]; // Only two collectible hearts
-
-let heartsOnClouds = {};
-function spawnHearts() {
-  heartsOnClouds = {};
-  for (const idx of heartClouds) heartsOnClouds[idx] = true;
+function playJumpSound() {
+  if (soundsEnabled) {
+    jumpSound.volume = sfxVolume;
+    jumpSound.currentTime = 0;
+    jumpSound.play().catch(()=>{});
+  }
 }
+function playDeathSound() {
+  if (soundsEnabled) {
+    deathSound.volume = sfxVolume;
+    deathSound.currentTime = 0;
+    deathSound.play().catch(()=>{});
+  }
+}
+// Game logic code starts here (rest unchanged except for sound function calls and volume logic)
+const platforms = [
+  [130, 210, 120, 25, false], [390, 320, 120, 25, false], [700, 410, 120, 25, false],
+  [1040, 340, 120, 25, false],[1400, 470, 120, 25, false],[1780, 370, 120, 25, false],
+  [2180, 410, 120, 25, true]
+];
+const heartClouds = [3, 5];
+let heartsOnClouds = {};
+function spawnHearts() { heartsOnClouds = {}; for (const idx of heartClouds) heartsOnClouds[idx] = true; }
 let platformDivs = [];
-
 const platformOffsets = new Array(platforms.length).fill(0);
 const platformAmplitudes = [0, 80, 120, 60, 100, 70, 50];
 const platformSpeeds = [0, 0.8, 1.1, 1.4, 0.9, 1.2, 1.1];
 const platformPhases = [0, 0.2, 1.1, 0.8, 0.5, 1.4, 0.7];
-
 const charGif = document.getElementById('character-gif');
 const charPng = document.getElementById('character-png');
 const charWidth = 120;
@@ -260,9 +122,9 @@ const BG_WIDTH = 1280;
 const BG_HEIGHT = 720;
 const groundHeight = 100;
 const HITBOX_SHRINK = 20;
-
 const maxLives = 3;
 let lives = 3;
+let cloudsTouched = Array(platforms.length).fill(false);
 function updateLifeMeter() {
   const meter = document.getElementById('life-meter');
   meter.innerHTML = '';
@@ -273,7 +135,6 @@ function updateLifeMeter() {
     meter.appendChild(span);
   }
 }
-
 const deathTransition = document.getElementById('death-transition');
 function playDeathTransition(cb) {
   deathTransition.classList.remove("flash");
@@ -297,7 +158,39 @@ function playDeathTransition(cb) {
     }, 800);
   }, 40);
 }
-
+let flyingHearts = [];
+function animateHeartToMeter(startX, startY) {
+  const meter = document.getElementById('life-meter');
+  const rect = meter.getBoundingClientRect();
+  const targetX = rect.left + rect.width/2;
+  const targetY = rect.top + rect.height/2;
+  flyingHearts.push({x: startX, y: startY, startX, startY, targetX, targetY, progress: 0});
+}
+function updateFlyingHearts() {
+  for (let i = flyingHearts.length - 1; i >= 0; i--) {
+    let h = flyingHearts[i];
+    h.progress += 0.04;
+    if (h.progress > 1) h.progress = 1;
+    h.x = h.startX + (h.targetX - h.startX) * h.progress;
+    h.y = h.startY + (h.targetY - h.startY) * h.progress;
+    let el = h.el;
+    if (!el) {
+      el = document.createElement('span');
+      el.className = 'flying-heart';
+      el.textContent = '❤️';
+      document.body.appendChild(el);
+      h.el = el;
+    }
+    el.style.left = h.x + 'px';
+    el.style.top = h.y + 'px';
+    el.style.opacity = 1;
+    if (h.progress >= 1) {
+      el.style.opacity = 0;
+      el.remove();
+      flyingHearts.splice(i, 1);
+    }
+  }
+}
 function drawPlatforms(cameraX) {
   for (const el of platformDivs) el.remove();
   platformDivs = [];
@@ -311,10 +204,9 @@ function drawPlatforms(cameraX) {
     pf.style.width = (w - HITBOX_SHRINK) + 'px';
     pf.style.height = h+'px';
     pf.dataset.idx = i;
+    pf.style.opacity = (cloudsTouched[i] ? 1 : 0.7);
     gameArea.appendChild(pf);
     platformDivs.push(pf);
-
-    // Draw floating heart if there is one on this cloud
     if (heartsOnClouds[i]) {
       let heart = document.createElement('span');
       heart.className = "heart-collectible";
@@ -327,11 +219,9 @@ function drawPlatforms(cameraX) {
     }
   }
 }
-
 let cameraX = 0;
 const VIEWPORT_W = () => window.innerWidth;
 const WORLD_WIDTH = platforms[platforms.length-1][0] + 400;
-
 let pos = { x: platforms[0][0]+10, y: platforms[0][1]+platforms[0][3] };
 let velocity = { x: 0, y: 0 };
 let move = { left: false, right: false, jump: false };
@@ -340,31 +230,121 @@ let lastDirection = "right";
 const speed = 5;
 const jumpStrength = 17;
 const gravity = 0.9;
-let prevStandingPlatform = 0; // index of previous platform (0 = ground)
-let wasOnGround = true; // for tracking transitions
-let justLandedLossCooldown = false; // prevents double life loss on same frame
-
-function checkHeartCollect() {
-  document.querySelectorAll('.heart-collectible').forEach(span => {
-    const idx = Number(span.dataset.platform);
-    if (!heartsOnClouds[idx]) return;
-    const plat = platforms[idx];
-    const hx = plat[0] + plat[2]/2 - 18;
-    const hy = plat[1] + (platformOffsets[idx]||0) + plat[3] + 34;
-    if (
-      pos.x + charWidth > hx &&
-      pos.x < hx + 36 &&
-      pos.y > hy - 36 &&   // expanded from -16 for standing collection
-      pos.y < hy + 60      // expanded from +50 for standing collection
-    ) {
-      heartsOnClouds[idx] = false;
-      span.style.opacity = 0;
-      if (lives < maxLives) lives++;
-      updateLifeMeter();
+let prevStandingPlatform = 0;
+let wasOnGround = true;
+const pebblesDialogue = document.getElementById('pebbles-dialogue');
+let dialogueHidden = false;
+function rebindDialogueHide() {
+  dialogueHidden = false;
+  function hideDialogueOnMove(e) {
+    if (dialogueHidden) return;
+    const k = e.key.toLowerCase();
+    if (k === "a" || k === "d" || k === " " || k === "w") {
+      pebblesDialogue.classList.add('hide');
+      dialogueHidden = true;
+      window.removeEventListener('keydown', hideDialogueOnMove);
     }
-  });
+  }
+  window.addEventListener('keydown', hideDialogueOnMove);
 }
-
+rebindDialogueHide();
+let gameFrozen = false;
+function updateCharPosition() {
+  if (gameFrozen) return;
+  velocity.x = 0;
+  if (move.left) velocity.x = -speed;
+  else if (move.right) velocity.x = speed;
+  if (move.jump && onGround) {
+    velocity.y = jumpStrength;
+    onGround = false;
+    playJumpSound();
+  }
+  velocity.y -= gravity;
+  pos.x += velocity.x;
+  pos.y += velocity.y;
+  if (pos.y < groundHeight - 120) {
+    if (lives > 0) {
+      lives--;
+      updateLifeMeter();
+      playDeathSound();
+    }
+    if (lives <= 0) {
+      gameFrozen = true;
+      playDeathTransition(()=>{
+        lives = maxLives;
+        updateLifeMeter();
+        resetToStart();
+        spawnHearts();
+        cloudsTouched = Array(platforms.length).fill(false);
+        pebblesDialogue.classList.remove('hide');
+        rebindDialogueHide();
+        gameFrozen = false;
+      });
+    } else {
+      resetToStart();
+    }
+    wasOnGround = true;
+    prevStandingPlatform = 0;
+    return;
+  }
+  let standing = getStandingPlatform();
+  let currentPlatformIdx = (standing && typeof standing[0] === "number") ? standing[0] : null;
+  let touchingGround = (currentPlatformIdx === 0);
+  if (currentPlatformIdx !== null && !cloudsTouched[currentPlatformIdx]) {
+    cloudsTouched[currentPlatformIdx] = true;
+  }
+  if (
+    touchingGround &&
+    !wasOnGround &&
+    prevStandingPlatform !== 0 &&
+    prevStandingPlatform !== 1
+  ) {
+    if (lives > 0) {
+      lives--;
+      updateLifeMeter();
+      playDeathSound();
+    }
+    if (lives <= 0) {
+      gameFrozen = true;
+      playDeathTransition(()=>{
+        lives = maxLives;
+        updateLifeMeter();
+        resetToStart();
+        spawnHearts();
+        cloudsTouched = Array(platforms.length).fill(false);
+        pebblesDialogue.classList.remove('hide');
+        rebindDialogueHide();
+        gameFrozen = false;
+      });
+      wasOnGround = true;
+      prevStandingPlatform = 0;
+      return;
+    }
+  }
+  wasOnGround = touchingGround;
+  prevStandingPlatform = touchingGround ? 0 : (currentPlatformIdx !== null ? currentPlatformIdx : prevStandingPlatform);
+  if (currentPlatformIdx !== null && currentPlatformIdx !== 0 && prevStandingPlatform !== null && prevStandingPlatform !== 0) {
+    const deltaY = (platformOffsets[currentPlatformIdx]||0) - (platformOffsets[prevStandingPlatform]||0);
+    if (onGround) pos.y += deltaY;
+  }
+  if (currentPlatformIdx !== null && platforms[currentPlatformIdx][4]) {
+    const ceiling = window.innerHeight - 80;
+    if (pos.y > ceiling) pos.y = ceiling;
+    window.location.href = "fightDialogue.html";
+  }
+  if (standing && velocity.y <= 0 && pos.y <= standing[1]) {
+    pos.y = standing[1];
+    velocity.y = 0;
+    onGround = true;
+  } else {
+    onGround = false;
+  }
+  if (pos.x<0) pos.x=0;
+  if (pos.x>WORLD_WIDTH-charWidth) pos.x=WORLD_WIDTH-charWidth;
+  checkHeartCollect();
+  const ceiling = window.innerHeight - 80;
+  if (pos.y > ceiling) pos.y = ceiling;
+}
 function getStandingPlatform() {
   for(let i=0; i<platforms.length; i++) {
     const [x, y, w, h, isTeleport] = platforms[i];
@@ -382,7 +362,6 @@ function getStandingPlatform() {
   }
   return null;
 }
-
 function resetToStart() {
   pos.x = platforms[0][0]+10;
   pos.y = platforms[0][1]+platforms[0][3];
@@ -390,8 +369,8 @@ function resetToStart() {
   velocity.y = 0;
   prevStandingPlatform = 0;
   wasOnGround = true;
+  move.left = move.right = move.jump = false;
 }
-
 function updatePlatforms() {
   const t = performance.now() / 1000;
   for (let i = 0; i < platforms.length; i++) {
@@ -399,137 +378,30 @@ function updatePlatforms() {
     platformOffsets[i] = Math.sin(t * platformSpeeds[i] + platformPhases[i]) * platformAmplitudes[i];
   }
 }
-
-// --- Robust textbox hide logic, always rebinding after death/respawn
-const pebblesDialogue = document.getElementById('pebbles-dialogue');
-let dialogueHidden = false;
-function rebindDialogueHide() {
-  dialogueHidden = false;
-  function hideDialogueOnMove(e) {
-    if (dialogueHidden) return;
-    const k = e.key.toLowerCase();
-    if (k === "a" || k === "d" || k === " " || k === "w") {
-      pebblesDialogue.classList.add('hide');
-      dialogueHidden = true;
-      window.removeEventListener('keydown', hideDialogueOnMove);
+function checkHeartCollect() {
+  document.querySelectorAll('.heart-collectible').forEach(span => {
+    const idx = Number(span.dataset.platform);
+    if (!heartsOnClouds[idx]) return;
+    const plat = platforms[idx];
+    const hx = plat[0] + plat[2]/2 - 18;
+    const hy = plat[1] + (platformOffsets[idx]||0) + plat[3] + 34;
+    if (
+      pos.x + charWidth > hx &&
+      pos.x < hx + 36 &&
+      pos.y > hy - 36 &&
+      pos.y < hy + 60
+    ) {
+      if (lives < maxLives) {
+        let rect = span.getBoundingClientRect();
+        animateHeartToMeter(rect.left, rect.top);
+        lives++;
+        setTimeout(updateLifeMeter, 350);
+      }
+      heartsOnClouds[idx] = false;
+      span.style.opacity = 0;
     }
-  }
-  window.addEventListener('keydown', hideDialogueOnMove);
+  });
 }
-rebindDialogueHide();
-
-let gameFrozen = false;
-function updateCharPosition() {
-  if (gameFrozen) return;
-  velocity.x = 0;
-  if (move.left) velocity.x = -speed;
-  else if (move.right) velocity.x = speed;
-  if (move.jump && onGround) {
-    velocity.y = jumpStrength;
-    onGround = false;
-  }
-  velocity.y -= gravity;
-  pos.x += velocity.x;
-  pos.y += velocity.y;
-
-  // Failsafe: If player falls way below the ground, treat as fatal fall
-  if (pos.y < groundHeight - 120) {
-    if (lives > 0) {
-      lives--;
-      updateLifeMeter();
-    }
-    if (lives <= 0) {
-      gameFrozen = true;
-      playDeathTransition(()=>{
-        lives = maxLives;
-        updateLifeMeter();
-        resetToStart();
-        spawnHearts();
-        pebblesDialogue.classList.remove('hide');
-        rebindDialogueHide();
-        gameFrozen = false;
-      });
-    } else {
-      resetToStart();
-    }
-    // Also set to grounded state so you don't chain-lose lives
-    wasOnGround = true;
-    prevStandingPlatform = 0;
-    return;
-  }
-  // Find which platform we are standing on (if any)
-  let standing = getStandingPlatform();
-  let currentPlatformIdx = (standing && typeof standing[0] === "number") ? standing[0] : null;
-  let touchingGround = (currentPlatformIdx === 0);
-
-  // Only lose a life if landing on ground from higher elevation (not from ground or first cloud)
-  if (
-    touchingGround &&
-    !wasOnGround &&
-    prevStandingPlatform !== 0 &&
-    prevStandingPlatform !== 1
-  ) {
-    if (lives > 0) {
-      lives--;
-      updateLifeMeter();
-    }
-    // Optional: death/respawn logic if lives==0...
-    if (lives <= 0) {
-      gameFrozen = true;
-      playDeathTransition(()=>{
-        lives = maxLives;
-        updateLifeMeter();
-        resetToStart();
-        spawnHearts();
-        pebblesDialogue.classList.remove('hide');
-        rebindDialogueHide();
-        gameFrozen = false;
-      });
-      wasOnGround = true;
-      prevStandingPlatform = 0;
-      return;
-    }
-  }
-
-  // Track for next frame
-  wasOnGround = touchingGround;
-  prevStandingPlatform = touchingGround ? 0 : (currentPlatformIdx !== null ? currentPlatformIdx : prevStandingPlatform);
-
-  // Platform moving logic
-  if (currentPlatformIdx !== null && currentPlatformIdx !== 0 && prevStandingPlatform !== null && prevStandingPlatform !== 0) {
-    const deltaY = (platformOffsets[currentPlatformIdx]||0) - (platformOffsets[prevStandingPlatform]||0);
-    if (onGround) pos.y += deltaY;
-  }
-
-  // Teleport logic: standing on teleport (blue cloud) triggers instantly, not just on landing
-  if (currentPlatformIdx !== null && platforms[currentPlatformIdx][4]) {
-    // Clamp y before teleporting (just in case)
-    const ceiling = window.innerHeight - 80;
-    if (pos.y > ceiling) pos.y = ceiling;
-    window.location.href = "fightDialogue.html";
-  }
-
-  // On landing (from above or side)
-  if (standing && velocity.y <= 0 && pos.y <= standing[1]) {
-    pos.y = standing[1];
-    velocity.y = 0;
-    onGround = true;
-  } else {
-    onGround = false;
-  }
-
-  // Boundaries
-  if (pos.x<0) pos.x=0;
-  if (pos.x>WORLD_WIDTH-charWidth) pos.x=WORLD_WIDTH-charWidth;
-
-  // Collect hearts
-  checkHeartCollect();
-
-  // Top boundary (ceiling)
-  const ceiling = window.innerHeight - 80;
-  if (pos.y > ceiling) pos.y = ceiling;
-}
-
 function updateCharacterFrame() {
   if (gameFrozen) return;
   if (move.left || move.right) {
@@ -547,12 +419,10 @@ function updateCharacterFrame() {
     charPng.classList.remove('flipped');
   }
 }
-
 function updateCamera() {
   cameraX = pos.x - VIEWPORT_W()/2 + charWidth/2;
   cameraX = Math.max(0, Math.min(cameraX, WORLD_WIDTH - VIEWPORT_W()));
 }
-
 function updateBackground() {
   let pxW = BG_WIDTH, pxH = BG_HEIGHT;
   let bgHtml = "";
@@ -563,12 +433,10 @@ function updateBackground() {
   }
   backgroundDiv.innerHTML = bgHtml;
 }
-
 function updateCharacterPositionOnScreen() {
   charGif.style.left = charPng.style.left = (pos.x - cameraX) + 'px';
   charGif.style.bottom = charPng.style.bottom = pos.y + 'px';
 }
-
 function gameLoop() {
   updatePlatforms();
   updateCharPosition();
@@ -578,12 +446,11 @@ function gameLoop() {
   updateLifeMeter();
   updateCharacterFrame();
   updateCharacterPositionOnScreen();
+  updateFlyingHearts();
   requestAnimationFrame(gameLoop);
 }
-
-// Keyboard Controls
 window.addEventListener('keydown', function(e) {
-  if (gameFrozen) return;
+  if (gameFrozen || !soundsEnabled) return;
   if (["INPUT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
   switch(e.key.toLowerCase()) {
     case "a": move.left = true; lastDirection = "left"; break;
@@ -593,7 +460,7 @@ window.addEventListener('keydown', function(e) {
   }
 });
 window.addEventListener('keyup', function(e) {
-  if (gameFrozen) return;
+  if (gameFrozen || !soundsEnabled) return;
   switch(e.key.toLowerCase()) {
     case "a": move.left = false; if (move.right) lastDirection = "right"; break;
     case "d": move.right = false; if (move.left) lastDirection = "left"; break;
@@ -601,26 +468,24 @@ window.addEventListener('keyup', function(e) {
     case " ": move.jump = false; break;
   }
 });
-
-// Settings button & volume slider logic
 document.getElementById('settings-btn').onclick = function() {
   const panel = document.getElementById('settings-panel');
   panel.style.display = (panel.style.display === 'none' ? 'block' : 'none');
 };
-document.getElementById('volume-slider').oninput = function(e) {
-  document.getElementById('bg-music').volume = parseFloat(e.target.value);
+document.getElementById('music-volume-slider').oninput = function(e) {
+  musicVolume = parseFloat(e.target.value);
+  bgMusic.volume = musicVolume;
 };
-
+document.getElementById('sfx-volume-slider').oninput = function(e) {
+  sfxVolume = parseFloat(e.target.value);
+  jumpSound.volume = sfxVolume;
+  deathSound.volume = sfxVolume;
+};
 window.addEventListener('resize', ()=>{
   drawPlatforms(cameraX);
   updateBackground();
   updateCharacterPositionOnScreen();
 });
-
-// Game start
-spawnHearts();
-updateLifeMeter();
-gameLoop();
 </script>
 </body>
 </html>
