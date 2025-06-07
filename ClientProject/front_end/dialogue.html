@@ -273,6 +273,9 @@
         <audio id="bg-music" preload="auto" loop>
           <source src="Pokemon BW2 Iris Battle Remix.mp3" type="audio/mpeg">
         </audio>
+        <!-- Voice audio for Pebble and Ham -->
+        <audio id="pebble-voice" src="Animal Crossing Isabelle Voice Clips.mp3" preload="auto"></audio>
+        <audio id="ham-voice" src="Animalese Speech System (1).mp3" preload="auto"></audio>
         <div class="dialogue-container">
             <!-- Character Sprites -->
             <img
@@ -336,7 +339,7 @@
           Settings
         </button>
         <!-- Settings Modal -->
-        <div id="settingsModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#3a4fa0; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.3); z-index:2000; padding:30px; color:#fff;">
+        <div id="settingsModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#3a4fa0; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.3); padding:24px; z-index:20000; color:white;">
           <h2>Settings</h2>
           <label for="volumeSlider">Volume:</label>
           <input type="range" id="volumeSlider" min="0" max="100" step="1"><span id="volumeValue"></span>%
@@ -366,7 +369,6 @@
                 console.warn("Music play failed:", e);
                 });
                 // Optionally fade in music if you want
-    
                 let vol = 0;
                 music.volume = vol;
                 const fadeIn = setInterval(() => {
@@ -377,7 +379,7 @@
                         clearInterval(fadeIn);
                     }
                 }, 50);
-    
+
                 music.addEventListener('ended', function() {
                     this.currentTime = 0;
                     this.play();
@@ -387,7 +389,6 @@
                     gameStarted = true;
                 }
             }
-
 
             // On page load: blur game, set up start button, make GIFs responsive
             window.addEventListener("DOMContentLoaded", function() {
@@ -441,7 +442,6 @@
                 { speaker: "Ham", text: "Wait a second! I don't work for free. I value knowledge. Prove to me that you learned something and I'll help you build your house." }
             ];
         
-
             // DOM Elements 
             const textElem = document.getElementById("dialogueText");
             const speakerElem = document.getElementById("speakerName");
@@ -450,16 +450,31 @@
             const popupBox = document.getElementById("popupBox");
             const backBtn = document.getElementById("backBtn");
             const nextBtn = document.getElementById("nextBtn");
+            const pebbleVoice = document.getElementById('pebble-voice');
+            const hamVoice = document.getElementById('ham-voice');
 
             // Typewriter Effect for Dialogue Text
             function typeTextWithHighlight(text, i = 0) {
-                // Replace *word* with <span class="highlight">word</span>
+                // --- VOICE AUDIO LOGIC ---
+                // Stop both audios before starting
+                pebbleVoice.pause(); pebbleVoice.currentTime = 0;
+                hamVoice.pause(); hamVoice.currentTime = 0;
+                const currentSpeaker = dialogues[currentIndex].speaker;
+                // Play relevant audio if at the start of typing
+                if (i === 0) {
+                    if (currentSpeaker === "Pebble") {
+                        pebbleVoice.currentTime = 0;
+                        pebbleVoice.play();
+                    } else if (currentSpeaker === "Ham") {
+                        hamVoice.currentTime = 0;
+                        hamVoice.play();
+                    }
+                }
+                // --- ORIGINAL TYPEWRITER LOGIC ---
                 const html = text.replace(/\*([^*]+)\*/g, '<span class="highlight">$1</span>');
-                // Strip tags to get plain text length for typing
                 const temp = document.createElement('div');
                 temp.innerHTML = html;
                 const plain = temp.textContent || temp.innerText || "";
-                // Build up the HTML up to the i-th character
                 let count = 0, result = "";
                 function walk(node) {
                     if (count >= i) return;
@@ -475,117 +490,126 @@
                 }
                 for (let child of temp.childNodes) walk(child);
                 textElem.innerHTML = result;
+
                 if (i < plain.length) {
                     typingTimeout = setTimeout(() => typeTextWithHighlight(text, i + 1), 60);
                 } else {
                     textElem.innerHTML = html;
                     nextBtn.disabled = currentIndex >= dialogues.length - 1;
+                    // --- STOP AUDIO when done typing ---
+                    pebbleVoice.pause(); pebbleVoice.currentTime = 0;
+                    hamVoice.pause(); hamVoice.currentTime = 0;
                 }
             }
 
-        // Make sure this matches your actual function name for next dialogue
-        function handleSkipDialogue(event) {
-            if (event.key === 's' || event.key === 'S') {
-                const current = dialogues[currentIndex];
+            // Make sure this matches your actual function name for next dialogue
+            function handleSkipDialogue(event) {
+                if (event.key === 's' || event.key === 'S') {
+                    const current = dialogues[currentIndex];
+                    clearTimeout(typingTimeout);
+                    textElem.innerHTML = current.text.replace(/\*([^*]+)\*/g, '<span class="highlight">$1</span>');
+                    nextBtn.disabled = currentIndex >= dialogues.length - 1;
+                    // Stop voice audio
+                    pebbleVoice.pause();
+                    pebbleVoice.currentTime = 0;
+                    hamVoice.pause();
+                    hamVoice.currentTime = 0;
+                }
+            }
+            document.addEventListener('keydown', handleSkipDialogue);
+
+            document.addEventListener('keydown', handleSkipDialogue);
+            function updateDialogue(index) {
                 clearTimeout(typingTimeout);
-                // Show full highlighted text instantly
-                textElem.innerHTML = current.text.replace(/\*([^*]+)\*/g, '<span class="highlight">$1</span>');
-                nextBtn.disabled = currentIndex >= dialogues.length - 1;
-            }
-        }
-        document.addEventListener('keydown', handleSkipDialogue);
 
-
-
-        document.addEventListener('keydown', handleSkipDialogue);
-        function updateDialogue(index) {
-            clearTimeout(typingTimeout);
-
-            const current = dialogues[index];
-            speakerElem.textContent = current.speaker;
-            const constructionGif = document.getElementById("constructionGif");
-            const puzzleGif = document.getElementById("puzzleGif");
-            // Show/hide GIFs based on dialogue
-            if (
-                current.speaker === "Ham" &&
-                current.text === "I can also help you to construct a house!"
-            ) {
-                constructionGif.style.display = "block";
-            } else {
-                constructionGif.style.display = "none";
-            }
-
-            if (
-            current.speaker === "Ham" &&
-                current.text === "If you put these roots together, you make a new word, which means to make something!"
-            ) {
-                puzzleGif.style.display = "block";
-            } else {
-                puzzleGif.style.display = "none";
-            }
-
-            // Disable back button
-            backBtn.disabled = index === 0;
-
-            // Handle popups for quizzes
-            const createPopupBox = document.getElementById("popupBoxCreate");
-            if (current.popup && !popupSubmitted) {
-                popupBox.style.display = "none";
-                createPopupBox.style.display = "none";
-                if (current.isCreateQuiz) {
-                    createPopupBox.style.display = "block";
-                    document
-                        .querySelectorAll(".popupCheckboxCreate")
-                        .forEach(cb => (cb.checked = false));
+                const current = dialogues[index];
+                speakerElem.textContent = current.speaker;
+                const constructionGif = document.getElementById("constructionGif");
+                const puzzleGif = document.getElementById("puzzleGif");
+                // Show/hide GIFs based on dialogue
+                if (
+                    current.speaker === "Ham" &&
+                    current.text === "I can also help you to construct a house!"
+                ) {
+                    constructionGif.style.display = "block";
                 } else {
-                    popupBox.style.display = "block";
-                    document
-                        .querySelectorAll(".popupCheckbox")
-                        .forEach(cb => (cb.checked = false));
+                    constructionGif.style.display = "none";
                 }
-                nextBtn.disabled = true;
-                textElem.textContent = ""; // Clear dialogue while quiz is open
-            } else {
-                popupBox.style.display = "none";
-                createPopupBox.style.display = "none";
-                nextBtn.disabled = true; // Disable until typing is done
-                textElem.textContent = "";
-                typeTextWithHighlight(current.text);
-            }
 
-            // Animate character sprites
-            pebbleImg.classList.remove("active", "talking");
-            hamImg.classList.remove("active", "talking");
+                if (
+                current.speaker === "Ham" &&
+                    current.text === "If you put these roots together, you make a new word, which means to make something!"
+                ) {
+                    puzzleGif.style.display = "block";
+                } else {
+                    puzzleGif.style.display = "none";
+                }
 
-            if (current.speaker === "Pebble") {
-                pebbleImg.classList.add("active", "talking");
-            } else if (current.speaker === "Ham") {
-                hamImg.classList.add("active", "talking");
+                // Disable back button
+                backBtn.disabled = index === 0;
+
+                // Handle popups for quizzes
+                const createPopupBox = document.getElementById("popupBoxCreate");
+                if (current.popup && !popupSubmitted) {
+                    popupBox.style.display = "none";
+                    createPopupBox.style.display = "none";
+                    if (current.isCreateQuiz) {
+                        createPopupBox.style.display = "block";
+                        document
+                            .querySelectorAll(".popupCheckboxCreate")
+                            .forEach(cb => (cb.checked = false));
+                    } else {
+                        popupBox.style.display = "block";
+                        document
+                            .querySelectorAll(".popupCheckbox")
+                            .forEach(cb => (cb.checked = false));
+                    }
+                    nextBtn.disabled = true;
+                    textElem.textContent = ""; // Clear dialogue while quiz is open
+                    // Stop both audios while quiz is open
+                    pebbleVoice.pause(); pebbleVoice.currentTime = 0;
+                    hamVoice.pause(); hamVoice.currentTime = 0;
+                } else {
+                    popupBox.style.display = "none";
+                    createPopupBox.style.display = "none";
+                    nextBtn.disabled = true; // Disable until typing is done
+                    textElem.textContent = "";
+                    typeTextWithHighlight(current.text);
+                }
+
+                // Animate character sprites
+                pebbleImg.classList.remove("active", "talking");
+                hamImg.classList.remove("active", "talking");
+
+                if (current.speaker === "Pebble") {
+                    pebbleImg.classList.add("active", "talking");
+                } else if (current.speaker === "Ham") {
+                    hamImg.classList.add("active", "talking");
+                }
             }
-        }
 
         // dialogue navigation
         function nextDialogue() {
-    if (dialogues[currentIndex].popup && !popupSubmitted) return;
-    if (currentIndex < dialogues.length - 1) {
-        currentIndex++;
-        popupSubmitted = false;
-        updateDialogue(currentIndex);
+            if (dialogues[currentIndex].popup && !popupSubmitted) return;
+            if (currentIndex < dialogues.length - 1) {
+                currentIndex++;
+                popupSubmitted = false;
+                updateDialogue(currentIndex);
 
-        // Redirect after Ham's last line
-        const current = dialogues[currentIndex];
-        if (
-            current.speaker === "Ham" &&
-            current.text === "Wait a second! I don't work for free. I value knowledge. Prove to me that you learned something and I'll help you build your house."
-        ) {
-            setTimeout(() => {
+                // Redirect after Ham's last line
+                const current = dialogues[currentIndex];
+                if (
+                    current.speaker === "Ham" &&
+                    current.text === "Wait a second! I don't work for free. I value knowledge. Prove to me that you learned something and I'll help you build your house."
+                ) {
+                    setTimeout(() => {
+                        window.location.href = "freeroam.html";
+                    }, 5500); // Optional: delay so user sees the line
+                }
+            } else {
                 window.location.href = "freeroam.html";
-            }, 5500); // Optional: delay so user sees the line
+            }
         }
-    } else {
-        window.location.href = "freeroam.html";
-    }
-}
 
         function prevDialogue() {
             if (currentIndex > 0) {
@@ -611,12 +635,18 @@
                 speakerElem.textContent = "Ham";
                 textElem.textContent = "Correct ✅";
                 popupSubmitted = true;
+                // Stop both audios when quiz answer is submitted
+                pebbleVoice.pause(); pebbleVoice.currentTime = 0;
+                hamVoice.pause(); hamVoice.currentTime = 0;
                 setTimeout(() => {
                     nextDialogue();
                 }, 1000);
             } else {
                 speakerElem.textContent = "Ham";
                 textElem.textContent = "Wrong ❌ Try again!";
+                // Stop both audios on wrong answer
+                pebbleVoice.pause(); pebbleVoice.currentTime = 0;
+                hamVoice.pause(); hamVoice.currentTime = 0;
             }
         }
 
@@ -659,11 +689,11 @@
                 loadSettings();
             };
             document.getElementById('closeSettingsBtn').onclick = function() {
-                odal.style.display = 'none';
+                modal.style.display = 'none';
             };
             document.getElementById('saveSettingsBtn').onclick = function() {
                 saveSettings();
-             modal.style.display = 'none';
+                 modal.style.display = 'none';
             };
             document.getElementById('volumeSlider').oninput = function() {
                 document.getElementById('volumeValue').textContent = this.value;
