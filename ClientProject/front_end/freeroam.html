@@ -24,9 +24,49 @@
     .dialogue-box.hide { opacity: 0; pointer-events: none; }
     .speaker-name { font-size: 1rem; color: #ffeb3b; margin-bottom: 10px; text-shadow: 2px 2px #000; letter-spacing: 2px; }
     .dialogue-text { font-size: 1.1rem; line-height: 1.8; color: #fff; text-shadow: 1px 1px 3px #000; min-height: 2em; }
-    #settings-btn { position:fixed; top:24px; right:32px; z-index:3002; cursor:pointer; background:#222; border-radius:10px; padding:8px 16px; font-size:16px; color:#fff;}
-    #settings-panel { display:none; position:fixed; top:70px; right:32px; background:#222; padding:16px 28px; z-index:3003; border-radius:16px; box-shadow:0 2px 10px #0008;}
-    #settings-panel label { color: #fff;}
+    /* Settings floating button + modal (dialogue.html style) */
+    #settingsBtn {
+      background: #3a4fa0 !important;
+      color: white !important;
+      border: 2px solid #fff !important;
+      border-radius: 8px !important;
+      font-size: 1rem !important;
+      font-family: "Press Start 2P", monospace;
+      padding: 12px 34px !important;
+      text-shadow: 3px 5px 1px #00000094;
+      transition: background 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      position:fixed; top:20px; right:20px; z-index:1000; min-width: 100px;
+      cursor:pointer;
+    }
+    #settingsBtn:hover {
+      background: #1d2558 !important;
+    }
+    #settingsModal {
+      display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+      background:#3a4fa0; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.3);
+      padding:24px; z-index:20000; color:white; min-width:320px;
+    }
+    #settingsModal label { color:white; font-size: 1rem; }
+    #settingsModal input[type="range"] { width: 140px; vertical-align: middle; }
+    #settingsModal h2 { margin-top:0; }
+    #settingsModal .button {
+      background: #3a4fa0 !important;
+      color: white !important;
+      border: 2px solid #fff !important;
+      border-radius: 8px !important;
+      font-size: 1rem !important;
+      font-family: "Press Start 2P", monospace;
+      padding: 12px 34px !important;
+      text-shadow: 3px 5px 1px #00000094;
+      transition: background 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      margin-right:10px;
+      margin-top:10px;
+    }
+    #settingsModal .button:hover {
+      background: #1d2558 !important;
+    }
     #start-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999;}
     #start-btn { background: #fff; color: #333; border: 2px solid #fff; border-radius: 12px; font-size: 1.2em; font-family: "Press Start 2P", monospace; padding: 18px 36px; cursor: pointer;}
     #start-btn:hover { background: #eef; color: #222;}
@@ -53,21 +93,103 @@
       Help me get to the end of this parkour so I can prove my knowledge to Ham the Hammer!
     </div>
   </div>
-  <div id="settings-btn">Settings</div>
-  <div id="settings-panel">
-    <label>Music Volume: <input type="range" id="music-volume-slider" min="0" max="1" step="0.01" value="1"></label><br>
-    <label>SFX Volume: <input type="range" id="sfx-volume-slider" min="0" max="1" step="0.01" value="1"></label>
+  <!-- Modern floating settings button and modal -->
+  <button id="settingsBtn" class="button">Settings</button>
+  <div id="settingsModal">
+    <h2>Settings</h2>
+    <label for="bgSlider">Background:</label>
+    <input type="range" id="bgSlider" min="0" max="100" step="1"><span id="bgValue"></span>%
+    <br><br>
+    <label for="sfxSlider">Sound Effects:</label>
+    <input type="range" id="sfxSlider" min="0" max="100" step="1"><span id="sfxValue"></span>%
+    <br><br>
+    <button id="saveSettingsBtn" class="button">Save</button>
+    <button id="closeSettingsBtn" class="button">Close</button>
   </div>
 <script>
 let soundsEnabled = false;
-let musicVolume = 1;
-let sfxVolume = 1;
 const jumpSound = document.getElementById('jump-sound');
 const deathSound = document.getElementById('death-sound');
 const bgMusic = document.getElementById('bg-music');
-bgMusic.volume = musicVolume;
-jumpSound.volume = sfxVolume;
-deathSound.volume = sfxVolume;
+
+// --- SETTINGS LOGIC FOR FREEROAM (dialogue.html style) ---
+function getFreeroamSettings() {
+    let settings = JSON.parse(localStorage.getItem('freeroamSettings'));
+    if (!settings) {
+        settings = { bg: 100, sfx: 100 };
+        localStorage.setItem('freeroamSettings', JSON.stringify(settings));
+    }
+    if (typeof settings.bg !== "number") settings.bg = 100;
+    if (typeof settings.sfx !== "number") settings.sfx = 100;
+    return settings;
+}
+function setVolumesFromFreeroamSettings() {
+    const settings = getFreeroamSettings();
+    if(bgMusic) bgMusic.volume = settings.bg / 100;
+    [jumpSound, deathSound].forEach(audio => {
+        audio.volume = settings.sfx / 100;
+    });
+}
+window.addEventListener("DOMContentLoaded", function() {
+    const modal = document.getElementById('settingsModal');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    const bgSlider = document.getElementById('bgSlider');
+    const bgValue = document.getElementById('bgValue');
+    const sfxSlider = document.getElementById('sfxSlider');
+    const sfxValue = document.getElementById('sfxValue');
+    function loadFreeroamSettings() {
+        const settings = getFreeroamSettings();
+        bgSlider.value = settings.bg;
+        bgValue.textContent = settings.bg;
+        sfxSlider.value = settings.sfx;
+        sfxValue.textContent = settings.sfx;
+        setVolumesFromFreeroamSettings();
+        return settings;
+    }
+    function saveFreeroamSettings() {
+        const bg = parseInt(bgSlider.value, 10);
+        const sfx = parseInt(sfxSlider.value, 10);
+        localStorage.setItem('freeroamSettings', JSON.stringify({ bg, sfx }));
+        setVolumesFromFreeroamSettings();
+        alert('Settings saved!');
+    }
+    settingsBtn.onclick = function() {
+        modal.style.display = 'block';
+        loadFreeroamSettings();
+    };
+    closeSettingsBtn.onclick = function() {
+        modal.style.display = 'none';
+    };
+    saveSettingsBtn.onclick = function() {
+        saveFreeroamSettings();
+        modal.style.display = 'none';
+    };
+    bgSlider.oninput = function() {
+        bgValue.textContent = this.value;
+        setVolumesFromFreeroamSettings();
+        localStorage.setItem('freeroamSettings', JSON.stringify({
+            bg: parseInt(this.value, 10),
+            sfx: parseInt(sfxSlider.value, 10)
+        }));
+    };
+    sfxSlider.oninput = function() {
+        sfxValue.textContent = this.value;
+        setVolumesFromFreeroamSettings();
+        localStorage.setItem('freeroamSettings', JSON.stringify({
+            bg: parseInt(bgSlider.value, 10),
+            sfx: parseInt(this.value, 10)
+        }));
+    };
+    loadFreeroamSettings();
+    setVolumesFromFreeroamSettings();
+});
+// --- END SETTINGS LOGIC ---
+
+bgMusic.volume = getFreeroamSettings().bg / 100;
+jumpSound.volume = getFreeroamSettings().sfx / 100;
+deathSound.volume = getFreeroamSettings().sfx / 100;
 document.getElementById('start-btn').onclick = function() {
   // Prime the sounds for browser autoplay policy
   Promise.all([
@@ -85,14 +207,14 @@ document.getElementById('start-btn').onclick = function() {
 };
 function playJumpSound() {
   if (soundsEnabled) {
-    jumpSound.volume = sfxVolume;
+    jumpSound.volume = getFreeroamSettings().sfx / 100;
     jumpSound.currentTime = 0;
     jumpSound.play().catch(()=>{});
   }
 }
 function playDeathSound() {
   if (soundsEnabled) {
-    deathSound.volume = sfxVolume;
+    deathSound.volume = getFreeroamSettings().sfx / 100;
     deathSound.currentTime = 0;
     deathSound.play().catch(()=>{});
   }
