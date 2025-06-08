@@ -221,7 +221,6 @@
         padding: 10px 3vw 10px;
       }
     }
-    /* Pebbles Taunt GIF Overlay Styles */
     #pebbleTauntGifOverlay {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
@@ -237,11 +236,26 @@
       opacity: 1;
       pointer-events: none;
     }
+    #pebbleCorrectGifOverlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+      z-index: 1;
+    }
+    #pebbleCorrectGifOverlay img {
+      max-width: 80vw;
+      max-height: 80vh;
+      opacity: 1;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
 <audio id="battleMusic" preload="auto" loop>
-  <source src="Pokemon XY Legendary Battle Remix.mp3" type="audio/mpeg">
+  <source src="https://github.com/ananya-k-a/ClientProject/raw/main/ClientProject/front_end/Pokemon%20XY%20Legendary%20Battle%20Remix.mp3" type="audio/mpeg">
 </audio>
   <button id="musicSettingsBtn">Music Settings</button>
   <div id="musicSettingsPanel">
@@ -317,6 +331,9 @@
     <div id="pebbleTauntGifOverlay" style="display:none;">
       <img src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/pixil-gif-drawing%20(2).gif" alt="Pebbles Taunted" />
     </div>
+    <div id="pebbleCorrectGifOverlay" style="display:none;">
+      <img src="https://raw.githubusercontent.com/ananya-k-a/ClientProject/refs/heads/main/ClientProject/front_end/pixil-gif-drawing%20(3).gif" alt="Pebbles Correct" />
+    </div>
   </div>
   <script>
 let musicStarted = false;
@@ -331,13 +348,6 @@ function startMusicIfNeeded() {
     musicStarted = true;
   }
 }
-document.body.addEventListener('click', startMusicIfNeeded, { once: true });
-musicSettingsBtn.onclick = function() {
-  musicSettingsPanel.style.display = musicSettingsPanel.style.display === "none" ? "block" : "none";
-};
-musicVolume.oninput = function() {
-  battleMusic.volume = this.value;
-};
 document.body.addEventListener('click', startMusicIfNeeded, { once: true });
 musicSettingsBtn.onclick = function() {
   musicSettingsPanel.style.display = musicSettingsPanel.style.display === "none" ? "block" : "none";
@@ -374,6 +384,12 @@ function showPebbleTauntGif() {
 }
 function hidePebbleTauntGif() {
   document.getElementById('pebbleTauntGifOverlay').style.display = 'none';
+}
+function showPebbleCorrectGif() {
+  document.getElementById('pebbleCorrectGifOverlay').style.display = 'flex';
+}
+function hidePebbleCorrectGif() {
+  document.getElementById('pebbleCorrectGifOverlay').style.display = 'none';
 }
 function updateHealth() {
   document.getElementById("pebbleHealth").textContent = `Pebbles ❤️: ${pebbleLives}`;
@@ -438,7 +454,7 @@ function checkHealAnswer() {
     updateHealth();
     popup.style.display = 'none';
     dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "You regained a life... (grumble)" });
-    nextDialogue();
+    nextDialogue(); // Immediately show Ham's message and show gif
   } else {
     const feedback = document.createElement('div');
     feedback.className = 'quiz-feedback';
@@ -511,6 +527,48 @@ function animateHamHit() {
   }, 180);
 }
 function nextDialogue() {
+  // Determine if we should show the happy gif for this line
+  let showHappyGif = false;
+  let showTauntGif = false;
+  if (currentIndex < dialogues.length) {
+    const current = dialogues[currentIndex];
+    if (
+      current &&
+      (
+        current.text === "Oof! That stung!" ||
+        current.text === "You regained a life... (grumble)" ||
+        current.text === "You did it! I'm out of tricks!" ||
+        current.text === "No way... You actually beat me!"
+      )
+    ) {
+      showHappyGif = true;
+    }
+    // Only show taunt gif for taunt lines
+    if (
+      current &&
+      current.speaker === "Ham" &&
+      [
+        "Ha! Not so fast, Pebbles!",
+        "You'll have to do better than that!",
+        "Is that all you've got?",
+        "Missed me! Try again if you dare!",
+        "You're losing your edge, Pebbles!"
+      ].includes(current.text)
+    ) {
+      showTauntGif = true;
+    }
+  }
+  if (showHappyGif) {
+    showPebbleCorrectGif();
+    hidePebbleTauntGif();
+  } else if (showTauntGif) {
+    hidePebbleCorrectGif();
+    showPebbleTauntGif();
+  } else {
+    hidePebbleCorrectGif();
+    hidePebbleTauntGif();
+  }
+
   if (isTyping) {
     clearTimeout(typingTimeout);
     const fullText = dialogues[currentIndex - 1]?.text || "";
@@ -547,6 +605,7 @@ function nextDialogue() {
     pebbleImg.style.display = "none";
     hamImg.style.display = "none";
     hidePebbleTauntGif();
+    hidePebbleCorrectGif();
     return;
   }
   if (
@@ -567,6 +626,7 @@ function nextDialogue() {
     pebbleImg.style.display = "none";
     hamImg.style.display = "none";
     hidePebbleTauntGif();
+    hidePebbleCorrectGif();
     return;
   }
   if (currentIndex < dialogues.length) {
@@ -587,17 +647,13 @@ function nextDialogue() {
       text.textContent = "";
       currentIndex++;
       hidePebbleTauntGif();
+      hidePebbleCorrectGif();
       return;
     }
     btn.style.display = "inline-block";
     dialogueBox.style.display = "block";
     pebbleImg.style.display = "";
     hamImg.style.display = "";
-    if (current.speaker === "Ham" && hamTaunts.includes(current.text)) {
-      showPebbleTauntGif();
-    } else {
-      hidePebbleTauntGif();
-    }
     btn.disabled = true;
     typeText(text, current.text, () => {
       btn.disabled = false;
@@ -612,6 +668,7 @@ function nextDialogue() {
     hamImg.style.display = "none";
     dialogueBox.style.display = "none";
     hidePebbleTauntGif();
+    hidePebbleCorrectGif();
   }
 }
 function handleRunAway() {
@@ -665,7 +722,7 @@ function checkAnswers(type = false) {
           dialogues.splice(currentIndex + 1, 0, { speaker: "Ham", text: "No way... You actually beat me!" });
         }
       }
-      nextDialogue();
+      nextDialogue(); // Immediately show Ham's message and show gif
       checkWinLose();
     }, 600);
   } else {
