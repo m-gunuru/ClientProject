@@ -426,11 +426,14 @@
             textElem.innerHTML = result;
 
             if (i < plain.length) {
-                typingTimeout = setTimeout(() => typeTextWithHighlight(text, i + 1), 60);
-            } else {
-                textElem.innerHTML = html;
-                nextBtn.disabled = currentIndex >= dialogues.length - 1;
-            }
+    typingTimeout = setTimeout(() => typeTextWithHighlight(text, i + 1), 60);
+} else {
+    textElem.innerHTML = html;
+    nextBtn.disabled = currentIndex >= dialogues.length - 1;
+    // Cut off character voices when Next is enabled
+    pebbleVoice.pause(); pebbleVoice.currentTime = 0;
+    hamVoice.pause(); hamVoice.currentTime = 0;
+}
         }
 
         function handleSkipDialogue(event) {
