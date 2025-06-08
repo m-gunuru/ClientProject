@@ -355,6 +355,8 @@ musicSettingsBtn.onclick = function() {
 musicVolume.oninput = function() {
   battleMusic.volume = this.value;
 };
+
+// DIALOGUE ARRAY: Add gifType for any dialogue that should show a gif (1 for good, 0 for bad)
 const dialogues = [
   { speaker: "Ham", text: "Ready to battle? Show me your wits!" },
   { speaker: "Pebbles", text: "Bring it on!" },
@@ -403,33 +405,34 @@ function handleFight() {
       break;
     }
   }
-  const taunts = [
-    "Ha! Not so fast, Pebbles!",
-    "You'll have to do better than that!",
-    "Is that all you've got?",
-    "Missed me! Try again if you dare!",
-    "You're losing your edge, Pebbles!",
-    "You regained a life... (grumble)"
-  ];
-  if (lastHam === "Oof! That stung!" || taunts.includes(lastHam)) {
-    dialogues.push({ speaker: "Ham", text: "Let's see if you can handle 'create'!" });
-    dialogues.push({ speaker: "Ham", text: "", popup: "create" });
-    currentIndex = dialogues.length - 2;
-  } else if (lastHam === "Not bad! But can you handle the next one?" || taunts.includes(lastHam)) {
-    dialogues.push({ speaker: "Ham", text: "Let's see if you can handle 'combine'!" });
-    dialogues.push({ speaker: "Ham", text: "", popup: "combine" });
-    currentIndex = dialogues.length - 2;
-  } else if (lastHam === "You did it! I'm out of tricks!") {
+
+  if (hamLives <= 0) {
     if (
       !dialogues[currentIndex] ||
       dialogues[currentIndex].text !== "No way... You actually beat me!"
     ) {
-      dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "No way... You actually beat me!" });
+      dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "No way... You actually beat me!", gifType: 1 });
     }
     hideFightMenu();
     nextDialogue();
     return;
   }
+
+  // Use modulo to cycle through the quizzes
+  const quizOrder = [
+    { quiz: "construct", prompt: "Let's see if you can handle 'construct'!" },
+    { quiz: "create", prompt: "Let's see if you can handle 'create'!" },
+    { quiz: "combine", prompt: "Let's see if you can handle 'combine'!" }
+  ];
+
+  // Count how many correct answers have been given so far (hamLives lost)
+  const quizIndex = (3 - hamLives) % quizOrder.length;
+  const { quiz, prompt } = quizOrder[quizIndex];
+
+  dialogues.push({ speaker: "Ham", text: prompt });
+  dialogues.push({ speaker: "Ham", text: "", popup: quiz });
+  currentIndex = dialogues.length - 2;
+
   hideFightMenu();
   nextDialogue();
 }
@@ -453,8 +456,16 @@ function checkHealAnswer() {
     pebbleLives = Math.min(pebbleLives + 1, 3);
     updateHealth();
     popup.style.display = 'none';
-    dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "You regained a life... (grumble)" });
-    nextDialogue(); // Immediately show Ham's message and show gif
+
+    // Remove any queued taunt/negative messages at this index:
+    while (
+      dialogues[currentIndex] &&
+      dialogues[currentIndex].gifType === 0
+    ) {
+      dialogues.splice(currentIndex, 1);
+    }
+    dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "You regained a life... (grumble)", gifType: 1 });
+    nextDialogue(); // Show Ham's message and show gif
   } else {
     const feedback = document.createElement('div');
     feedback.className = 'quiz-feedback';
@@ -470,7 +481,7 @@ function checkHealAnswer() {
 function handleRunAway() {}
 function checkWinLose() {
   if (hamLives <= 0) {
-    dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "No way... You actually beat me!" });
+    dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "No way... You actually beat me!", gifType: 1 });
     nextDialogue();
     setTimeout(() => {
       window.location.href = "dialogue.html";
@@ -526,44 +537,21 @@ function animateHamHit() {
     hamImg.classList.remove("ham-hit");
   }, 180);
 }
+
 function nextDialogue() {
-  // Determine if we should show the happy gif for this line
-  let showHappyGif = false;
-  let showTauntGif = false;
+  // Show gif based on gifType for this line
+  let current = null;
   if (currentIndex < dialogues.length) {
-    const current = dialogues[currentIndex];
-    if (
-      current &&
-      (
-        current.text === "Oof! That stung!" ||
-        current.text === "You regained a life... (grumble)" ||
-        current.text === "You did it! I'm out of tricks!" ||
-        current.text === "No way... You actually beat me!"
-      )
-    ) {
-      showHappyGif = true;
-    }
-    // Only show taunt gif for taunt lines
-    if (
-      current &&
-      current.speaker === "Ham" &&
-      [
-        "Ha! Not so fast, Pebbles!",
-        "You'll have to do better than that!",
-        "Is that all you've got?",
-        "Missed me! Try again if you dare!",
-        "You're losing your edge, Pebbles!"
-      ].includes(current.text)
-    ) {
-      showTauntGif = true;
-    }
+    current = dialogues[currentIndex];
   }
-  if (showHappyGif) {
-    showPebbleCorrectGif();
-    hidePebbleTauntGif();
-  } else if (showTauntGif) {
-    hidePebbleCorrectGif();
-    showPebbleTauntGif();
+  if (current && typeof current.gifType !== "undefined") {
+    if (current.gifType === 1) {
+      showPebbleCorrectGif();
+      hidePebbleTauntGif();
+    } else if (current.gifType === 0) {
+      hidePebbleCorrectGif();
+      showPebbleTauntGif();
+    }
   } else {
     hidePebbleCorrectGif();
     hidePebbleTauntGif();
@@ -630,7 +618,7 @@ function nextDialogue() {
     return;
   }
   if (currentIndex < dialogues.length) {
-    const current = dialogues[currentIndex];
+    current = dialogues[currentIndex];
     speaker.textContent = current.speaker || "";
     if (current.speaker === "Pebbles") {
       pebbleImg.classList.add("active");
@@ -671,6 +659,7 @@ function nextDialogue() {
     hidePebbleCorrectGif();
   }
 }
+
 function handleRunAway() {
   hideFightMenu();
   document.getElementById("nextBtn").style.display = "none";
@@ -706,25 +695,21 @@ function checkAnswers(type = false) {
     return;
   }
   if (allCorrect) {
-    hamLives--;
-    updateHealth();
-    animateHamHit();
-    setTimeout(() => {
-      popupBox.style.display = 'none';
-      document.getElementById('nextBtn').disabled = false;
-      if (type === "construct" || type === false) {
-        dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "Oof! That stung!" });
-      } else if (type === true) {
-        dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "Not bad! But can you handle the next one?" });
-      } else if (type === "combine") {
-        dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "You did it! I'm out of tricks!" });
-        if (hamLives <= 0) {
-          dialogues.splice(currentIndex + 1, 0, { speaker: "Ham", text: "No way... You actually beat me!" });
-        }
-      }
-      nextDialogue(); // Immediately show Ham's message and show gif
-      checkWinLose();
-    }, 600);
+  hamLives--;
+  updateHealth();
+  animateHamHit();
+  setTimeout(() => {
+    popupBox.style.display = 'none';
+    document.getElementById('nextBtn').disabled = false;
+    // Only show "You did it!" and victory if hamLives is 0
+    if (hamLives <= 0) {
+      dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "No way... You actually beat me!", gifType: 1 });
+    } else {
+      dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "Oof! That stung!", gifType: 1 });
+    }
+    nextDialogue();
+    checkWinLose();
+  }, 600);
   } else {
     quizAttempts++;
     if (quizAttempts >= MAX_ATTEMPTS) {
@@ -734,7 +719,7 @@ function checkAnswers(type = false) {
         popupBox.style.display = 'none';
         document.getElementById('nextBtn').disabled = false;
         const taunt = getRandomHamTaunt();
-        dialogues.splice(currentIndex, 0, { speaker: "Ham", text: taunt });
+        dialogues.splice(currentIndex, 0, { speaker: "Ham", text: taunt, gifType: 0 });
         nextDialogue();
         checkWinLose();
       }, 600);
