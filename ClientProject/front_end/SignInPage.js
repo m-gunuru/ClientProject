@@ -19,12 +19,14 @@ try {
   const userCredential = await createUserWithEmailAndPassword(auth, email, password);
   const user = userCredential.user;
   
-
+  // send email verification
   await sendEmailVerification(user);
   alert("Account created! A verification email has been sent to " + email + ". Please verify your email before logging in.");
   
+  // sign out the user after registration
   await signOut(auth);
 
+  // redirect them to the login page
   window.location.href = "FrontPage.html";  
 
 } catch (error) {

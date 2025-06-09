@@ -17,8 +17,7 @@
     #musicSettingsBtn {
       position: fixed;
       top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
+      right: 625px;
       z-index: 20;
       background: #111;
       color: #fff;
@@ -472,7 +471,6 @@ function checkHealAnswer() {
     }, 1000);
   }
 }
-function handleRunAway() {}
 function typeText(element, text, callback) {
   let i = 0;
   element.textContent = "";
@@ -557,7 +555,7 @@ function nextDialogue() {
     dialogues[currentIndex - 1].text === "No way... You actually beat me!"
   ) {
     setTimeout(() => {
-      window.location.href = "dialogue.html";
+      window.location.href = "EndingScreen.html";
     }, 800);
     return;
   }

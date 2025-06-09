@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <img id = "gameBG" src="https://raw.githubusercontent.com/m-gunuru/ClientProject/refs/heads/Test/ClientProject/front_end/image0.png">
+  <img id = "Ham" class="centerChar" src="https://raw.githubusercontent.com/m-gunuru/ClientProject/Test/ClientProject/front_end/HamMouthClosed.png">
   <style>
     body {
       background-color: black;
@@ -12,13 +13,10 @@
       color: white;
       font-family: 'Press Start 2P';
       text-align: center;
-      position: fixed;
       width: 50ch;
       overflow: hidden;
       white-space: normal;
-      animation: typing 4s steps(80) forwards, blink 0.75s infinite;
-      left: 50px;
-      top: 200px;
+      animation: typing 4s steps(80) forwards, blink 5s infinite;
      
     }
     #gameBG {
@@ -38,16 +36,39 @@
       from { border-color: transparent; }
       to { border-color: white; }
     }
-
+    .dialogue-box {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90vw;
+      max-width: 1500px;
+      max-height: 1000px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 48px 64px 80px;
+      border: 1.5px solid #fff;
+      border-radius: 18px;
+      box-shadow: 0 -4px 16px #000a;
+      z-index: 2;
+    }
+    .centerChar {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px; /* Adjust size as needed */
+      height: auto; 
+      z-index: 1;
+    }
 
   </style>
 </head> 
 <body>
   <div>
-    <h2 id = "typewriter" class = "typing"> </h2>
+    <h2 id = "typewriter" class = "typing dialogue-box"> </h2>
   </div>
   <script>
-    const text = "A long time ago...a cat fell from the sky. His name was Pebbles and this is his story.";
+    const text = "Aw shucks...I guess I lost, but I'll definitely win next time!";
     const typewriter = document.getElementById('typewriter');
     let index = 0;
 
@@ -60,6 +81,6 @@
   }
 
     type();
-  </script>
+    </script>
 </body>
 </html>
