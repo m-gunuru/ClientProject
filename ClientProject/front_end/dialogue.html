@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -344,7 +345,10 @@
           <br><br>
           <button id="saveSettingsBtn" class="button">Save</button>
           <button id="closeSettingsBtn" class="button">Close</button>
+          <button id="saveProgressBtn" class="button"> Save Progress</button>
         </div>
+
+
         <script>
             // --- Start Overlay and Music Logic ---
             let gameStarted = false;
@@ -480,18 +484,16 @@
                     typingTimeout = setTimeout(() => typeTextWithHighlight(text, i + 1), 60);
                 } else {
                     textElem.innerHTML = html;
-                    nextBtn.disabled = currentIndex >= dialogues.length - 1;
+                    nextBtn.disabled = currentIndex > dialogues.length - 1;
                 }
             }
 
-        // Make sure this matches your actual function name for next dialogue
         function handleSkipDialogue(event) {
             if (event.key === 's' || event.key === 'S') {
                 const current = dialogues[currentIndex];
                 clearTimeout(typingTimeout);
-                // Show full highlighted text instantly
                 textElem.innerHTML = current.text.replace(/\*([^*]+)\*/g, '<span class="highlight">$1</span>');
-                nextBtn.disabled = currentIndex >= dialogues.length - 1;
+                nextBtn.disabled = currentIndex > dialogues.length - 1;
             }
         }
         document.addEventListener('keydown', handleSkipDialogue);
@@ -506,7 +508,7 @@
             speakerElem.textContent = current.speaker;
             const constructionGif = document.getElementById("constructionGif");
             const puzzleGif = document.getElementById("puzzleGif");
-            // Show/hide GIFs based on dialogue
+            // show/hide GIFs based on dialogue
             if (
                 current.speaker === "Ham" &&
                 current.text === "I can also help you to construct a house!"
@@ -573,7 +575,7 @@
                 popupSubmitted = false;
                 updateDialogue(currentIndex);
             } else {
-                window.location.href = "fightDialogue.html"; //redirect to fight screen
+                window.location.href = "fightDialogue.html"; // redirect to fight screen
             }
         }
 
@@ -610,7 +612,7 @@
             }
         }
 
-        // Particle Animation on Button Clicks 
+        // animation when buttons are clicked
         function createParticles(x, y) {
             for (let i = 0; i < 10; i++) {
                 const p = document.createElement('div');
@@ -649,11 +651,11 @@
                 loadSettings();
             };
             document.getElementById('closeSettingsBtn').onclick = function() {
-                odal.style.display = 'none';
+                modal.style.display = 'none';
             };
             document.getElementById('saveSettingsBtn').onclick = function() {
                 saveSettings();
-             modal.style.display = 'none';
+                modal.style.display = 'none';
             };
             document.getElementById('volumeSlider').oninput = function() {
                 document.getElementById('volumeValue').textContent = this.value;

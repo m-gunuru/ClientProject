@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/fireba
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 import { firebaseConfig } from './firebaseConfig.js';
 
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
@@ -31,7 +32,7 @@ document.getElementById('password-container').appendChild(logPass);
 
 
 const logB = document.createElement('button');
-logB.textContent = 'Submit';
+logB.textContent = 'Log-In';
 logB.className = 'logB';
 document.getElementById('login-container').appendChild(logB);
 

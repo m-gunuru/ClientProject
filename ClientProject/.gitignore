@@ -23,4 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 front_end/firebaseConfig.js
+front_end/GameLogic.js
+back_end/LevelOutput
+back_end/User
 

@@ -484,7 +484,7 @@ musicVolume.oninput = function() {
         dialogues.splice(currentIndex, 0, { speaker: "Ham", text: "No way... You actually beat me!" });
         nextDialogue();
         setTimeout(() => {
-          window.location.href = "dialogue.html";
+          window.location.href = "EndingScreen.html";
         }, 1200);
         return;
       }
@@ -559,7 +559,7 @@ musicVolume.oninput = function() {
     dialogues[currentIndex - 1].text === "No way... You actually beat me!"
   ) {
     setTimeout(() => {
-      window.location.href = "dialogue.html";
+      window.location.href = "EndingScreen.html";
     }, 800);
     return;
   }
