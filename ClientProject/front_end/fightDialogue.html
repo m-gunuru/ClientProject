@@ -680,7 +680,7 @@ function checkAnswers(type = false) {
   const submitBtn = popupBox.querySelector('.next-btn');
   if (submitBtn) submitBtn.disabled = true;
   if (hamLives <= 0 || pebbleLives <= 0) {
-    return;
+    window.location.href = "EndingScreen.html";
   }
   if (allCorrect) {
     hamLives = Math.max(0, hamLives - 1);
